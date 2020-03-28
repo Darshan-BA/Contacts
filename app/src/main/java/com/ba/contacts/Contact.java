@@ -79,4 +79,9 @@ public class Contact {
         this.secondaryPhoneNumber = secondaryPhoneNumber;
         this.emailId = emailId;
     }
+
+    public Contact(String firstName, int primaryPhoneNumber) {
+        this.firstName = firstName;
+        this.primaryPhoneNumber = primaryPhoneNumber;
+    }
 }
