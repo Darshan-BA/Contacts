@@ -1,20 +1,29 @@
 package com.ba.contacts;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
+import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.Manifest;
+import android.app.AlertDialog;
 import android.app.Application;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
@@ -22,30 +31,31 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
 
-import static android.app.PendingIntent.getActivity;
+public class MainActivity extends AppCompatActivity {
+    public static final int PERMISSION_CALL=1;
 
-public class MainActivity extends AppCompatActivity  {
     Toolbar toolbar;
     FloatingActionButton floatingActionButton;
     ContactViewModel contactViewModel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         //action bar
-        toolbar=findViewById(R.id.toolbar);
-        toolbar.setTitleTextColor(getResources().getColor(R.color.primaryTextColor,null));
+        toolbar = findViewById(R.id.toolbar);
+        toolbar.setTitleTextColor(getResources().getColor(R.color.primaryTextColor, null));
         setSupportActionBar(toolbar);
 
         //Floating Button
-        floatingActionButton=findViewById(R.id.add_float);
+        floatingActionButton = findViewById(R.id.add_float);
 
         //RecyclerView Adapter instance
-        final ContactAdapter adapter=new ContactAdapter();
+        final ContactAdapter adapter = new ContactAdapter();
 
         //RecyclerView
-        final RecyclerView recyclerView=findViewById(R.id.recyclerview);
+        final RecyclerView recyclerView = findViewById(R.id.recyclerview);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setHasFixedSize(true);
         recyclerView.setAdapter(adapter);
@@ -69,23 +79,102 @@ public class MainActivity extends AppCompatActivity  {
 
             @Override
             public void onEditClick(Contact contact) {
-                Intent intent=new Intent(MainActivity.this,EditContact.class);
-                intent.putExtra("id",contact.getId());
-                intent.putExtra("first",contact.getFirstName());
-                intent.putExtra("last",contact.getLastName());
-                intent.putExtra("primary",contact.getPrimaryPhoneNumber());
-                intent.putExtra("secondary",contact.getSecondaryPhoneNumber());
-                intent.putExtra("email",contact.getEmailId());
+                Intent intent = new Intent(MainActivity.this, EditContact.class);
+                intent.putExtra("id", contact.getId());
+                intent.putExtra("first", contact.getFirstName());
+                intent.putExtra("last", contact.getLastName());
+                intent.putExtra("primary", contact.getPrimaryPhoneNumber());
+                intent.putExtra("secondary", contact.getSecondaryPhoneNumber());
+                intent.putExtra("email", contact.getEmailId());
                 startActivity(intent);
             }
 
             @Override
             public void onCardClick(int position) {
+               final String[] dialogList;
+                Contact cardContact = adapter.getContactAt(position);
+                String first=cardContact.getPrimaryPhoneNumber();
+                String second=cardContact.getSecondaryPhoneNumber();
+                String email=cardContact.getEmailId();
+                Log.d("number",first);
+                Log.d("number",second);
+                Log.d("number",email);
+                if(first.isEmpty() && second.isEmpty() && email.isEmpty()){
+                    dialogList=new String[0];
+                    Toast.makeText(MainActivity.this,"No Phone Numbers to Call",Toast.LENGTH_SHORT).show();
+                }else if(second.isEmpty() && email.isEmpty()) {
+                        dialogList=new String[1];
+                        dialogList[0]=cardContact.getPrimaryPhoneNumber();
+                }else if(first.isEmpty() && email.isEmpty()){
+                    dialogList=new String[1];
+                    dialogList[0]=cardContact.getSecondaryPhoneNumber();
+                }else if(first.isEmpty() && second.isEmpty()){
+                    dialogList=new String[1];
+                    dialogList[0]=cardContact.getEmailId();
+                }else if(email.isEmpty()){
+                    dialogList=new String[2];
+                    dialogList[0]=cardContact.getPrimaryPhoneNumber();
+                    dialogList[1]=cardContact.getSecondaryPhoneNumber();
+                }else if(second.isEmpty()){
+                    dialogList=new String[2];
+                    dialogList[0]=cardContact.getPrimaryPhoneNumber();
+                    dialogList[1]=cardContact.getEmailId();
+                }else if(first.isEmpty()){
+                    dialogList=new String[2];
+                    dialogList[0]=cardContact.getSecondaryPhoneNumber();
+                    dialogList[1]=cardContact.getEmailId();
+                }else{
+                    dialogList=new String[3];
+                    dialogList[0]=cardContact.getPrimaryPhoneNumber();
+                    dialogList[1]=cardContact.getSecondaryPhoneNumber();
+                    dialogList[2]=cardContact.getEmailId();
+                }
 
+                final Intent phoneIntent = new Intent((Intent.ACTION_CALL));
+                final Intent emailIntent =new Intent(Intent.ACTION_SENDTO);
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setItems(dialogList, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String var=dialogList[which];
+                        boolean isVarEmail=false;
+                        for(int i = 0; i < var.length(); i++){
+                            char temp=var.charAt(i);
+                            Log.d("ba",String.valueOf(temp));
+                            if(temp == '@'){
+                                isVarEmail=true;
+                                break;
+                            }
+                        }
+                        if(isVarEmail){
+                            emailIntent.setData(Uri.parse("mailto:"+dialogList[which]));
+                            startActivity(emailIntent);
+
+                        }else {
+                            if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+                                requestCallPermission();
+                                //return;
+                            }else {
+                                phoneIntent.setData(Uri.parse("tel:"+dialogList[which]));
+                                startActivity(phoneIntent);
+                            }
+                        }
+                    }
+                });
+                builder.create();
+                builder.show();
+            }
+
+            private void requestCallPermission() {
+                if(ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,Manifest.permission.CALL_PHONE)) {
+                    Toast.makeText(MainActivity.this, "Grant Phone Call Permission inorder to Call", Toast.LENGTH_SHORT).show();
+                    ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.CALL_PHONE},PERMISSION_CALL);
+                }else{
+                    ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.CALL_PHONE},PERMISSION_CALL);
+                }
             }
 
         });
-
     }
 
     public void addContact(View view) {

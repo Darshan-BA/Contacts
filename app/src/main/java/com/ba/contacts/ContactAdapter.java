@@ -12,13 +12,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactHolder> {
-    public static final String TAG = "BA";
 
     private List<Contact> contacts = new ArrayList<>();
-
 
     private OnItemClickListner mListener;
 
