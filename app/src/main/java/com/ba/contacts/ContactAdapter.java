@@ -1,9 +1,9 @@
 package com.ba.contacts;
 
+import android.content.ContentProviderClient;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactHolder> {
+public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactHolder>{
 
     private List<Contact> contacts = new ArrayList<>();
 
@@ -23,11 +23,10 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactH
         return contacts.get(position);
     }
 
-
     public interface OnItemClickListner {
         void onCardClick(int position);
-        void onDeleteClick(int position);
-        void onEditClick(Contact contact);
+        void onPopUpClick(Contact contact, View view);
+        void onIconClick(int position,View view);
     }
 
     public void setOnItemClickListener(OnItemClickListner listener) {
@@ -66,8 +65,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactH
 
     class ContactHolder extends RecyclerView.ViewHolder {
         private TextView first, last, email, primary, secondary;
-        private ImageView icon;
-        private ImageView deleteIcon,editIcon;
+        private ImageView popUpOption,icon;
 
         ContactHolder(@NonNull View itemView, final OnItemClickListner listener) {
             super(itemView);
@@ -76,9 +74,8 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactH
             email = itemView.findViewById(R.id.email);
             primary = itemView.findViewById(R.id.primary);
             secondary = itemView.findViewById(R.id.secondary);
-            icon = itemView.findViewById(R.id.icon);
-            deleteIcon = itemView.findViewById(R.id.delete_contact);
-            editIcon=itemView.findViewById(R.id.edit_contact_icon);
+            popUpOption = itemView.findViewById(R.id.popup_option);
+            icon =itemView.findViewById(R.id.icon);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -91,30 +88,27 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactH
                     }
                 }
             });
-            deleteIcon.setOnClickListener(new View.OnClickListener() {
+            popUpOption.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if(listener!=null){
                         int position=getAdapterPosition();
                         if(position!= RecyclerView.NO_POSITION){
-                            listener.onDeleteClick(position);
+                            listener.onPopUpClick(contacts.get(position),v);
                         }
                     }
                 }
             });
-            editIcon.setOnClickListener(new View.OnClickListener() {
 
+            icon.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(listener!=null){
-                        int position=getAdapterPosition();
-                        if(position!=RecyclerView.NO_POSITION){
-                            listener.onEditClick(contacts.get(position));
-                        }
+                    int position=getAdapterPosition();
+                    if(listener!=null && position!=RecyclerView.NO_POSITION){
+                        listener.onIconClick(position,v);
                     }
                 }
             });
-
         }
     }
 }

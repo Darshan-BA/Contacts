@@ -56,6 +56,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="68dp"
         android:layout_toEndOf="@+id/firstname"
+        android:layout_toStartOf="@+id/popup_option"
         android:ellipsize="end"
         android:maxLines="1"
         android:text="@string/lastname"
@@ -69,13 +70,14 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/firstname"
         android:layout_toEndOf="@+id/materialCardView"
+        android:layout_toStartOf="@+id/popup_option"
         android:layout_marginStart="16dp"
+        android:layout_marginEnd="8dp"
         android:ellipsize="end"
         android:maxLines="1"
         android:text="@string/primarynumber"
         android:textAppearance="@style/TextAppearance.AppCompat.Small"
-        android:textColor="@color/secondaryDarkColor"
-        android:layout_toStartOf="@+id/edit_contact_icon"/>
+        android:textColor="@color/secondaryDarkColor"/>
 
     <TextView
         android:id="@+id/secondary"
@@ -87,7 +89,7 @@
         android:ellipsize="end"
         android:maxLines="1"
         android:layout_toEndOf="@+id/materialCardView"
-        android:layout_toStartOf="@+id/edit_contact_icon"
+        android:layout_toStartOf="@+id/popup_option"
         android:text="@string/secondaryNumber"
         android:textAppearance="@style/TextAppearance.AppCompat.Small"
         android:textColor="@color/secondaryDarkColor"
@@ -101,7 +103,6 @@
         android:layout_marginStart="16dp"
         android:layout_marginEnd="8dp"
         android:layout_toEndOf="@+id/materialCardView"
-        android:layout_toStartOf="@+id/edit_contact_icon"
         android:ellipsize="end"
         android:maxLines="1"
         android:text="@string/emailId"
@@ -110,26 +111,13 @@
         android:visibility="gone"/>
 
     <ImageView
-        android:id="@+id/delete_contact"
+        android:id="@+id/popup_option"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginStart="8dp"
-        android:src="@drawable/ic_delete_black_24dp"
         android:layout_alignParentEnd="true"
-        android:layout_centerVertical="true"
-        />
-
-    <ImageView
-        android:id="@+id/edit_contact_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_toStartOf="@+id/delete_contact"
-        android:src="@drawable/ic_mode_edit_black_24dp"
+        android:src="@drawable/ic_more_vert_black_24dp"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginBottom="8dp"
         android:layout_marginStart="8dp"
         android:layout_centerVertical="true"

@@ -2,28 +2,21 @@ package com.ba.contacts;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import android.Manifest;
 import android.app.AlertDialog;
-import android.app.Application;
-import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 
@@ -70,23 +63,44 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
         // OnClick listner for deleting and editing
         adapter.setOnItemClickListener(new ContactAdapter.OnItemClickListner() {
             @Override
-            public void onDeleteClick(int position) {
-                contactViewModel.delete(adapter.getContactAt(position));
+            public void onPopUpClick(final Contact contact, View view) {
+                //contactViewModel.delete(adapter.getContactAt(position));
+                PopupMenu popupMenu=new PopupMenu(MainActivity.this,view);
+                popupMenu.getMenuInflater().inflate(R.menu.contact_card_menu,popupMenu.getMenu());
+                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()){
+                            case R.id.edit:
+                                Intent intent = new Intent(MainActivity.this, EditContact.class);
+                                intent.putExtra("id", contact.getId());
+                                intent.putExtra("first", contact.getFirstName());
+                                intent.putExtra("last", contact.getLastName());
+                                intent.putExtra("primary", contact.getPrimaryPhoneNumber());
+                                intent.putExtra("secondary", contact.getSecondaryPhoneNumber());
+                                intent.putExtra("email", contact.getEmailId());
+                                startActivity(intent);
+                                return true;
+                            case R.id.delete:
+                                contactViewModel.delete(contact);
+                                return true;
+                            case R.id.share:
+                            default:
+                                return false;
+                        }
+
+                    }
+                });
+                popupMenu.show();
             }
 
             @Override
-            public void onEditClick(Contact contact) {
-                Intent intent = new Intent(MainActivity.this, EditContact.class);
-                intent.putExtra("id", contact.getId());
-                intent.putExtra("first", contact.getFirstName());
-                intent.putExtra("last", contact.getLastName());
-                intent.putExtra("primary", contact.getPrimaryPhoneNumber());
-                intent.putExtra("secondary", contact.getSecondaryPhoneNumber());
-                intent.putExtra("email", contact.getEmailId());
-                startActivity(intent);
+            public void onIconClick(int position, View view) {
+
             }
 
             @Override
