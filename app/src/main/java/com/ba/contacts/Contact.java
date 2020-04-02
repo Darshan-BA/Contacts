@@ -2,6 +2,7 @@ package com.ba.contacts;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 @Entity(tableName ="contacts")
@@ -16,10 +17,10 @@ public class Contact {
     private String lastName;
 
     @ColumnInfo(name = "primary_number")
-    private int primaryPhoneNumber;
+    private String primaryPhoneNumber;
 
     @ColumnInfo(name="secondary_number")
-    private int secondaryPhoneNumber;
+    private String secondaryPhoneNumber;
 
     @ColumnInfo(name = "email_id")
     private  String emailId;
@@ -28,23 +29,23 @@ public class Contact {
         return id;
     }
 
-    public String getFirstName() {
+    String getFirstName() {
         return firstName;
     }
 
-    public String getLastName() {
+    String getLastName() {
         return lastName;
     }
 
-    public int getPrimaryPhoneNumber() {
+    String getPrimaryPhoneNumber() {
         return primaryPhoneNumber;
     }
 
-    public int getSecondaryPhoneNumber() {
+    String  getSecondaryPhoneNumber() {
         return secondaryPhoneNumber;
     }
 
-    public String getEmailId() {
+    String getEmailId() {
         return emailId;
     }
 
@@ -52,27 +53,7 @@ public class Contact {
         this.id = id;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public void setPrimaryPhoneNumber(int primaryPhoneNumber) {
-        this.primaryPhoneNumber = primaryPhoneNumber;
-    }
-
-    public void setSecondaryPhoneNumber(int secondaryPhoneNumber) {
-        this.secondaryPhoneNumber = secondaryPhoneNumber;
-    }
-
-    public void setEmailId(String emailId) {
-        this.emailId = emailId;
-    }
-
-    public Contact(String firstName, String lastName, int primaryPhoneNumber, int secondaryPhoneNumber, String emailId) {
+    public Contact(String firstName, String lastName, String primaryPhoneNumber, String secondaryPhoneNumber, String emailId) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.primaryPhoneNumber = primaryPhoneNumber;
@@ -80,8 +61,4 @@ public class Contact {
         this.emailId = emailId;
     }
 
-    public Contact(String firstName, int primaryPhoneNumber) {
-        this.firstName = firstName;
-        this.primaryPhoneNumber = primaryPhoneNumber;
-    }
 }

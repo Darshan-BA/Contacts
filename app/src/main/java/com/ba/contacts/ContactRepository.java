@@ -10,26 +10,30 @@ import java.util.List;
 public class ContactRepository {
     private ContactDao contactDao;
     private LiveData<List<Contact>>allContacts;
-    public ContactRepository(Application application){
-        ContactDatabase database=ContactDatabase.getContactDB(application);
+    ContactRepository(Application application){
+        ContactDatabase database =ContactDatabase.getInstance(application);
         contactDao=database.contactDao();
         allContacts=contactDao.getAllContacts();
     }
-    public void insert(Contact contact){
+
+    void insert(Contact contact){
         new InsertContactAsyncTask(contactDao).execute(contact);
     }
-    public void update(Contact contact){
+
+    void update(Contact contact){
         new UpdateContactAsyncTask(contactDao).execute(contact);
     }
-    public void delete(Contact contact){
+    void delete(Contact contact){
         new DeleteContactAsyncTask(contactDao).execute(contact);
     }
-    public LiveData<List<Contact>>getAllContacts(){
+    LiveData<List<Contact>>getAllContacts(){
         return allContacts;
     }
+
+
     private static class InsertContactAsyncTask extends AsyncTask<Contact,Void,Void>{
     private ContactDao contactDao;
-    InsertContactAsyncTask(ContactDao contactDao){
+    private InsertContactAsyncTask(ContactDao contactDao){
         this.contactDao=contactDao;
     }
 
@@ -42,7 +46,7 @@ public class ContactRepository {
 
     private static class UpdateContactAsyncTask extends AsyncTask<Contact,Void,Void>{
         private ContactDao contactDao;
-        UpdateContactAsyncTask(ContactDao contactDao){
+        private UpdateContactAsyncTask(ContactDao contactDao){
             this.contactDao=contactDao;
         }
 
@@ -55,7 +59,7 @@ public class ContactRepository {
 
     private static class DeleteContactAsyncTask extends AsyncTask<Contact,Void,Void>{
         private ContactDao contactDao;
-        DeleteContactAsyncTask(ContactDao contactDao){
+        private DeleteContactAsyncTask(ContactDao contactDao){
             this.contactDao=contactDao;
         }
 

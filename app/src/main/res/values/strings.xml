@@ -3,4 +3,13 @@
     <string name="share">Share</string>
     <string name="delete">Delete</string>
     <string name="edit">Edit</string>
+    <string name="firstname">FirstName</string>
+    <string name="lastname">LastName</string>
+    <string name="primarynumber">Primary</string>
+    <string name="secondaryNumber">Secondary</string>
+    <string name="emailId">"Email"</string>
+    <string name="icon">Icon</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="update">Update</string>
 </resources>

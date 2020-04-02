@@ -9,25 +9,25 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
-@Database(entities = {Contact.class},version = 1)
+@Database(entities = {Contact.class},version = 2)
 public abstract class ContactDatabase extends RoomDatabase {
 
-    private static ContactDatabase contactDB;
+    private static ContactDatabase instance;
 
     public abstract ContactDao contactDao();
 
-    public static synchronized ContactDatabase getContactDB(Context context){
-        if(contactDB==null){
-            contactDB= Room.databaseBuilder(context.getApplicationContext(),ContactDatabase.class,"contact_database")
-                    .fallbackToDestructiveMigration().build();
+    static synchronized ContactDatabase getInstance(Context context){
+        if(instance == null){
+            instance = Room.databaseBuilder(context.getApplicationContext(),ContactDatabase.class,"contact_database")
+                    .fallbackToDestructiveMigration().addCallback(roomCallback).build();
         }
-        return contactDB;
+        return instance;
     }
     private  static RoomDatabase.Callback roomCallback=new RoomDatabase.Callback(){
         @Override
         public void onCreate(@NonNull SupportSQLiteDatabase db) {
             super.onCreate(db);
-            new PopulateDBAsyncTask(contactDB).execute();
+            new PopulateDBAsyncTask(instance).execute();
 
         }
     };
@@ -38,8 +38,8 @@ public abstract class ContactDatabase extends RoomDatabase {
         }
         @Override
         protected Void doInBackground(Void... voids) {
-            contactDao.insert(new Contact("Ambulance",108));
-            contactDao.insert(new Contact("Police",100));
+            contactDao.insert(new Contact("Ambulance","","100","",""));
+            contactDao.insert(new Contact("Police","","108","",""));
             return null;
         }
     }

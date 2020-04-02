@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/primaryColor"
+        android:elevation="4dp"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:popupTheme="@style/Theme.AppCompat.Light"/>
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_below="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:listitem="@layout/contacts_cardview"/>
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/add_float"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_add_black_24dp"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="32dp"
+            android:onClick="addContact"
+            style="@style/Widget.MaterialComponents.FloatingActionButton"
+            android:elevation="8dp"
+            android:backgroundTint="@color/secondaryColor"
+            android:tint="@color/secondaryLightColor"
+            app:rippleColor="@color/secondaryLightColor"
+            app:backgroundTint="@color/secondaryColor"
+            app:fabSize="normal"
+            app:borderWidth="2dp"/>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+</RelativeLayout>
