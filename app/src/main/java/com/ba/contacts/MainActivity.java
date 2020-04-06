@@ -101,6 +101,8 @@ public class MainActivity extends AppCompatActivity {
                                         dialog.dismiss();
                                     }
                                 });
+                                alertDialog.create();
+                                alertDialog.show();
                                 return true;
                             case R.id.share:
                                 //Sharing need to implemented
