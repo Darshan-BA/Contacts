@@ -86,9 +86,24 @@ public class MainActivity extends AppCompatActivity {
                                 startActivity(intent);
                                 return true;
                             case R.id.delete:
-                                contactViewModel.delete(contact);
+                                final AlertDialog.Builder alertDialog=new AlertDialog.Builder(MainActivity.this);
+                                alertDialog.setTitle("Deletee");
+                                alertDialog.setMessage("Are you sure want to delete");
+                                alertDialog.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        contactViewModel.delete(contact);
+                                    }
+                                });
+                                alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                });
                                 return true;
                             case R.id.share:
+                                //Sharing need to implemented
                             default:
                                 return false;
                         }
