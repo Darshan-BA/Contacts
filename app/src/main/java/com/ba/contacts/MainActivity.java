@@ -1,6 +1,7 @@
 package com.ba.contacts;
 
 import androidx.appcompat.app.AppCompatActivity;
+import android.view.ActionMode;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.Observer;
@@ -15,21 +16,23 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.PopupMenu;
 import android.widget.Toast;
-
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     public static final int PERMISSION_CALL=1;
-
     Toolbar toolbar;
     FloatingActionButton floatingActionButton;
     ContactViewModel contactViewModel;
+    ArrayList<Contact> deleteContactList=new ArrayList<Contact>();
+    //private ActionMode actionMode;
+    ContactAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
         floatingActionButton = findViewById(R.id.add_float);
 
         //RecyclerView Adapter instance
-        final ContactAdapter adapter = new ContactAdapter();
+        adapter= new ContactAdapter();
 
         //RecyclerView
         final RecyclerView recyclerView = findViewById(R.id.recyclerview);
@@ -62,7 +65,6 @@ public class MainActivity extends AppCompatActivity {
                 adapter.setContacts(contacts);
             }
         });
-
 
         // OnClick listner for deleting and editing
         adapter.setOnItemClickListener(new ContactAdapter.OnItemClickListner() {
@@ -87,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
                                 return true;
                             case R.id.delete:
                                 final AlertDialog.Builder alertDialog=new AlertDialog.Builder(MainActivity.this);
-                                alertDialog.setTitle("Deletee");
+                                alertDialog.setTitle("Delete");
                                 alertDialog.setMessage("Are you sure want to delete");
                                 alertDialog.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
                                     @Override
@@ -118,6 +120,22 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onIconClick(int position, View view) {
 
+            }
+
+            @Override
+            public void setContextualActionMode() {
+                adapter.setSetMultiDelete(true);
+                adapter.notifyDataSetChanged();
+                toolbar.startActionMode(actionModeCallback);
+            }
+
+            @Override
+            public void multiSelect(int adapterPosition, boolean check) {
+                if(check){
+                    deleteContactList.add(adapter.getContactAt(adapterPosition));
+                }else {
+                    deleteContactList.remove(adapter.getContactAt(adapterPosition));
+                }
             }
 
             @Override
@@ -212,5 +230,56 @@ public class MainActivity extends AppCompatActivity {
         Intent intent=new Intent(this,EditContact.class);
         startActivity(intent);
     }
+
+
+    private ActionMode.Callback actionModeCallback=new ActionMode.Callback() {
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            mode.getMenuInflater().inflate(R.menu.toolbar_list,menu);
+            mode.setTitle("Delete Contact");
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            return false;
+        }
+
+        @Override
+        public boolean onActionItemClicked(final ActionMode mode, MenuItem item) {
+            if (item.getItemId() == R.id.delete_toolbar) {
+                final AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
+                alertDialog.setTitle("Delete Selected");
+                alertDialog.setMessage("Are you sure want to delete selected contacts");
+                alertDialog.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        contactViewModel.multipleDelete(deleteContactList.toArray(new Contact[deleteContactList.size()]));
+                        deleteContactList.clear();
+                        adapter.setSetMultiDelete(false);
+                        adapter.notifyDataSetChanged();
+                        Toast.makeText(MainActivity.this, "Contacts Deleted", Toast.LENGTH_SHORT).show();
+                        mode.finish();
+                    }
+                });
+                alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                alertDialog.create();
+                alertDialog.show();
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            adapter.setSetMultiDelete(false);
+            adapter.notifyDataSetChanged();
+        }
+    };
 
 }

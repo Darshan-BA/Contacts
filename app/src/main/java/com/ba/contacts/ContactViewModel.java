@@ -26,6 +26,11 @@ public class ContactViewModel extends AndroidViewModel {
     void delete(Contact contact){
         repository.delete(contact);
     }
+
+    //multiple delete
+    void multipleDelete(Contact... contacts){
+        repository.multipleDelete(contacts);
+    }
     LiveData<List<Contact>>getAllContacts(){
         return allContacts;
     }

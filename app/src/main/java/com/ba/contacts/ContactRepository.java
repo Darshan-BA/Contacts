@@ -7,7 +7,7 @@ import androidx.lifecycle.LiveData;
 
 import java.util.List;
 
-public class ContactRepository {
+class ContactRepository {
     private ContactDao contactDao;
     private LiveData<List<Contact>>allContacts;
     ContactRepository(Application application){
@@ -25,6 +25,11 @@ public class ContactRepository {
     }
     void delete(Contact contact){
         new DeleteContactAsyncTask(contactDao).execute(contact);
+    }
+
+    //multiple delete
+    void multipleDelete(Contact... contacts){
+        new multipleDeleteConractAsyncTask(contactDao).execute(contacts);
     }
     LiveData<List<Contact>>getAllContacts(){
         return allContacts;
@@ -66,6 +71,21 @@ public class ContactRepository {
         @Override
         protected Void doInBackground(Contact... contacts) {
             contactDao.delete(contacts[0]);
+            return null;
+        }
+    }
+
+    //multiple delete
+    private static class multipleDeleteConractAsyncTask extends AsyncTask<Contact,Void,Void>{
+        private ContactDao contactDao;
+
+        multipleDeleteConractAsyncTask(ContactDao contactDao) {
+            this.contactDao = contactDao;
+        }
+
+        @Override
+        protected Void doInBackground(Contact... contacts) {
+            contactDao.multipleDelete(contacts);
             return null;
         }
     }
