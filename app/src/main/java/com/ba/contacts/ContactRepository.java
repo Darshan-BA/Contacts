@@ -2,45 +2,55 @@ package com.ba.contacts;
 
 import android.app.Application;
 import android.os.AsyncTask;
-
 import androidx.lifecycle.LiveData;
 
 import java.util.List;
 
 class ContactRepository {
     private ContactDao contactDao;
-    private LiveData<List<Contact>>allContacts;
-    ContactRepository(Application application){
-        ContactDatabase database =ContactDatabase.getInstance(application);
-        contactDao=database.contactDao();
-        allContacts=contactDao.getAllContacts();
+    private LiveData<List<Contact>> allContacts;
+    //private List<Contact> exportList;
+
+    ContactRepository(Application application) {
+        ContactDatabase database = ContactDatabase.getInstance(application);
+        contactDao = database.contactDao();
+        allContacts = contactDao.getAllContacts();
+        //exportList=contactDao.getExportContactsList();
     }
 
-    void insert(Contact contact){
+    void insert(Contact contact) {
         new InsertContactAsyncTask(contactDao).execute(contact);
     }
 
-    void update(Contact contact){
+    void update(Contact contact) {
         new UpdateContactAsyncTask(contactDao).execute(contact);
     }
-    void delete(Contact contact){
+
+    void delete(Contact contact) {
         new DeleteContactAsyncTask(contactDao).execute(contact);
     }
 
     //multiple delete
-    void multipleDelete(Contact... contacts){
-        new multipleDeleteConractAsyncTask(contactDao).execute(contacts);
+    void multipleDelete(Contact... contacts) {
+        new multipleDeleteContactAsyncTask(contactDao).execute(contacts);
     }
-    LiveData<List<Contact>>getAllContacts(){
+
+    LiveData<List<Contact>> getAllContacts() {
         return allContacts;
     }
 
+    /*export
+    List<Contact>getExportList(){
+        return contactDao.getExportContactsList();
+    }*/
 
-    private static class InsertContactAsyncTask extends AsyncTask<Contact,Void,Void>{
-    private ContactDao contactDao;
-    private InsertContactAsyncTask(ContactDao contactDao){
-        this.contactDao=contactDao;
-    }
+
+    private static class InsertContactAsyncTask extends AsyncTask<Contact, Void, Void> {
+        private ContactDao contactDao;
+
+        private InsertContactAsyncTask(ContactDao contactDao) {
+            this.contactDao = contactDao;
+        }
 
         @Override
         protected Void doInBackground(Contact... contacts) {
@@ -49,10 +59,11 @@ class ContactRepository {
         }
     }
 
-    private static class UpdateContactAsyncTask extends AsyncTask<Contact,Void,Void>{
+    private static class UpdateContactAsyncTask extends AsyncTask<Contact, Void, Void> {
         private ContactDao contactDao;
-        private UpdateContactAsyncTask(ContactDao contactDao){
-            this.contactDao=contactDao;
+
+        private UpdateContactAsyncTask(ContactDao contactDao) {
+            this.contactDao = contactDao;
         }
 
         @Override
@@ -62,10 +73,11 @@ class ContactRepository {
         }
     }
 
-    private static class DeleteContactAsyncTask extends AsyncTask<Contact,Void,Void>{
+    private static class DeleteContactAsyncTask extends AsyncTask<Contact, Void, Void> {
         private ContactDao contactDao;
-        private DeleteContactAsyncTask(ContactDao contactDao){
-            this.contactDao=contactDao;
+
+        private DeleteContactAsyncTask(ContactDao contactDao) {
+            this.contactDao = contactDao;
         }
 
         @Override
@@ -76,10 +88,10 @@ class ContactRepository {
     }
 
     //multiple delete
-    private static class multipleDeleteConractAsyncTask extends AsyncTask<Contact,Void,Void>{
+    private static class multipleDeleteContactAsyncTask extends AsyncTask<Contact, Void, Void> {
         private ContactDao contactDao;
 
-        multipleDeleteConractAsyncTask(ContactDao contactDao) {
+        multipleDeleteContactAsyncTask(ContactDao contactDao) {
             this.contactDao = contactDao;
         }
 

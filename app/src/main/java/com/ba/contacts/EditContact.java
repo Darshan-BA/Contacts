@@ -105,11 +105,9 @@ public class EditContact extends AppCompatActivity {
                     Toast.makeText(EditContact.this,"Contact Saved",Toast.LENGTH_SHORT).show();
                     finish();
                 }
-
-
             }
         });
-        builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton("NO",new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();

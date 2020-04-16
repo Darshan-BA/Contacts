@@ -26,4 +26,8 @@ public interface ContactDao {
 
     @Query("SELECT * FROM contacts ORDER BY first_name ASC")
     LiveData<List<Contact>>getAllContacts();
+
+    /*export
+    @Query("SELECT * FROM contacts ORDER BY first_name ASC")
+    List<Contact>getExportContactsList();*/
 }

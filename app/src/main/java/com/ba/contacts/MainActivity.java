@@ -1,9 +1,16 @@
 package com.ba.contacts;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import android.app.Activity;
+import android.os.AsyncTask;
+import android.os.Environment;
+import android.provider.DocumentsContract;
 import android.view.ActionMode;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -22,17 +29,29 @@ import android.view.View;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    public static final int PERMISSION_CALL=1;
+    private static final int PERMISSION_CALL=1;
+    private static final int PERMISSION_EXTERNAL_WRITE=2;
+    private static final int CREATE_JSON_FILE=3;
+    private static final int PICK_JSON_FILE=4;
+
     Toolbar toolbar;
     FloatingActionButton floatingActionButton;
     ContactViewModel contactViewModel;
-    ArrayList<Contact> deleteContactList=new ArrayList<Contact>();
-    //private ActionMode actionMode;
+    ArrayList<Contact> deleteContactList= new ArrayList<>();
     ContactAdapter adapter;
+    List<Contact> exportContacts;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,8 +80,8 @@ public class MainActivity extends AppCompatActivity {
         contactViewModel.getAllContacts().observe(this, new Observer<List<Contact>>() {
             @Override
             public void onChanged(List<Contact> contacts) {
-                //Toast.makeText(MainActivity.this,"onChanged",Toast.LENGTH_LONG).show();
                 adapter.setContacts(contacts);
+                exportContacts=contacts;
             }
         });
 
@@ -111,7 +130,6 @@ public class MainActivity extends AppCompatActivity {
                             default:
                                 return false;
                         }
-
                     }
                 });
                 popupMenu.show();
@@ -119,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onIconClick(int position, View view) {
-
+                //need to implement adding profile photo
             }
 
             @Override
@@ -224,7 +242,8 @@ public class MainActivity extends AppCompatActivity {
             }
 
         });
-    }
+
+    }//end of onCreate()
 
     public void addContact(View view) {
         Intent intent=new Intent(this,EditContact.class);
@@ -282,4 +301,193 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-}
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.toolbar_menu,menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.import_menu_item) {
+            Log.d("BA", "On Import Clicked");
+            Intent intent=new Intent(Intent.ACTION_OPEN_DOCUMENT);
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            intent.setType("*/*");
+            startActivityForResult(intent,PICK_JSON_FILE);
+        }
+        if (item.getItemId() == R.id.export_menu_item) {
+            Log.d("BA", "On Export Clicked");
+            if(ContextCompat.checkSelfPermission(this,Manifest.permission.WRITE_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED){
+                if(ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                    Toast.makeText(MainActivity.this, "Grant Write Permission To Export Contact List", Toast.LENGTH_LONG).show();
+                    ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},PERMISSION_EXTERNAL_WRITE);
+                }else{
+                    ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},PERMISSION_EXTERNAL_WRITE);
+                }
+            }else{
+                Intent intent=new Intent(Intent.ACTION_CREATE_DOCUMENT);
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                intent.setType("*/*");
+                intent.putExtra(Intent.EXTRA_TITLE,"contacts.json");
+                startActivityForResult(intent,CREATE_JSON_FILE);
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == PERMISSION_EXTERNAL_WRITE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(MainActivity.this, "Write External Storage Granted", Toast.LENGTH_SHORT).show();
+                new ExportAsyncTask(adapter).execute();
+            } else {
+                Toast.makeText(MainActivity.this, "Grant Write Permission To Export Contact List", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PICK_JSON_FILE && resultCode == Activity.RESULT_OK) {
+            Uri uri=null;
+            if(data!=null){
+                uri=data.getData();
+                final String docId = DocumentsContract.getDocumentId(uri);
+                final String[] split = docId.split(":");
+                new ImportAsyncTask().execute(split[1]);
+            }else {
+                Toast.makeText(MainActivity.this,"Choose Appropriate File",Toast.LENGTH_SHORT).show();
+            }
+        }
+        if(requestCode==CREATE_JSON_FILE && resultCode==Activity.RESULT_OK){
+            Uri uri=null;
+        if(data!=null){
+            uri=data.getData();
+            final String docId = DocumentsContract.getDocumentId(uri);
+            final String[] split = docId.split(":");
+            new ExportAsyncTask(adapter).execute(split[1]);
+        }else{
+            Toast.makeText(MainActivity.this,"Export Failed",Toast.LENGTH_SHORT).show();
+        }
+        }
+    }
+
+    // Start of ImportAsyncTask
+    private class ImportAsyncTask extends AsyncTask<String,Void,String>{
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            Toast.makeText(MainActivity.this,s,Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            String path = strings[0];
+            Log.d("import", path);
+            File file = new File(Environment.getExternalStorageDirectory(), path);
+            String filePath = fileExtenstion(path);
+            if (filePath != "json") {
+                return "Select JSON format file";
+            } else {
+                try (FileReader fileReader = new FileReader(file)) {
+                    BufferedReader bufferedReader = new BufferedReader(fileReader);
+                    StringBuilder stringBuilder = new StringBuilder();
+                    String line = bufferedReader.readLine();
+                    while (line != null) {
+                        stringBuilder.append(line).append("\n");
+                        line = bufferedReader.readLine();
+                    }
+                    bufferedReader.close();
+                    String jsonString = stringBuilder.toString();
+                    Log.d("object", jsonString);
+                    JSONObject jsonObject = new JSONObject(jsonString);
+                    JSONArray jsonArray = jsonObject.getJSONArray("Contacts");
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject tempObject = jsonArray.getJSONObject(i);
+                        String first = tempObject.getString("first");
+                        String last = tempObject.getString("last");
+                        String primary = tempObject.getString("primary");
+                        String secondary = tempObject.getString("secondary");
+                        String email = tempObject.getString("email");
+                        Contact contact = new Contact(first, last, primary, secondary, email);
+                        contactViewModel.insert(contact);
+                    }
+                } catch (IOException | JSONException e) {
+                    e.printStackTrace();
+                }
+                return "Contacts Imported";
+            }
+        }
+
+        private String fileExtenstion(String path) {
+            if(path.lastIndexOf(".")!=-1 && path.lastIndexOf(".")!=0){
+                return path.substring(path.lastIndexOf("."));
+            }
+            else
+                return "";
+        }
+
+
+    }
+
+    // start of ExportAsyncTask
+    private class ExportAsyncTask extends AsyncTask<String,Void,String>{
+        private ContactAdapter adapter;
+
+        private ExportAsyncTask(ContactAdapter adapter) {
+            this.adapter = adapter;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            Toast.makeText(MainActivity.this,"Exported started in background",Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            String  path=strings[0];
+            JSONObject jsonObject=new JSONObject();
+            JSONArray jsonArray=new JSONArray();
+            for (int i=0;i<adapter.getItemCount();i++){
+                Contact contact=adapter.getContactAt(i);
+                JSONObject tempObject=new JSONObject();
+                try {
+                    tempObject.put("first",contact.getFirstName());
+                    tempObject.put("last",contact.getLastName());
+                    tempObject.put("primary",contact.getPrimaryPhoneNumber());
+                    tempObject.put("secondary",contact.getSecondaryPhoneNumber());
+                    tempObject.put("email",contact.getEmailId());
+                    jsonArray.put(tempObject);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    jsonObject.put("Contacts",jsonArray);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                File dir=new File(Environment.getExternalStorageDirectory(),path);
+                dir.mkdirs();
+                try (FileOutputStream fileOutputStream=new FileOutputStream(dir)){
+                    fileOutputStream.write(jsonObject.toString().getBytes());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            return "Contacts Exported to: "+path;
+        }
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            Toast.makeText(MainActivity.this,s,Toast.LENGTH_SHORT).show();
+        }
+    }//end of exportAsyncTask
+
+} //end of main activity
+
+

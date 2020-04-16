@@ -3,7 +3,6 @@ package com.ba.contacts;
 
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
@@ -11,14 +10,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactHolder>{
 
     private List<Contact> contacts = new ArrayList<>();
-    private MainActivity mainActivity=new MainActivity();
+    //private MainActivity mainActivity=new MainActivity();
     private boolean setMultiDelete=false;
     private OnItemClickListner mListener;
 
@@ -113,8 +111,6 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactH
             itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    //setMultiDelete=true;
-                    //notifyDataSetChanged();
                     listener.setContextualActionMode();
                     return true;
                 }
