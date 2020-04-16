@@ -341,7 +341,11 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == PERMISSION_EXTERNAL_WRITE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(MainActivity.this, "Write External Storage Granted", Toast.LENGTH_SHORT).show();
-                new ExportAsyncTask(adapter).execute();
+                Intent intent=new Intent(Intent.ACTION_CREATE_DOCUMENT);
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                intent.setType("*/*");
+                intent.putExtra(Intent.EXTRA_TITLE,"contacts.json");
+                startActivityForResult(intent,CREATE_JSON_FILE);
             } else {
                 Toast.makeText(MainActivity.this, "Grant Write Permission To Export Contact List", Toast.LENGTH_LONG).show();
             }
