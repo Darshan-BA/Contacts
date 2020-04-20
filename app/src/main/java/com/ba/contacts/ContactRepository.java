@@ -9,13 +9,11 @@ import java.util.List;
 class ContactRepository {
     private ContactDao contactDao;
     private LiveData<List<Contact>> allContacts;
-    //private List<Contact> exportList;
 
     ContactRepository(Application application) {
         ContactDatabase database = ContactDatabase.getInstance(application);
         contactDao = database.contactDao();
         allContacts = contactDao.getAllContacts();
-        //exportList=contactDao.getExportContactsList();
     }
 
     void insert(Contact contact) {
@@ -38,11 +36,6 @@ class ContactRepository {
     LiveData<List<Contact>> getAllContacts() {
         return allContacts;
     }
-
-    /*export
-    List<Contact>getExportList(){
-        return contactDao.getExportContactsList();
-    }*/
 
 
     private static class InsertContactAsyncTask extends AsyncTask<Contact, Void, Void> {

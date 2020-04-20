@@ -394,7 +394,8 @@ public class MainActivity extends AppCompatActivity {
             Log.d("import", path);
             File file = new File(Environment.getExternalStorageDirectory(), path);
             String filePath = fileExtenstion(path);
-            if (filePath != "json") {
+            Log.d("filepath", filePath);
+            if (!filePath.equals(".json")) {
                 return "Select JSON format file";
             } else {
                 try (FileReader fileReader = new FileReader(file)) {
