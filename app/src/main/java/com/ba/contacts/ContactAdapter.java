@@ -22,6 +22,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactH
 
     void setSetMultiDelete(boolean setMultiDelete) {
         this.setMultiDelete = setMultiDelete;
+        notifyDataSetChanged();
     }
 
     Contact getContactAt(int position) {
@@ -32,7 +33,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactH
         void onCardClick(int position);
         void onPopUpClick(Contact contact, View view);
         void onIconClick(int position,View view);
-        void setContextualActionMode();
+        boolean setContextualActionMode();
         void multiSelect(int adapterPosition,boolean check);
     }
 
@@ -59,7 +60,6 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactH
         if(!setMultiDelete){
             Log.d("BA", "if setMultiDelete="+String.valueOf(setMultiDelete));
             holder.checkBox.setVisibility(View.GONE);
-
         }else {
             Log.d("BA","else setMultiDelete="+String.valueOf(setMultiDelete));
             holder.checkBox.setVisibility(View.VISIBLE);
@@ -68,6 +68,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactH
         }
 
     }
+
 
     @Override
     public int getItemCount() {
@@ -78,7 +79,6 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactH
         this.contacts = contacts;
         notifyDataSetChanged();
     }
-
 
     class ContactHolder extends RecyclerView.ViewHolder {
         private TextView first, last, email, primary, secondary;
@@ -111,7 +111,10 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactH
             itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    listener.setContextualActionMode();
+                    if(listener.setContextualActionMode()){
+                        setMultiDelete=true;
+                        notifyDataSetChanged();
+                    };
                     return true;
                 }
             });
@@ -148,7 +151,6 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactH
                     }
                 }
             });
-
 
             }
     }

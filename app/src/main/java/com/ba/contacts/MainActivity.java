@@ -26,6 +26,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Adapter;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -141,10 +142,11 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void setContextualActionMode() {
-                adapter.setSetMultiDelete(true);
-                adapter.notifyDataSetChanged();
+            public boolean setContextualActionMode() {
+                //adapter.setSetMultiDelete(true);
+                //adapter.notifyDataSetChanged();
                 toolbar.startActionMode(actionModeCallback);
+                return true;
             }
 
             @Override
@@ -242,8 +244,9 @@ public class MainActivity extends AppCompatActivity {
             }
 
         });
-
+        
     }//end of onCreate()
+
 
     public void addContact(View view) {
         Intent intent=new Intent(this,EditContact.class);
@@ -276,7 +279,6 @@ public class MainActivity extends AppCompatActivity {
                         contactViewModel.multipleDelete(deleteContactList.toArray(new Contact[deleteContactList.size()]));
                         deleteContactList.clear();
                         adapter.setSetMultiDelete(false);
-                        adapter.notifyDataSetChanged();
                         Toast.makeText(MainActivity.this, "Contacts Deleted", Toast.LENGTH_SHORT).show();
                         mode.finish();
                     }
