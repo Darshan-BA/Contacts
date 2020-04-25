@@ -16,15 +16,8 @@ import java.util.List;
 public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactHolder>{
 
     private List<Contact> contacts = new ArrayList<>();
-    //private MainActivity mainActivity=new MainActivity();
-    private boolean setMultiDelete=false;
+    boolean setMultiDelete=false;
     private OnItemClickListner mListener;
-
-    void setSetMultiDelete(boolean setMultiDelete) {
-        this.setMultiDelete = setMultiDelete;
-        notifyDataSetChanged();
-    }
-
     Contact getContactAt(int position) {
         return contacts.get(position);
     }
@@ -33,7 +26,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactH
         void onCardClick(int position);
         void onPopUpClick(Contact contact, View view);
         void onIconClick(int position,View view);
-        boolean setContextualActionMode();
+        void setContextualActionMode();
         void multiSelect(int adapterPosition,boolean check);
     }
 
@@ -58,10 +51,8 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactH
         holder.primary.setText(currentContact.getPrimaryPhoneNumber());
         holder.secondary.setText(currentContact.getSecondaryPhoneNumber());
         if(!setMultiDelete){
-            Log.d("BA", "if setMultiDelete="+String.valueOf(setMultiDelete));
             holder.checkBox.setVisibility(View.GONE);
         }else {
-            Log.d("BA","else setMultiDelete="+String.valueOf(setMultiDelete));
             holder.checkBox.setVisibility(View.VISIBLE);
             holder.popUpOption.setVisibility(View.INVISIBLE);
             holder.checkBox.setChecked(false);
@@ -111,10 +102,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactH
             itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    if(listener.setContextualActionMode()){
-                        setMultiDelete=true;
-                        notifyDataSetChanged();
-                    };
+                    listener.setContextualActionMode();
                     return true;
                 }
             });

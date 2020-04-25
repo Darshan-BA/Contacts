@@ -4,12 +4,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.view.ActionMode;
+
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -17,6 +17,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -28,13 +29,15 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Adapter;
 import android.widget.PopupMenu;
 import android.widget.Toast;
+
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -44,18 +47,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    private static final int PERMISSION_CALL=1;
-    private static final int PERMISSION_EXTERNAL_WRITE=2;
-    private static final int PERMISSION_EXTERNAL_READ=3;
-    private static final int CREATE_JSON_FILE=4;
-    private static final int PICK_JSON_FILE=5;
+    private static final int PERMISSION_CALL = 1;
+    private static final int PERMISSION_EXTERNAL_WRITE = 2;
+    private static final int PERMISSION_EXTERNAL_READ = 3;
+    private static final int CREATE_JSON_FILE = 4;
+    private static final int PICK_JSON_FILE = 5;
 
     Toolbar toolbar;
     FloatingActionButton floatingActionButton;
     ContactViewModel contactViewModel;
-    ArrayList<Contact> deleteContactList= new ArrayList<>();
+    ArrayList<Contact> deleteContactList = new ArrayList<>();
     ContactAdapter adapter;
     List<Contact> exportContacts;
+
+    private String phoneNumberHolder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
         floatingActionButton = findViewById(R.id.add_float);
 
         //RecyclerView Adapter instance
-        adapter= new ContactAdapter();
+        adapter = new ContactAdapter();
 
         //RecyclerView
         final RecyclerView recyclerView = findViewById(R.id.recyclerview);
@@ -85,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChanged(List<Contact> contacts) {
                 adapter.setContacts(contacts);
-                exportContacts=contacts;
+                exportContacts = contacts;
             }
         });
 
@@ -94,12 +99,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPopUpClick(final Contact contact, View view) {
                 //contactViewModel.delete(adapter.getContactAt(position));
-                PopupMenu popupMenu=new PopupMenu(MainActivity.this,view);
-                popupMenu.getMenuInflater().inflate(R.menu.contact_card_menu,popupMenu.getMenu());
+                PopupMenu popupMenu = new PopupMenu(MainActivity.this, view);
+                popupMenu.getMenuInflater().inflate(R.menu.contact_card_menu, popupMenu.getMenu());
                 popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
-                        switch (item.getItemId()){
+                        switch (item.getItemId()) {
                             case R.id.edit:
                                 Intent intent = new Intent(MainActivity.this, EditContact.class);
                                 intent.putExtra("id", contact.getId());
@@ -111,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
                                 startActivity(intent);
                                 return true;
                             case R.id.delete:
-                                final AlertDialog.Builder alertDialog=new AlertDialog.Builder(MainActivity.this);
+                                final AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
                                 alertDialog.setTitle("Delete");
                                 alertDialog.setMessage("Are you sure want to delete");
                                 alertDialog.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
@@ -145,89 +150,95 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public boolean setContextualActionMode() {
+            public void setContextualActionMode() {
                 //adapter.setSetMultiDelete(true);
                 //adapter.notifyDataSetChanged();
+                adapter.setMultiDelete = true;
+                adapter.notifyDataSetChanged();
                 toolbar.startActionMode(actionModeCallback);
-                return true;
             }
 
             @Override
             public void multiSelect(int adapterPosition, boolean check) {
-                if(check){
+                if (check) {
                     deleteContactList.add(adapter.getContactAt(adapterPosition));
-                }else {
+                } else {
                     deleteContactList.remove(adapter.getContactAt(adapterPosition));
                 }
             }
 
             @Override
             public void onCardClick(int position) {
-               final String[] dialogList;
+                final String[] dialogList;
                 Contact cardContact = adapter.getContactAt(position);
-                String first=cardContact.getPrimaryPhoneNumber();
-                String second=cardContact.getSecondaryPhoneNumber();
-                String email=cardContact.getEmailId();
-                Log.d("number",first);
-                Log.d("number",second);
-                Log.d("number",email);
-                if(first.isEmpty() && second.isEmpty() && email.isEmpty()){
-                    dialogList=new String[0];
-                    Toast.makeText(MainActivity.this,"No Phone Numbers to Call",Toast.LENGTH_SHORT).show();
-                }else if(second.isEmpty() && email.isEmpty()) {
-                        dialogList=new String[1];
-                        dialogList[0]=cardContact.getPrimaryPhoneNumber();
-                }else if(first.isEmpty() && email.isEmpty()){
-                    dialogList=new String[1];
-                    dialogList[0]=cardContact.getSecondaryPhoneNumber();
-                }else if(first.isEmpty() && second.isEmpty()){
-                    dialogList=new String[1];
-                    dialogList[0]=cardContact.getEmailId();
-                }else if(email.isEmpty()){
-                    dialogList=new String[2];
-                    dialogList[0]=cardContact.getPrimaryPhoneNumber();
-                    dialogList[1]=cardContact.getSecondaryPhoneNumber();
-                }else if(second.isEmpty()){
-                    dialogList=new String[2];
-                    dialogList[0]=cardContact.getPrimaryPhoneNumber();
-                    dialogList[1]=cardContact.getEmailId();
-                }else if(first.isEmpty()){
-                    dialogList=new String[2];
-                    dialogList[0]=cardContact.getSecondaryPhoneNumber();
-                    dialogList[1]=cardContact.getEmailId();
-                }else{
-                    dialogList=new String[3];
-                    dialogList[0]=cardContact.getPrimaryPhoneNumber();
-                    dialogList[1]=cardContact.getSecondaryPhoneNumber();
-                    dialogList[2]=cardContact.getEmailId();
+                String first = cardContact.getPrimaryPhoneNumber();
+                String second = cardContact.getSecondaryPhoneNumber();
+                String email = cardContact.getEmailId();
+                Log.d("number", first);
+                Log.d("number", second);
+                Log.d("number", email);
+                if (first.isEmpty() && second.isEmpty() && email.isEmpty()) {
+                    dialogList = new String[0];
+                    Toast.makeText(MainActivity.this, "No Phone Numbers to Call", Toast.LENGTH_SHORT).show();
+                } else if (second.isEmpty() && email.isEmpty()) {
+                    dialogList = new String[1];
+                    dialogList[0] = cardContact.getPrimaryPhoneNumber();
+                } else if (first.isEmpty() && email.isEmpty()) {
+                    dialogList = new String[1];
+                    dialogList[0] = cardContact.getSecondaryPhoneNumber();
+                } else if (first.isEmpty() && second.isEmpty()) {
+                    dialogList = new String[1];
+                    dialogList[0] = cardContact.getEmailId();
+                } else if (email.isEmpty()) {
+                    dialogList = new String[2];
+                    dialogList[0] = cardContact.getPrimaryPhoneNumber();
+                    dialogList[1] = cardContact.getSecondaryPhoneNumber();
+                } else if (second.isEmpty()) {
+                    dialogList = new String[2];
+                    dialogList[0] = cardContact.getPrimaryPhoneNumber();
+                    dialogList[1] = cardContact.getEmailId();
+                } else if (first.isEmpty()) {
+                    dialogList = new String[2];
+                    dialogList[0] = cardContact.getSecondaryPhoneNumber();
+                    dialogList[1] = cardContact.getEmailId();
+                } else {
+                    dialogList = new String[3];
+                    dialogList[0] = cardContact.getPrimaryPhoneNumber();
+                    dialogList[1] = cardContact.getSecondaryPhoneNumber();
+                    dialogList[2] = cardContact.getEmailId();
                 }
 
                 final Intent phoneIntent = new Intent((Intent.ACTION_CALL));
-                final Intent emailIntent =new Intent(Intent.ACTION_SENDTO);
+                final Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setItems(dialogList, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        String var=dialogList[which];
-                        boolean isVarEmail=false;
-                        for(int i = 0; i < var.length(); i++){
-                            char temp=var.charAt(i);
-                            Log.d("ba",String.valueOf(temp));
-                            if(temp == '@'){
-                                isVarEmail=true;
+                        String var = dialogList[which];
+                        boolean isVarEmail = false;
+                        for (int i = 0; i < var.length(); i++) {
+                            char temp = var.charAt(i);
+                            Log.d("ba", String.valueOf(temp));
+                            if (temp == '@') {
+                                isVarEmail = true;
                                 break;
                             }
                         }
-                        if(isVarEmail){
-                            emailIntent.setData(Uri.parse("mailto:"+dialogList[which]));
+                        if (isVarEmail) {
+                            emailIntent.setData(Uri.parse("mailto:" + dialogList[which]));
                             startActivity(emailIntent);
 
-                        }else {
+                        } else {
+                            phoneNumberHolder=dialogList[which];
                             if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-                                requestCallPermission();
-                                //return;
-                            }else {
-                                phoneIntent.setData(Uri.parse("tel:"+dialogList[which]));
+                                if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.CALL_PHONE)) {
+                                    Toast.makeText(MainActivity.this, "Need Telephone permission to start call", Toast.LENGTH_LONG).show();
+                                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.CALL_PHONE}, PERMISSION_CALL);
+                                } else {
+                                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.CALL_PHONE}, PERMISSION_CALL);
+                                }
+                            } else {
+                                phoneIntent.setData(Uri.parse("tel:" + dialogList[which]));
                                 startActivity(phoneIntent);
                             }
                         }
@@ -237,30 +248,21 @@ public class MainActivity extends AppCompatActivity {
                 builder.show();
             }
 
-            private void requestCallPermission() {
-                if(ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,Manifest.permission.CALL_PHONE)) {
-                    Toast.makeText(MainActivity.this, "Grant Phone Call Permission inorder to Call", Toast.LENGTH_SHORT).show();
-                    ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.CALL_PHONE},PERMISSION_CALL);
-                }else{
-                    ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.CALL_PHONE},PERMISSION_CALL);
-                }
-            }
-
         });
-        
+
     }//end of onCreate()
 
 
     public void addContact(View view) {
-        Intent intent=new Intent(this,EditContact.class);
+        Intent intent = new Intent(this, EditContact.class);
         startActivity(intent);
     }
 
 
-    private ActionMode.Callback actionModeCallback=new ActionMode.Callback() {
+    private ActionMode.Callback actionModeCallback = new ActionMode.Callback() {
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            mode.getMenuInflater().inflate(R.menu.toolbar_list,menu);
+            mode.getMenuInflater().inflate(R.menu.toolbar_list, menu);
             mode.setTitle("Delete Contact");
             return true;
         }
@@ -281,9 +283,13 @@ public class MainActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         contactViewModel.multipleDelete(deleteContactList.toArray(new Contact[deleteContactList.size()]));
                         deleteContactList.clear();
-                        adapter.setSetMultiDelete(false);
+                        adapter.setMultiDelete = false;
+                        adapter.notifyDataSetChanged();
                         Toast.makeText(MainActivity.this, "Contacts Deleted", Toast.LENGTH_SHORT).show();
                         mode.finish();
+                        finish();
+                        Intent intent = new Intent(MainActivity.this, MainActivity.class);
+                        startActivity(intent);
                     }
                 });
                 alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -301,51 +307,74 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onDestroyActionMode(ActionMode mode) {
-            adapter.setSetMultiDelete(false);
+            adapter.setMultiDelete = false;
             adapter.notifyDataSetChanged();
         }
     };
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.toolbar_menu,menu);
+        getMenuInflater().inflate(R.menu.toolbar_menu, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.delete_toolbar) {
+            final AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
+            alertDialog.setTitle("Delete Selected");
+            alertDialog.setMessage("Are you sure want to delete selected contacts");
+            alertDialog.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    contactViewModel.multipleDelete(deleteContactList.toArray(new Contact[deleteContactList.size()]));
+                    deleteContactList.clear();
+                    adapter.setMultiDelete = false;
+                    adapter.notifyDataSetChanged();
+                    Toast.makeText(MainActivity.this, "Contacts Deleted", Toast.LENGTH_SHORT).show();
+                }
+            });
+            alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            alertDialog.create();
+            alertDialog.show();
+        }
         if (item.getItemId() == R.id.import_menu_item) {
             Log.d("BA", "On Import Clicked");
-            if(ContextCompat.checkSelfPermission(this,Manifest.permission.READ_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED){
-                if(ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,Manifest.permission.READ_EXTERNAL_STORAGE)){
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
                     Toast.makeText(MainActivity.this, "Need READ permission to Import Contacts ", Toast.LENGTH_LONG).show();
-                    ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},PERMISSION_EXTERNAL_READ);
-                }else {
-                    ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},PERMISSION_EXTERNAL_WRITE);
+                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_EXTERNAL_READ);
+                } else {
+                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_EXTERNAL_READ);
                 }
-            }else {
-                Intent intent=new Intent(Intent.ACTION_OPEN_DOCUMENT);
+            } else {
+                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
                 intent.addCategory(Intent.CATEGORY_OPENABLE);
                 intent.setType("*/*");
-                startActivityForResult(intent,PICK_JSON_FILE);
+                startActivityForResult(intent, PICK_JSON_FILE);
             }
         }
 
         if (item.getItemId() == R.id.export_menu_item) {
             Log.d("BA", "On Export Clicked");
-            if(ContextCompat.checkSelfPermission(this,Manifest.permission.WRITE_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED){
-                if(ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                     Toast.makeText(MainActivity.this, "Need WRITE permission to Export Contacts", Toast.LENGTH_LONG).show();
-                    ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},PERMISSION_EXTERNAL_WRITE);
-                }else{
-                    ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},PERMISSION_EXTERNAL_WRITE);
+                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_EXTERNAL_WRITE);
+                } else {
+                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_EXTERNAL_WRITE);
                 }
-            }else{
-                Intent intent=new Intent(Intent.ACTION_CREATE_DOCUMENT);
+            } else {
+                Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
                 intent.addCategory(Intent.CATEGORY_OPENABLE);
                 intent.setType("*/*");
-                intent.putExtra(Intent.EXTRA_TITLE,"contacts.json");
-                startActivityForResult(intent,CREATE_JSON_FILE);
+                intent.putExtra(Intent.EXTRA_TITLE, "contacts.json");
+                startActivityForResult(intent, CREATE_JSON_FILE);
             }
         }
         return true;
@@ -353,15 +382,28 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == PERMISSION_CALL) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(MainActivity.this, "Call Permission Granted", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(Intent.ACTION_CALL);
+                intent.setData(Uri.parse("tel:" + phoneNumberHolder));
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
+                    startActivity(intent);
+                }
+            }else{
+                Toast.makeText(MainActivity.this, "Grant Telephone Permission to Call", Toast.LENGTH_LONG).show();
+            }
+
+        }
         if(requestCode == PERMISSION_EXTERNAL_READ){
-            if(grantResults.length>0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+            if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
                 Toast.makeText(MainActivity.this, "Read External Storage Granted", Toast.LENGTH_SHORT).show();
                 Intent intent=new Intent(Intent.ACTION_OPEN_DOCUMENT);
                 intent.addCategory(Intent.CATEGORY_OPENABLE);
                 intent.setType("*/*");
                 startActivityForResult(intent,PICK_JSON_FILE);
             }
-            else{
+            else {
                 Toast.makeText(MainActivity.this, "Grant Read Permission To Export Contacts", Toast.LENGTH_LONG).show();
             }
         }
