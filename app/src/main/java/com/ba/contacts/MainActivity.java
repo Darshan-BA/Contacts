@@ -135,7 +135,12 @@ public class MainActivity extends AppCompatActivity {
                                 alertDialog.show();
                                 return true;
                             case R.id.share:
-                                //Sharing need to implemented
+                                Intent shareIntent=new Intent(Intent.ACTION_SEND);
+                                shareIntent.putExtra(Intent.EXTRA_TEXT,"Name: "+contact.getFirstName()+"\b"+contact.getLastName()+"\n"+"Primary Number: "
+                                +contact.getPrimaryPhoneNumber()+"\n"+"Secondary Number: "+contact.getSecondaryPhoneNumber()+"\n"+"EmailId :"+contact.getEmailId());
+                                shareIntent.setType("text/plain");
+                                startActivity(Intent.createChooser(shareIntent,"Sharing Contact"));
+                                return true;
                             default:
                                 return false;
                         }
@@ -355,7 +360,7 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
                 intent.addCategory(Intent.CATEGORY_OPENABLE);
-                intent.setType("*/*");
+                intent.setType("text/json");
                 startActivityForResult(intent, PICK_JSON_FILE);
             }
         }
@@ -372,7 +377,7 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
                 intent.addCategory(Intent.CATEGORY_OPENABLE);
-                intent.setType("*/*");
+                intent.setType("text/json");
                 intent.putExtra(Intent.EXTRA_TITLE, "contacts.json");
                 startActivityForResult(intent, CREATE_JSON_FILE);
             }
