@@ -3,6 +3,8 @@ package com.ba.contacts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.app.ActionBar;
 import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Environment;
@@ -44,8 +46,9 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
     private static final int PERMISSION_CALL=1;
     private static final int PERMISSION_EXTERNAL_WRITE=2;
-    private static final int CREATE_JSON_FILE=3;
-    private static final int PICK_JSON_FILE=4;
+    private static final int PERMISSION_EXTERNAL_READ=3;
+    private static final int CREATE_JSON_FILE=4;
+    private static final int PICK_JSON_FILE=5;
 
     Toolbar toolbar;
     FloatingActionButton floatingActionButton;
@@ -313,16 +316,26 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.import_menu_item) {
             Log.d("BA", "On Import Clicked");
-            Intent intent=new Intent(Intent.ACTION_OPEN_DOCUMENT);
-            intent.addCategory(Intent.CATEGORY_OPENABLE);
-            intent.setType("*/*");
-            startActivityForResult(intent,PICK_JSON_FILE);
+            if(ContextCompat.checkSelfPermission(this,Manifest.permission.READ_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED){
+                if(ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,Manifest.permission.READ_EXTERNAL_STORAGE)){
+                    Toast.makeText(MainActivity.this, "Need READ permission to Import Contacts ", Toast.LENGTH_LONG).show();
+                    ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},PERMISSION_EXTERNAL_READ);
+                }else {
+                    ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},PERMISSION_EXTERNAL_WRITE);
+                }
+            }else {
+                Intent intent=new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                intent.setType("*/*");
+                startActivityForResult(intent,PICK_JSON_FILE);
+            }
         }
+
         if (item.getItemId() == R.id.export_menu_item) {
             Log.d("BA", "On Export Clicked");
             if(ContextCompat.checkSelfPermission(this,Manifest.permission.WRITE_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED){
                 if(ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                    Toast.makeText(MainActivity.this, "Grant Write Permission To Export Contact List", Toast.LENGTH_LONG).show();
+                    Toast.makeText(MainActivity.this, "Need WRITE permission to Export Contacts", Toast.LENGTH_LONG).show();
                     ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},PERMISSION_EXTERNAL_WRITE);
                 }else{
                     ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},PERMISSION_EXTERNAL_WRITE);
@@ -340,6 +353,18 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if(requestCode == PERMISSION_EXTERNAL_READ){
+            if(grantResults.length>0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                Toast.makeText(MainActivity.this, "Read External Storage Granted", Toast.LENGTH_SHORT).show();
+                Intent intent=new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                intent.setType("*/*");
+                startActivityForResult(intent,PICK_JSON_FILE);
+            }
+            else{
+                Toast.makeText(MainActivity.this, "Grant Read Permission To Export Contacts", Toast.LENGTH_LONG).show();
+            }
+        }
         if (requestCode == PERMISSION_EXTERNAL_WRITE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(MainActivity.this, "Write External Storage Granted", Toast.LENGTH_SHORT).show();
@@ -349,7 +374,7 @@ public class MainActivity extends AppCompatActivity {
                 intent.putExtra(Intent.EXTRA_TITLE,"contacts.json");
                 startActivityForResult(intent,CREATE_JSON_FILE);
             } else {
-                Toast.makeText(MainActivity.this, "Grant Write Permission To Export Contact List", Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, "Grant Write Permission To Export Contacts", Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -437,8 +462,6 @@ public class MainActivity extends AppCompatActivity {
             else
                 return "";
         }
-
-
     }
 
     // start of ExportAsyncTask
