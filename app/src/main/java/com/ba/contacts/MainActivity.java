@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int PERMISSION_EXTERNAL_READ = 3;
     private static final int CREATE_JSON_FILE = 4;
     private static final int PICK_JSON_FILE = 5;
+    private static final int CREATE_VCF_FILE = 6;
 
     Toolbar toolbar;
     FloatingActionButton floatingActionButton;
@@ -364,11 +365,13 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (item.getItemId() == R.id.export_menu_item) {
-            Log.d("BA", "On Export Clicked");
+            ec();
+           /* Log.d("BA", "On Export Clicked");
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                     Toast.makeText(MainActivity.this, "Need WRITE permission to Export Contacts", Toast.LENGTH_LONG).show();
-                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_EXTERNAL_WRITE);
+                    ActivityCompat.requestPermissions(MainActivity.this,                builder.create();
+                builder.show(); new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_EXTERNAL_WRITE);
                 } else {
                     ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_EXTERNAL_WRITE);
                 }
@@ -378,9 +381,54 @@ public class MainActivity extends AppCompatActivity {
                 intent.setType("text/json");
                 intent.putExtra(Intent.EXTRA_TITLE, "contacts.json");
                 startActivityForResult(intent, CREATE_JSON_FILE);
-            }
+            }*/
         }
         return true;
+    }
+    void ec(){
+        final String[] dialogList= new String[]{"Export to .json", "Export to .vcf"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setItems(dialogList, new DialogInterface.OnClickListener(){
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if(which==0){
+                    if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                        if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                            Toast.makeText(MainActivity.this, "Need WRITE permission to Export Contacts", Toast.LENGTH_LONG).show();
+                            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_EXTERNAL_WRITE);
+                        } else {
+                            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_EXTERNAL_WRITE);
+                        }
+                    } else {
+                        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+                        intent.addCategory(Intent.CATEGORY_OPENABLE);
+                        intent.setType("text/json");
+                        intent.putExtra(Intent.EXTRA_TITLE, "contacts.json");
+                        startActivityForResult(intent, CREATE_JSON_FILE);
+                    }
+
+                }
+                if(which==1){
+                    if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                        if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                            Toast.makeText(MainActivity.this, "Need WRITE permission to Export Contacts", Toast.LENGTH_LONG).show();
+                            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_EXTERNAL_WRITE);
+                        } else {
+                            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_EXTERNAL_WRITE);
+                        }
+                    } else {
+                        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+                        intent.addCategory(Intent.CATEGORY_OPENABLE);
+                        intent.setType("text/json");
+                        intent.putExtra(Intent.EXTRA_TITLE, "contacts.vcf");
+                        startActivityForResult(intent, CREATE_VCF_FILE);
+                    }
+
+                }
+            }
+        });
+        builder.create();
+        builder.show();
     }
 
     @Override
@@ -405,6 +453,7 @@ public class MainActivity extends AppCompatActivity {
                 intent.addCategory(Intent.CATEGORY_OPENABLE);
                 intent.setType("*/*");
                 startActivityForResult(intent,PICK_JSON_FILE);
+
             }
             else {
                 Toast.makeText(MainActivity.this, "Grant Read Permission To Import Contacts", Toast.LENGTH_LONG).show();
@@ -413,11 +462,7 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == PERMISSION_EXTERNAL_WRITE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(MainActivity.this, "Write External Storage Granted", Toast.LENGTH_SHORT).show();
-                Intent intent=new Intent(Intent.ACTION_CREATE_DOCUMENT);
-                intent.addCategory(Intent.CATEGORY_OPENABLE);
-                intent.setType("*/*");
-                intent.putExtra(Intent.EXTRA_TITLE,"contacts.json");
-                startActivityForResult(intent,CREATE_JSON_FILE);
+                ec();
             } else {
                 Toast.makeText(MainActivity.this, "Grant Write Permission To Export Contacts", Toast.LENGTH_LONG).show();
             }
@@ -444,10 +489,21 @@ public class MainActivity extends AppCompatActivity {
             uri=data.getData();
             final String docId = DocumentsContract.getDocumentId(uri);
             final String[] split = docId.split(":");
-            new ExportAsyncTask(adapter).execute(split[1]);
+            new ExportAsyncTask(adapter,0).execute(split[1]);
         }else{
             Toast.makeText(MainActivity.this,"Export Failed",Toast.LENGTH_SHORT).show();
         }
+        }
+        if(requestCode==CREATE_VCF_FILE && resultCode==Activity.RESULT_OK){
+            Uri uri=null;
+            if(data!=null){
+                uri=data.getData();
+                final String docId = DocumentsContract.getDocumentId(uri);
+                final String[] split = docId.split(":");
+                new ExportAsyncTask(adapter,1).execute(split[1]);
+            }else{
+                Toast.makeText(MainActivity.this,"Export Failed",Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -512,9 +568,11 @@ public class MainActivity extends AppCompatActivity {
     // start of ExportAsyncTask
     private class ExportAsyncTask extends AsyncTask<String,Void,String>{
         private ContactAdapter adapter;
+        int which;
 
-        private ExportAsyncTask(ContactAdapter adapter) {
+        private ExportAsyncTask(ContactAdapter adapter,int which) {
             this.adapter = adapter;
+            this.which=which;
         }
 
         @Override
@@ -526,35 +584,65 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected String doInBackground(String... strings) {
             String  path=strings[0];
-            JSONObject jsonObject=new JSONObject();
-            JSONArray jsonArray=new JSONArray();
-            for (int i=0;i<adapter.getItemCount();i++){
-                Contact contact=adapter.getContactAt(i);
-                JSONObject tempObject=new JSONObject();
-                try {
-                    tempObject.put("first",contact.getFirstName());
-                    tempObject.put("last",contact.getLastName());
-                    tempObject.put("primary",contact.getPrimaryPhoneNumber());
-                    tempObject.put("secondary",contact.getSecondaryPhoneNumber());
-                    tempObject.put("email",contact.getEmailId());
-                    jsonArray.put(tempObject);
-                } catch (JSONException e) {
-                    e.printStackTrace();
+            File dir=new File(Environment.getExternalStorageDirectory(),path);
+            dir.mkdirs();
+            if(which==0){
+                JSONObject jsonObject=new JSONObject();
+                JSONArray jsonArray=new JSONArray();
+                for (int i=0;i<adapter.getItemCount();i++){
+                    Contact contact=adapter.getContactAt(i);
+                    JSONObject tempObject=new JSONObject();
+                    try {
+                        tempObject.put("first",contact.getFirstName());
+                        tempObject.put("last",contact.getLastName());
+                        tempObject.put("primary",contact.getPrimaryPhoneNumber());
+                        tempObject.put("secondary",contact.getSecondaryPhoneNumber());
+                        tempObject.put("email",contact.getEmailId());
+                        jsonArray.put(tempObject);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        jsonObject.put("Contacts",jsonArray);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    try (FileOutputStream fileOutputStream=new FileOutputStream(dir)){
+                        fileOutputStream.write(jsonObject.toString().getBytes());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
-                try {
-                    jsonObject.put("Contacts",jsonArray);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                File dir=new File(Environment.getExternalStorageDirectory(),path);
-                dir.mkdirs();
+                return "Contacts Exported to: "+path;
+            }
+            if(which==1){
                 try (FileOutputStream fileOutputStream=new FileOutputStream(dir)){
-                    fileOutputStream.write(jsonObject.toString().getBytes());
+                    byte[] begin="BEGIN:VCARD\n".getBytes();
+                    byte[] version="VERSION:2.1\n".getBytes();
+                    byte[] end="END:VCARD\n".getBytes();
+                    for (int i=0;i<adapter.getItemCount();i++) {
+                        Contact contact = adapter.getContactAt(i);
+                        fileOutputStream.write(begin);
+                        fileOutputStream.write(version);
+                        byte[] n=("N:;"+contact.getFirstName()+";;;\n").getBytes();
+                        fileOutputStream.write(n);
+                        byte[] fn=("FN:"+contact.getFirstName()+" "+contact.getLastName()+"\n").getBytes();
+                        fileOutputStream.write(fn);
+                        byte[] tel1=("TEL;CELL;PREF:"+contact.getPrimaryPhoneNumber()+"\n").getBytes();
+                        fileOutputStream.write(tel1);
+                        byte[] tel2=("TEL;CELL:"+contact.getSecondaryPhoneNumber()+"\n").getBytes();
+                        fileOutputStream.write(tel2);
+                        byte[] email=("EMAIL;HOME:"+contact.getSecondaryPhoneNumber()+"\n").getBytes();
+                        fileOutputStream.write(email);
+                        fileOutputStream.write(end);
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                return "Contacts Exported to: "+path;
             }
-            return "Contacts Exported to: "+path;
+
+            return "Export Failed";
         }
         @Override
         protected void onPostExecute(String s) {
