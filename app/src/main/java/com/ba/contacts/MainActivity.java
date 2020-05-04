@@ -40,9 +40,11 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int CREATE_JSON_FILE = 4;
     private static final int PICK_JSON_FILE = 5;
     private static final int CREATE_VCF_FILE = 6;
+    private static final int PICK_VCF_FILE =7;
 
     Toolbar toolbar;
     FloatingActionButton floatingActionButton;
@@ -348,8 +351,7 @@ public class MainActivity extends AppCompatActivity {
             alertDialog.show();
         }
         if (item.getItemId() == R.id.import_menu_item) {
-            Log.d("BA", "On Import Clicked");
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ) {
+            if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ) {
                 if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
                     Toast.makeText(MainActivity.this, "Need READ permission to Import Contacts ", Toast.LENGTH_LONG).show();
                     ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_EXTERNAL_READ);
@@ -357,33 +359,55 @@ public class MainActivity extends AppCompatActivity {
                     ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_EXTERNAL_READ);
                 }
             } else {
-                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-                intent.addCategory(Intent.CATEGORY_OPENABLE);
-                intent.setType("*/*");
-                startActivityForResult(intent, PICK_JSON_FILE);
-           }
+                ic();
+                //Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                //intent.addCategory(Intent.CATEGORY_OPENABLE);
+                //intent.setType("*/*");
+                //startActivityForResult(intent, PICK_JSON_FILE);
+            }
         }
-
         if (item.getItemId() == R.id.export_menu_item) {
-            ec();
-           /* Log.d("BA", "On Export Clicked");
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                     Toast.makeText(MainActivity.this, "Need WRITE permission to Export Contacts", Toast.LENGTH_LONG).show();
-                    ActivityCompat.requestPermissions(MainActivity.this,                builder.create();
-                builder.show(); new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_EXTERNAL_WRITE);
+                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_EXTERNAL_WRITE);
                 } else {
                     ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_EXTERNAL_WRITE);
                 }
             } else {
-                Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
-                intent.addCategory(Intent.CATEGORY_OPENABLE);
-                intent.setType("text/json");
-                intent.putExtra(Intent.EXTRA_TITLE, "contacts.json");
-                startActivityForResult(intent, CREATE_JSON_FILE);
-            }*/
+                //Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+                //intent.addCategory(Intent.CATEGORY_OPENABLE);
+                //intent.setType("text/json");
+                //intent.putExtra(Intent.EXTRA_TITLE, "contacts.vcf");
+                //startActivityForResult(intent, CREATE_VCF_FILE);
+                ec();
+            }
         }
         return true;
+    }
+    void ic() {
+        final String[] dialogList= new String[]{"Import .json", "Import .vcf"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setItems(dialogList, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if(which==0){
+                    Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                    intent.addCategory(Intent.CATEGORY_OPENABLE);
+                    intent.setType("*/*");
+                    startActivityForResult(intent, PICK_JSON_FILE);
+                }
+                if(which==1){
+                    Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                    intent.addCategory(Intent.CATEGORY_OPENABLE);
+                    intent.setType("*/*");
+                    startActivityForResult(intent, PICK_VCF_FILE);
+                }
+            }
+        });
+        builder.create();
+        builder.show();
+
     }
     void ec(){
         final String[] dialogList= new String[]{"Export to .json", "Export to .vcf"};
@@ -392,21 +416,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if(which==0){
-                    if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                        if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                            Toast.makeText(MainActivity.this, "Need WRITE permission to Export Contacts", Toast.LENGTH_LONG).show();
-                            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_EXTERNAL_WRITE);
-                        } else {
-                            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_EXTERNAL_WRITE);
-                        }
-                    } else {
                         Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
                         intent.addCategory(Intent.CATEGORY_OPENABLE);
                         intent.setType("text/json");
                         intent.putExtra(Intent.EXTRA_TITLE, "contacts.json");
                         startActivityForResult(intent, CREATE_JSON_FILE);
-                    }
-
                 }
                 if(which==1){
                     if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
@@ -423,7 +437,6 @@ public class MainActivity extends AppCompatActivity {
                         intent.putExtra(Intent.EXTRA_TITLE, "contacts.vcf");
                         startActivityForResult(intent, CREATE_VCF_FILE);
                     }
-
                 }
             }
         });
@@ -449,10 +462,11 @@ public class MainActivity extends AppCompatActivity {
         if(requestCode == PERMISSION_EXTERNAL_READ){
             if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
                 Toast.makeText(MainActivity.this, "Read External Storage Granted", Toast.LENGTH_SHORT).show();
-                Intent intent=new Intent(Intent.ACTION_OPEN_DOCUMENT);
-                intent.addCategory(Intent.CATEGORY_OPENABLE);
-                intent.setType("*/*");
-                startActivityForResult(intent,PICK_JSON_FILE);
+                //Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                //intent.addCategory(Intent.CATEGORY_OPENABLE);
+                //intent.setType("*/*");
+                //startActivityForResult(intent, PICK_JSON_FILE);
+                ic();
 
             }
             else {
@@ -477,8 +491,11 @@ public class MainActivity extends AppCompatActivity {
             if(data!=null){
                 uri=data.getData();
                 final String docId = DocumentsContract.getDocumentId(uri);
+                Log.d("split","doc="+docId);
                 final String[] split = docId.split(":");
-                new ImportAsyncTask().execute(split[1]);
+                Log.d("split","split 0="+split[0]);
+                Log.d("split","split 1="+split[1]);
+                new ImportAsyncTask(0).execute(split[1]);
             }else {
                 Toast.makeText(MainActivity.this,"Choose Appropriate File",Toast.LENGTH_SHORT).show();
             }
@@ -494,6 +511,15 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(MainActivity.this,"Export Failed",Toast.LENGTH_SHORT).show();
         }
         }
+        if(requestCode==PICK_VCF_FILE && resultCode==Activity.RESULT_OK){
+            Uri uri=null;
+            if(data!=null){
+                uri=data.getData();
+                final String docId = DocumentsContract.getDocumentId(uri);
+                final String[] split = docId.split(":");
+                new ImportAsyncTask(1).execute(split[1]);
+            }
+        }
         if(requestCode==CREATE_VCF_FILE && resultCode==Activity.RESULT_OK){
             Uri uri=null;
             if(data!=null){
@@ -508,12 +534,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // Start of ImportAsyncTask
-    private class ImportAsyncTask extends AsyncTask<String,Void,String>{
+    private class ImportAsyncTask extends AsyncTask<String,Void,String> {
+        int which;
+
+        ImportAsyncTask(int which) {
+            this.which = which;
+        }
 
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            Toast.makeText(MainActivity.this,s,Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this, s, Toast.LENGTH_SHORT).show();
         }
 
         @Override
@@ -521,47 +552,106 @@ public class MainActivity extends AppCompatActivity {
             String path = strings[0];
             Log.d("import", path);
             File file = new File(Environment.getExternalStorageDirectory(), path);
-            String filePath = fileExtenstion(path);
+            String filePath = fileExtenstion(path, which);
             Log.d("filepath", filePath);
-            if (!filePath.equals(".json")) {
-                return "Select JSON format file";
-            } else {
-                try (FileReader fileReader = new FileReader(file)) {
-                    BufferedReader bufferedReader = new BufferedReader(fileReader);
-                    StringBuilder stringBuilder = new StringBuilder();
-                    String line = bufferedReader.readLine();
-                    while (line != null) {
-                        stringBuilder.append(line).append("\n");
-                        line = bufferedReader.readLine();
+            if (which == 0) {
+                if (!filePath.equals(".json")) {
+                    return "Select JSON format file";
+                } else {
+                    try (FileReader fileReader = new FileReader(file)) {
+                        BufferedReader bufferedReader = new BufferedReader(fileReader);
+                        StringBuilder stringBuilder = new StringBuilder();
+                        String line = bufferedReader.readLine();
+                        while (line != null) {
+                            stringBuilder.append(line).append("\n");
+                            line = bufferedReader.readLine();
+                        }
+                        bufferedReader.close();
+                        String jsonString = stringBuilder.toString();
+                        Log.d("object", jsonString);
+                        JSONObject jsonObject = new JSONObject(jsonString);
+                        JSONArray jsonArray = jsonObject.getJSONArray("Contacts");
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            JSONObject tempObject = jsonArray.getJSONObject(i);
+                            String first = tempObject.getString("first");
+                            String last = tempObject.getString("last");
+                            String primary = tempObject.getString("primary");
+                            String secondary = tempObject.getString("secondary");
+                            String email = tempObject.getString("email");
+                            Contact contact = new Contact(first, last, primary, secondary, email);
+                            contactViewModel.insert(contact);
+                        }
+                    } catch (IOException | JSONException e) {
+                        e.printStackTrace();
                     }
-                    bufferedReader.close();
-                    String jsonString = stringBuilder.toString();
-                    Log.d("object", jsonString);
-                    JSONObject jsonObject = new JSONObject(jsonString);
-                    JSONArray jsonArray = jsonObject.getJSONArray("Contacts");
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        JSONObject tempObject = jsonArray.getJSONObject(i);
-                        String first = tempObject.getString("first");
-                        String last = tempObject.getString("last");
-                        String primary = tempObject.getString("primary");
-                        String secondary = tempObject.getString("secondary");
-                        String email = tempObject.getString("email");
-                        Contact contact = new Contact(first, last, primary, secondary, email);
-                        contactViewModel.insert(contact);
-                    }
-                } catch (IOException | JSONException e) {
-                    e.printStackTrace();
+                    return "Contacts Imported";
                 }
-                return "Contacts Imported";
             }
+            if (which == 1) {
+                if (!filePath.equals(".vcf")) {
+                    return "Select vcf format";
+                } else {
+                    try (FileInputStream fileInputStream = new FileInputStream(file)) {
+                        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fileInputStream));
+                        String line = bufferedReader.readLine();
+                        boolean hasNext = false;
+                        String first = "", last = "", primary = "", secondary = "", email = "";
+                        if (line.equals("BEGIN:VCARD"))
+                            hasNext = true;
+                        while (hasNext) {
+                            String s = bufferedReader.readLine();
+                            if (s.lastIndexOf("N:", 2) == 0) {
+                                String[] temp = s.split(";", 3);
+                                last = temp[0].substring(temp[0].lastIndexOf(":") + 1);
+                                first = temp[1];
+                                Log.d("con", "last" + temp[0]);
+                                Log.d("con", "first" + temp[1]);
+                            }
+                            if (s.contains("TEL;CELL;PREF:") && s.lastIndexOf(":") != 0) {
+                                primary = s.substring(s.lastIndexOf(":") + 1);
+                                Log.d("con", "primary" + primary);
+                            }
+                            if (s.contains("TEL;CELL:") && s.lastIndexOf(":") != 0) {
+                                secondary = s.substring(s.lastIndexOf(":") + 1);
+                                Log.d("con", "secondary" + secondary);
+                            }
+                            if (s.contains("EMAIL") && s.lastIndexOf(":") != 0) {
+                                email = s.substring(s.lastIndexOf(":") + 1);
+                                Log.d("con", "email" + email);
+                            }
+                            if (s.equals("END:VCARD")) {
+                                Contact importContact = new Contact(first, last, primary, secondary, email);
+                                contactViewModel.insert(importContact);
+                                String next = bufferedReader.readLine();
+                                if (next == null)
+                                    hasNext = false;
+                            }
+                        }
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    return "Contacts Imported";
+                }
+            }
+            return "Import failed";
         }
 
-        private String fileExtenstion(String path) {
-            if(path.lastIndexOf(".")!=-1 && path.lastIndexOf(".")!=0){
-                return path.substring(path.lastIndexOf("."));
+        private String fileExtenstion(String path, int which) {
+            if (path.lastIndexOf(".") != -1 && path.lastIndexOf(".") != 0) {
+                if (which == 0) {
+                    int index = path.lastIndexOf(".");
+                    Log.d("file", path.substring(index, index + 5));
+                    return path.substring(index, index + 5);
+                }
+                if (which == 1) {
+                    int index = path.lastIndexOf(".");
+                    Log.d("file", path.substring(index, index + 4));
+                    return path.substring(index, index + 4);
+                }
+
             }
-            else
-                return "";
+            return "";
         }
     }
 
@@ -624,7 +714,7 @@ public class MainActivity extends AppCompatActivity {
                         Contact contact = adapter.getContactAt(i);
                         fileOutputStream.write(begin);
                         fileOutputStream.write(version);
-                        byte[] n=("N:;"+contact.getFirstName()+";;;\n").getBytes();
+                        byte[] n=("N:"+contact.getLastName()+";"+contact.getFirstName()+";;;\n").getBytes();
                         fileOutputStream.write(n);
                         byte[] fn=("FN:"+contact.getFirstName()+" "+contact.getLastName()+"\n").getBytes();
                         fileOutputStream.write(fn);
@@ -632,7 +722,7 @@ public class MainActivity extends AppCompatActivity {
                         fileOutputStream.write(tel1);
                         byte[] tel2=("TEL;CELL:"+contact.getSecondaryPhoneNumber()+"\n").getBytes();
                         fileOutputStream.write(tel2);
-                        byte[] email=("EMAIL;HOME:"+contact.getSecondaryPhoneNumber()+"\n").getBytes();
+                        byte[] email=("EMAIL;HOME:"+contact.getEmailId()+"\n").getBytes();
                         fileOutputStream.write(email);
                         fileOutputStream.write(end);
                     }
