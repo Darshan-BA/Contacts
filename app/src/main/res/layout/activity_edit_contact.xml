@@ -14,9 +14,31 @@
         android:elevation="4dp"
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         app:popupTheme="@style/Theme.AppCompat.Light"/>
+    <RelativeLayout
+        android:layout_width="156dp"
+        android:layout_height="156dp"
+        android:layout_below="@+id/toolbar"
+        android:layout_margin="16dp"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/profile_photo"
+        android:gravity="center_horizontal"
+        android:background="@drawable/circle_shape">
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            app:cardCornerRadius="75dp"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true">
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/circlr_image"
+                android:scaleType="centerCrop"/>
+        </com.google.android.material.card.MaterialCardView>
+    </RelativeLayout>
     <EditText
         android:id="@+id/firstname_edit"
-        android:layout_below="@+id/toolbar"
+        android:layout_below="@+id/profile_photo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"

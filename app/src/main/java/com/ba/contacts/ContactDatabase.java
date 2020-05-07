@@ -1,6 +1,7 @@
 package com.ba.contacts;
 
 import android.content.Context;
+import android.net.Uri;
 import android.os.AsyncTask;
 
 import androidx.annotation.NonNull;
@@ -9,7 +10,7 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
-@Database(entities = {Contact.class},version = 2)
+@Database(entities = {Contact.class},version = 3)
 public abstract class ContactDatabase extends RoomDatabase {
 
     private static ContactDatabase instance;
@@ -38,8 +39,8 @@ public abstract class ContactDatabase extends RoomDatabase {
         }
         @Override
         protected Void doInBackground(Void... voids) {
-            contactDao.insert(new Contact("Ambulance","","100","",""));
-            contactDao.insert(new Contact("Police","","108","",""));
+            contactDao.insert(new Contact("Ambulance","","100","","",""));
+            contactDao.insert(new Contact("Police","","108","","",""));
             return null;
         }
     }

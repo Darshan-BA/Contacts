@@ -1,5 +1,7 @@
 package com.ba.contacts;
 
+import android.net.Uri;
+
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
@@ -25,6 +27,9 @@ public class Contact {
     @ColumnInfo(name = "email_id")
     private  String emailId;
 
+    @ColumnInfo(name="path")
+    private String photoPath;
+
     public int getId() {
         return id;
     }
@@ -35,6 +40,10 @@ public class Contact {
 
     String getLastName() {
         return lastName;
+    }
+
+    public String getPhotoPath() {
+        return photoPath;
     }
 
     String getPrimaryPhoneNumber() {
@@ -53,12 +62,13 @@ public class Contact {
         this.id = id;
     }
 
-    public Contact(String firstName, String lastName, String primaryPhoneNumber, String secondaryPhoneNumber, String emailId) {
+    public Contact(String firstName, String lastName, String primaryPhoneNumber, String secondaryPhoneNumber, String emailId,String photoPath) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.primaryPhoneNumber = primaryPhoneNumber;
         this.secondaryPhoneNumber = secondaryPhoneNumber;
         this.emailId = emailId;
+        this.photoPath=photoPath;
     }
 
 }

@@ -1,6 +1,8 @@
 package com.ba.contacts;
 
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +12,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +24,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactH
     private List<Contact> contacts = new ArrayList<>();
     boolean setMultiDelete=false;
     private OnItemClickListner mListener;
+    private MainActivity mainActivity=new MainActivity();
     Contact getContactAt(int position) {
         return contacts.get(position);
     }
@@ -50,6 +57,14 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactH
         holder.email.setText(currentContact.getEmailId());
         holder.primary.setText(currentContact.getPrimaryPhoneNumber());
         holder.secondary.setText(currentContact.getSecondaryPhoneNumber());
+        if(currentContact.getPhotoPath()!=null) {
+            //Glide.with(mainActivity).load(new File(currentContact.getPhotoPath())).into(holder.icon);
+            if (currentContact.getPhotoPath().equals("")) {
+                holder.icon.setImageResource(R.drawable.photo_icon);
+            }else {
+                holder.icon.setImageBitmap(BitmapFactory.decodeFile(currentContact.getPhotoPath()));
+            }
+        }
         if(!setMultiDelete){
             holder.checkBox.setVisibility(View.GONE);
         }else {

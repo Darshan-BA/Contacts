@@ -117,6 +117,7 @@ public class MainActivity extends AppCompatActivity {
                                 intent.putExtra("primary", contact.getPrimaryPhoneNumber());
                                 intent.putExtra("secondary", contact.getSecondaryPhoneNumber());
                                 intent.putExtra("email", contact.getEmailId());
+                                intent.putExtra("photoPath",contact.getPhotoPath());
                                 startActivity(intent);
                                 return true;
                             case R.id.delete:
@@ -578,7 +579,7 @@ public class MainActivity extends AppCompatActivity {
                             String primary = tempObject.getString("primary");
                             String secondary = tempObject.getString("secondary");
                             String email = tempObject.getString("email");
-                            Contact contact = new Contact(first, last, primary, secondary, email);
+                            Contact contact = new Contact(first, last, primary, secondary, email,"");
                             contactViewModel.insert(contact);
                         }
                     } catch (IOException | JSONException e) {
@@ -620,7 +621,7 @@ public class MainActivity extends AppCompatActivity {
                                 Log.d("con", "email" + email);
                             }
                             if (s.equals("END:VCARD")) {
-                                Contact importContact = new Contact(first, last, primary, secondary, email);
+                                Contact importContact = new Contact(first, last, primary, secondary, email,"");
                                 contactViewModel.insert(importContact);
                                 String next = bufferedReader.readLine();
                                 if (next == null)
@@ -641,15 +642,26 @@ public class MainActivity extends AppCompatActivity {
             if (path.lastIndexOf(".") != -1 && path.lastIndexOf(".") != 0) {
                 if (which == 0) {
                     int index = path.lastIndexOf(".");
-                    Log.d("file", path.substring(index, index + 5));
-                    return path.substring(index, index + 5);
+                    String p=path.substring(index);
+                    if(p.length()<=4){
+                        Log.d("file",p);
+                        return p;
+                    }else{
+                        return path.substring(index, index + 5);
+                    }
+                    //Log.d("file", path.substring(index, index + 5));
                 }
                 if (which == 1) {
                     int index = path.lastIndexOf(".");
-                    Log.d("file", path.substring(index, index + 4));
-                    return path.substring(index, index + 4);
+                    String p = path.substring(index);
+                    if (p.length() <= 4) {
+                        Log.d("file", p);
+                        return p;
+                    } else {
+                        Log.d("file", path.substring(index, index + 4));
+                        return path.substring(index, index + 4);
+                    }
                 }
-
             }
             return "";
         }
