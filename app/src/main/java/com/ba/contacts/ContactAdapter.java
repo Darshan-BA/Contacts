@@ -8,6 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -19,14 +21,46 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactHolder>{
+public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactHolder> implements Filterable {
 
     private List<Contact> contacts = new ArrayList<>();
+    private List<Contact> duplicateContacts;
     boolean setMultiDelete=false;
     private OnItemClickListner mListener;
     private MainActivity mainActivity=new MainActivity();
     Contact getContactAt(int position) {
         return contacts.get(position);
+    }
+
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence constraint) {
+                String queryChar=constraint.toString();
+                if(queryChar.isEmpty()){
+                    contacts=duplicateContacts;
+                }else{
+                    List<Contact>filterContacts=new ArrayList<>();
+                    for(Contact row:duplicateContacts){
+                        if(row.getFirstName().toLowerCase().contains(queryChar.toLowerCase()) || row.getLastName().toLowerCase().contains(queryChar.toLowerCase()) || row.getPrimaryPhoneNumber().contains(
+                                queryChar) || row.getSecondaryPhoneNumber().contains(queryChar)){
+                            filterContacts.add(row);
+                        }
+                    }
+                    contacts=filterContacts;
+                }
+                FilterResults filterResults=new FilterResults();
+                filterResults.values=contacts;
+                return filterResults;
+            }
+
+            @Override
+            protected void publishResults(CharSequence constraint, FilterResults results) {
+                contacts=(ArrayList<Contact>)results.values;
+                notifyDataSetChanged();
+            }
+        };
     }
 
     public interface OnItemClickListner {
@@ -83,6 +117,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactH
 
     public void setContacts(List<Contact> contacts) {
         this.contacts = contacts;
+        duplicateContacts=contacts;
         notifyDataSetChanged();
     }
 

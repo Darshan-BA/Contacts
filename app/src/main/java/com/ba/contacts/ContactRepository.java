@@ -9,11 +9,13 @@ import java.util.List;
 class ContactRepository {
     private ContactDao contactDao;
     private LiveData<List<Contact>> allContacts;
+    private LiveData<List<Contact>> allContactsByLastName;
 
     ContactRepository(Application application) {
         ContactDatabase database = ContactDatabase.getInstance(application);
         contactDao = database.contactDao();
         allContacts = contactDao.getAllContacts();
+        allContactsByLastName=contactDao.getAllContactsByLastName();
     }
 
     void insert(Contact contact) {
@@ -35,6 +37,9 @@ class ContactRepository {
 
     LiveData<List<Contact>> getAllContacts() {
         return allContacts;
+    }
+    LiveData<List<Contact>> getAllContactsByLastName(){
+        return allContactsByLastName;
     }
 
 

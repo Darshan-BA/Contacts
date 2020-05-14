@@ -5,10 +5,14 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
+import android.app.SearchManager;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.view.ActionMode;
+import android.widget.SearchView;
 
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
@@ -63,8 +67,8 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<Contact> deleteContactList = new ArrayList<>();
     ContactAdapter adapter;
     List<Contact> exportContacts;
-
     private String phoneNumberHolder;
+    private SearchView searchView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +78,9 @@ public class MainActivity extends AppCompatActivity {
         //action bar
         toolbar = findViewById(R.id.toolbar);
         toolbar.setTitleTextColor(getResources().getColor(R.color.primaryTextColor, null));
+        toolbar.setLogo(R.mipmap.contact_icon);
+        toolbar.setTitle("Contacts");
+        //setActionBar(toolbar);
         setSupportActionBar(toolbar);
 
         //Floating Button
@@ -88,15 +95,30 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setHasFixedSize(true);
         recyclerView.setAdapter(adapter);
 
+        //SharedPrefrence for Contacts Sort
+        SharedPreferences sortPrep=getSharedPreferences("SORT",MODE_PRIVATE);
+        int sortId=sortPrep.getInt("name",0);
+
         //ViewModel instance
         contactViewModel = new ViewModelProvider(this).get(ContactViewModel.class);
-        contactViewModel.getAllContacts().observe(this, new Observer<List<Contact>>() {
-            @Override
-            public void onChanged(List<Contact> contacts) {
-                adapter.setContacts(contacts);
-                exportContacts = contacts;
-            }
-        });
+        if(sortId==1){
+            contactViewModel.getAllContactsByLastName().observe(this, new Observer<List<Contact>>() {
+                @Override
+                public void onChanged(List<Contact> contacts) {
+                    adapter.setContacts(contacts);
+                    exportContacts=contacts;
+                }
+            });
+        }
+        if(sortId==0) {
+            contactViewModel.getAllContacts().observe(this, new Observer<List<Contact>>() {
+                @Override
+                public void onChanged(List<Contact> contacts) {
+                    adapter.setContacts(contacts);
+                    exportContacts = contacts;
+                }
+            });
+        }
 
         // OnClick listner for deleting and editing
         adapter.setOnItemClickListener(new ContactAdapter.OnItemClickListner() {
@@ -266,7 +288,6 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-
     private ActionMode.Callback actionModeCallback = new ActionMode.Callback() {
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
@@ -323,34 +344,37 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.toolbar_menu, menu);
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        searchView= (SearchView) menu.findItem(R.id.search_toolbar).getActionView();
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        searchView.setIconifiedByDefault(true);
+        searchView.setMinimumWidth(Integer.MAX_VALUE);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                adapter.getFilter().filter(query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                adapter.getFilter().filter(newText);
+                return false;
+            }
+        });
         return true;
+    }
+    @Override
+    public void onBackPressed() {
+        if(!searchView.isIconified()){
+            searchView.setIconified(true);
+            return;
+        }
+        super.onBackPressed();
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.delete_toolbar) {
-            final AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
-            alertDialog.setTitle("Delete Selected");
-            alertDialog.setMessage("Are you sure want to delete selected contacts");
-            alertDialog.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    contactViewModel.multipleDelete(deleteContactList.toArray(new Contact[deleteContactList.size()]));
-                    deleteContactList.clear();
-                    adapter.setMultiDelete = false;
-                    adapter.notifyDataSetChanged();
-                    Toast.makeText(MainActivity.this, "Contacts Deleted", Toast.LENGTH_SHORT).show();
-                }
-            });
-            alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                }
-            });
-            alertDialog.create();
-            alertDialog.show();
-        }
         if (item.getItemId() == R.id.import_menu_item) {
             if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ) {
                 if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
@@ -384,8 +408,54 @@ public class MainActivity extends AppCompatActivity {
                 ec();
             }
         }
+        if(item.getItemId()==R.id.sort_menu_item){
+            sortContacts();
+        }
         return true;
+    }//end of onOptionItemSelected
+
+    private void sortContacts() {
+        final String[] dialogList=new String[]{"First Name","Last Name"};
+        final AlertDialog.Builder builder=new AlertDialog.Builder(MainActivity.this);
+        builder.setTitle("Sort Contacts By");
+        final SharedPreferences sortPrep=getSharedPreferences("SORT",MODE_PRIVATE);
+        int selectedItem=sortPrep.getInt("name",0);
+        builder.setSingleChoiceItems(dialogList,selectedItem, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                SharedPreferences.Editor sortPrepEditor=sortPrep.edit();
+                switch(which){
+                    case 0:
+                        sortPrepEditor.putInt("name",0);
+                        sortPrepEditor.apply();
+                        dialog.dismiss();
+                        contactViewModel.getAllContacts().observe(MainActivity.this, new Observer<List<Contact>>() {
+                            @Override
+                            public void onChanged(List<Contact> contacts) {
+                                adapter.setContacts(contacts);
+                                exportContacts=contacts;
+                            }
+                        });
+                        break;
+                    case 1:
+                        sortPrepEditor.putInt("name",1);
+                        sortPrepEditor.apply();
+                        dialog.dismiss();
+                        contactViewModel.getAllContactsByLastName().observe(MainActivity.this, new Observer<List<Contact>>() {
+                            @Override
+                            public void onChanged(List<Contact> contacts) {
+                                adapter.setContacts(contacts);
+                                exportContacts=contacts;
+                            }
+                        });
+                        break;
+                }
+            }
+        });
+        builder.create();
+        builder.show();
     }
+
     void ic() {
         final String[] dialogList= new String[]{"Import .json", "Import .vcf"};
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
@@ -596,39 +666,49 @@ public class MainActivity extends AppCompatActivity {
                         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fileInputStream));
                         String line = bufferedReader.readLine();
                         boolean hasNext = false;
-                        String first = "", last = "", primary = "", secondary = "", email = "";
                         if (line.equals("BEGIN:VCARD"))
                             hasNext = true;
+                        String first = "", last = "", primary = "", secondary = "", email = "";
+                        List<String>phonenumbers=new ArrayList<>();
                         while (hasNext) {
                             String s = bufferedReader.readLine();
                             if (s.lastIndexOf("N:", 2) == 0) {
                                 String[] temp = s.split(";", 3);
                                 last = temp[0].substring(temp[0].lastIndexOf(":") + 1);
                                 first = temp[1];
-                                Log.d("con", "last" + temp[0]);
-                                Log.d("con", "first" + temp[1]);
+                                Log.d("con", "last:" + temp[0]);
+                                Log.d("con", "first:" + temp[1]);
                             }
-                            if (s.contains("TEL;CELL;PREF:") && s.lastIndexOf(":") != 0) {
-                                primary = s.substring(s.lastIndexOf(":") + 1);
-                                Log.d("con", "primary" + primary);
+                            if (s.contains("TEL;") && s.lastIndexOf(":") != 0 ) {
+                                phonenumbers.add(s.substring(s.lastIndexOf(":") + 1));
+                                //primary = s.substring(s.lastIndexOf(":") + 1);
+                                //Log.d("con", "primary" + primary);
+                                Log.d("con", "primary:" + s.substring(s.lastIndexOf(":") + 1));
+                                Log.d("con","Now phonenumber size is:"+String.valueOf(phonenumbers.size()));
                             }
-                            if (s.contains("TEL;CELL:") && s.lastIndexOf(":") != 0) {
+                            /*if (s.contains("TEL;") && s.lastIndexOf(":") != 0 ) {
                                 secondary = s.substring(s.lastIndexOf(":") + 1);
-                                Log.d("con", "secondary" + secondary);
-                            }
+                                Log.d("con", "secondary:" + secondary);
+                            }*/
                             if (s.contains("EMAIL") && s.lastIndexOf(":") != 0) {
                                 email = s.substring(s.lastIndexOf(":") + 1);
-                                Log.d("con", "email" + email);
+                                Log.d("con", "email:" + email);
                             }
                             if (s.equals("END:VCARD")) {
-                                Contact importContact = new Contact(first, last, primary, secondary, email,"");
-                                contactViewModel.insert(importContact);
+                                if(phonenumbers.size() == 1){
+                                    Contact importContact = new Contact(first, last, phonenumbers.get(0), "", email,"");
+                                    contactViewModel.insert(importContact);
+                                }else if(phonenumbers.size() >=2) {
+                                    Contact importContact = new Contact(first, last, phonenumbers.get(0), phonenumbers.get(1), email, "");
+                                    contactViewModel.insert(importContact);
+                                }
+                                first = ""; last = "";primary = ""; secondary = ""; email = "";
+                                phonenumbers.clear();
                                 String next = bufferedReader.readLine();
                                 if (next == null)
                                     hasNext = false;
                             }
                         }
-
                     } catch (IOException e) {
                         e.printStackTrace();
                     }

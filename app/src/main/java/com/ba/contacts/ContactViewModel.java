@@ -11,11 +11,13 @@ import java.util.List;
 public class ContactViewModel extends AndroidViewModel {
     private ContactRepository repository;
     private LiveData<List<Contact>>allContacts;
+    private LiveData<List<Contact>>allContactsByLastName;
 
     public ContactViewModel(@NonNull Application application) {
         super(application);
         repository=new ContactRepository(application);
         allContacts=repository.getAllContacts();
+        allContactsByLastName=repository.getAllContactsByLastName();
     }
     void insert(Contact contact){
         repository.insert(contact);
@@ -34,5 +36,7 @@ public class ContactViewModel extends AndroidViewModel {
     LiveData<List<Contact>>getAllContacts(){
         return allContacts;
     }
-
+    LiveData<List<Contact>>getAllContactsByLastName(){
+        return allContactsByLastName;
+    }
 }

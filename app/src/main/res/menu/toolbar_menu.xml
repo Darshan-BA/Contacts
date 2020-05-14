@@ -1,7 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item android:id="@+id/import_menu_item" android:title="Import" android:icon="@drawable/ic_import_export_black_24dp" app:showAsAction="never"/>
-    <item android:id="@+id/export_menu_item" android:title="Export" android:icon="@drawable/ic_import_export_black_24dp" app:showAsAction="never"/>
-
+    <item
+        android:id="@+id/search_toolbar"
+        android:title="Search"
+        android:orderInCategory="1"
+        android:icon="@drawable/ic_search_black_24dp"
+        app:showAsAction="collapseActionView|always"
+        app:actionViewClass="android.widget.SearchView" />
+    <item
+        android:id="@+id/import_menu_item"
+        android:title="Import"
+        android:orderInCategory="2"
+        android:icon="@drawable/ic_import_export_black_24dp" />
+    <item android:id="@+id/export_menu_item"
+        android:title="Export"
+        android:orderInCategory="3"
+        android:icon="@drawable/ic_import_export_black_24dp"/>
+    <item
+        android:id="@+id/sort_menu_item"
+        android:title="Sort By"
+        android:orderInCategory="3"/>
 </menu>

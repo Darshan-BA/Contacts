@@ -7,16 +7,21 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity"
     android:id="@+id/mainactivity_relativelayout">
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbarlayout"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/primaryColor"
-        android:elevation="4dp"
-        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-        app:popupTheme="@style/Theme.AppCompat.Light"/>
+        android:layout_height="wrap_content">
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/primaryColor"
+            android:elevation="4dp"
+            android:theme="@style/Widget.AppCompat.ActionBar"
+            app:popupTheme="@style/Theme.AppCompat.Light"/>
+    </com.google.android.material.appbar.AppBarLayout>
     <androidx.coordinatorlayout.widget.CoordinatorLayout
-        android:layout_below="@+id/toolbar"
+        android:layout_below="@+id/appbarlayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <androidx.recyclerview.widget.RecyclerView

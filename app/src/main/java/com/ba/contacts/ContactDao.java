@@ -24,7 +24,10 @@ public interface ContactDao {
     @Delete
     void multipleDelete(Contact... contacts);
 
-    @Query("SELECT * FROM contacts ORDER BY first_name ASC")
+    @Query("SELECT * FROM contacts ORDER BY first_name COLLATE NOCASE ASC")
     LiveData<List<Contact>>getAllContacts();
 
+    @Query("SELECT * FROM contacts ORDER BY last_name COLLATE NOCASE ASC ")
+    LiveData<List<Contact>>getAllContactsByLastName();
+    //IfNULL(last_name),
 }
