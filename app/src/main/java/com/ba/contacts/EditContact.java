@@ -1,11 +1,14 @@
 package com.ba.contacts;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.room.PrimaryKey;
 
 import android.content.ContentResolver;
 import android.content.DialogInterface;
@@ -15,15 +18,25 @@ import android.graphics.BitmapFactory;
 import android.graphics.ImageDecoder;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.InputType;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -38,12 +51,15 @@ public class EditContact extends AppCompatActivity {
     Contact contact;
     ContactViewModel contactViewModel;
     Toolbar toolbar;
-    EditText firstName,lastName,emailAddress,primaryPhoneNumber,secondaryPhoneNumber;
-    MaterialButton cancelButton,saveButton,editButton;
+    TextInputLayout firstNameLay,lastNameLay,emailAddressLay,primaryPhoneNumberLay,secondaryPhoneNumberLay,spinnerLay;
+    TextInputEditText firstName,lastName,emailAddress,primaryPhoneNumber,secondaryPhoneNumber;
+    //MaterialButton cancelButton,saveButton,editButton;
     ImageView photo;
     private Uri pUri;
     private String photoPath;
     private Bitmap photoBitmap;
+    private AutoCompleteTextView autoCompleteTextView;
+    private int saveUpdate;
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -77,19 +93,43 @@ public class EditContact extends AppCompatActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.editcontact_toolbar_ment, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case (R.id.save_editcontact_toolbar):
+                if(saveUpdate==0)
+                    saveDialog();
+                if(saveUpdate==1)
+                    updateDialog();
+        }
+        return false;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_contact);
 
         //View widgets initialization
+        firstNameLay=findViewById(R.id.firstname_edit_layout);
+        lastNameLay=findViewById(R.id.lastname_edit_layout);
+        emailAddressLay=findViewById(R.id.email_edit_layout);
+        primaryPhoneNumberLay=findViewById(R.id.primary_edit_layout);
+        secondaryPhoneNumberLay=findViewById(R.id.secondary_edit_layout);
+        spinnerLay=findViewById(R.id.spinner_edit_layout);
         firstName=findViewById(R.id.firstname_edit);
         lastName=findViewById(R.id.lastname_edit);
         emailAddress=findViewById(R.id.email_edit);
         primaryPhoneNumber=findViewById(R.id.primary_edit);
         secondaryPhoneNumber=findViewById(R.id.secondary_edit);
-        cancelButton=findViewById(R.id.cancel_button);
-        saveButton=findViewById(R.id.save_button);
-        editButton=findViewById(R.id.update_button);
+        //cancelButton=findViewById(R.id.cancel_button);
+        //saveButton=findViewById(R.id.save_button);
+        //editButton=findViewById(R.id.update_button);
         photo=findViewById(R.id.circlr_image);
         photo.setImageResource(R.drawable.add_photo);
         photo.setOnClickListener(new View.OnClickListener() {
@@ -100,16 +140,23 @@ public class EditContact extends AppCompatActivity {
             }
         });
 
+        //spinner
+
+        String[] groupNames={"Default","Family","Friends"};
+        ArrayAdapter<String> arrayAdapter=new ArrayAdapter<String>(this,R.layout.spinner_list_item,groupNames);
+        autoCompleteTextView=findViewById(R.id.dropdown_edit);
+        autoCompleteTextView.setAdapter(arrayAdapter);
+        autoCompleteTextView.setInputType(InputType.TYPE_NULL);
+
         //Toolbar initialization
         toolbar=findViewById(R.id.toolbar);
         toolbar.setTitleTextColor(getResources().getColor(R.color.primaryTextColor,null));
         setSupportActionBar(toolbar);
-        ActionBar actionBar=getSupportActionBar();
 
         //fetched Intent extras
         Intent intent=getIntent();
         if(intent.hasExtra("id")) {
-            actionBar.setTitle("Edit Contact");
+            toolbar.setTitle("Edit Contact");
             firstName.setText(intent.getStringExtra("first"));
             lastName.setText(intent.getStringExtra("last"));
             primaryPhoneNumber.setText(intent.getStringExtra("primary"));
@@ -122,11 +169,15 @@ public class EditContact extends AppCompatActivity {
             }else{
                 photo.setImageBitmap(BitmapFactory.decodeFile(intent.getStringExtra("photoPath")));
             }
-            saveButton.setVisibility(View.GONE);
-            editButton.getVisibility();
-            editButton.setVisibility(View.VISIBLE);
+            //saveButton.setVisibility(View.GONE);
+            //editButton.getVisibility();
+            //editButton.setVisibility(View.VISIBLE);
+            spinnerLay.setVisibility(View.GONE);
+            saveUpdate=1;
+
         }else {
-            actionBar.setTitle("Add Contact");
+            toolbar.setTitle("Add Contact");
+            saveUpdate=0;
         }
         contactViewModel=new ViewModelProvider(this).get(ContactViewModel.class);
 
@@ -159,6 +210,7 @@ public class EditContact extends AppCompatActivity {
             String primary=strings[2];
             String secondary=strings[3];
             String email=strings[4];
+            String group=strings[5];
             String photoPath="";
             File file=new File(getApplicationContext().getFilesDir(),"Photos");
             Log.d("edit","filepath1="+file.getAbsolutePath());
@@ -178,7 +230,7 @@ public class EditContact extends AppCompatActivity {
             Log.d("photoPath","photoPath:"+photoPath);
             if(which==0){
                 contact=new Contact(first,last,primary,secondary,email,photoPath);
-                contactViewModel.insert(contact);
+                contactViewModel.insetWithGroup(contact,group);
                 return "Contact Saved";
             }
             if(which==1){
@@ -205,6 +257,7 @@ public class EditContact extends AppCompatActivity {
             photoBitmap=bitmap;
         }
 
+        @RequiresApi(api = Build.VERSION_CODES.P)
         @Override
         protected Bitmap doInBackground(Uri... uris) {
             Bitmap bitmap= null;
@@ -238,7 +291,7 @@ public class EditContact extends AppCompatActivity {
     }
 
     //save button dialog
-    public void saveDialog(View view) {
+    public void saveDialog() {
         AlertDialog.Builder builder=new AlertDialog.Builder(this);
         builder.setCancelable(false);
         builder.setTitle("Save");
@@ -251,14 +304,20 @@ public class EditContact extends AppCompatActivity {
                 String primary=primaryPhoneNumber.getText().toString().trim();
                 String secondary=secondaryPhoneNumber.getText().toString().trim();
                 String email=emailAddress.getText().toString().trim();
-                if(first.isEmpty() && second.isEmpty() && primary.isEmpty()
+                String selectedGroup=autoCompleteTextView.getText().toString().trim();
+                if(first.isEmpty() && !second.isEmpty()){
+                    firstNameLay.setError("Is Empty");
+                }
+                else if(first.isEmpty() && second.isEmpty() && primary.isEmpty()
                         && secondary.isEmpty() && email.isEmpty()){
+
                     Toast.makeText(EditContact.this,"All Fields Are Empty",Toast.LENGTH_SHORT).show();
                 }else{
-                    new PhotoSaveAsyncTask(0).execute(first,second,primary,secondary,email);
-                    //contact=new Contact(first,second,primary,secondary,email);
-                    //contactViewModel.insert(contact);
-                    //Toast.makeText(EditContact.this,"Contact Saved",Toast.LENGTH_SHORT).show();
+                    if(first.isEmpty() && !primary.isEmpty())
+                        first=primary;
+                    if(first.isEmpty() && primary.isEmpty() && !secondary.isEmpty())
+                        first=secondary;
+                    new PhotoSaveAsyncTask(0).execute(first,second,primary,secondary,email,selectedGroup);
                     finish();
                 }
             }
@@ -273,7 +332,7 @@ public class EditContact extends AppCompatActivity {
     }
 
     //update button dialog
-    public void updateDialog(View view) {
+    public void updateDialog() {
         AlertDialog.Builder builder=new AlertDialog.Builder(this);
         builder.setCancelable(false);
         builder.setTitle("Update");
@@ -287,6 +346,7 @@ public class EditContact extends AppCompatActivity {
                 String secondary=secondaryPhoneNumber.getText().toString().trim();
                 String email=emailAddress.getText().toString().trim();
                 int id=getIntent().getIntExtra("id",-1);
+                if(first.isEmpty() && !second.isEmpty())
                 if(id == -1){
                     Toast.makeText(EditContact.this,"Contact can not be update",Toast.LENGTH_SHORT).show();
                 }
@@ -297,7 +357,7 @@ public class EditContact extends AppCompatActivity {
                     //contact=new Contact(first,second,primary,secondary,email,"");
                     //contact.setId(id);
                     //contactViewModel.update(contact);
-                    new PhotoSaveAsyncTask(1,id).execute(first,second,primary,secondary,email);
+                    new PhotoSaveAsyncTask(1,id).execute(first,second,primary,secondary,email,"");
                     finish();
                 }
 

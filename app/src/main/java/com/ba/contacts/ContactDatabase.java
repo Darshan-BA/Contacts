@@ -10,12 +10,20 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
-@Database(entities = {Contact.class},version = 3)
+import com.ba.contacts.DAOs.FamilyDao;
+import com.ba.contacts.DAOs.FriendsDao;
+import com.ba.contacts.Entities.FamilyList;
+import com.ba.contacts.Entities.FriendsList;
+
+@Database(entities = {Contact.class, FriendsList.class, FamilyList.class},version = 6)
 public abstract class ContactDatabase extends RoomDatabase {
 
     private static ContactDatabase instance;
 
     public abstract ContactDao contactDao();
+    //group
+    public abstract FriendsDao friendsDao();
+    public abstract FamilyDao familyDao();
 
     static synchronized ContactDatabase getInstance(Context context){
         if(instance == null){

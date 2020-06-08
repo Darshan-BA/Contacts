@@ -34,11 +34,11 @@ public class Contact {
         return id;
     }
 
-    String getFirstName() {
+    public String getFirstName() {
         return firstName;
     }
 
-    String getLastName() {
+    public String getLastName() {
         return lastName;
     }
 
@@ -46,15 +46,15 @@ public class Contact {
         return photoPath;
     }
 
-    String getPrimaryPhoneNumber() {
+    public String getPrimaryPhoneNumber() {
         return primaryPhoneNumber;
     }
 
-    String  getSecondaryPhoneNumber() {
+    public String  getSecondaryPhoneNumber() {
         return secondaryPhoneNumber;
     }
 
-    String getEmailId() {
+    public String getEmailId() {
         return emailId;
     }
 

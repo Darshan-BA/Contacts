@@ -13,4 +13,15 @@
         <item name="windowActionModeOverlay">true</item>
     </style>
 
+    <style name="TextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeColor">@color/primaryColor</item>
+        <item name="android:enabled">true</item>
+        <item name="android:textColorHint">@color/secondaryColor</item>
+        <item name="hintTextColor">@color/primaryLightColor</item>
+    </style>
+
+    <style name="navigation" parent="AppTheme">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+
 </resources>

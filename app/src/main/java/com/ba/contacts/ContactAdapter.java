@@ -15,8 +15,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,10 +23,16 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactH
 
     private List<Contact> contacts = new ArrayList<>();
     private List<Contact> duplicateContacts;
+
+    public void setSetMultiDelete(boolean setMultiDelete) {
+        this.setMultiDelete = setMultiDelete;
+    }
+
     boolean setMultiDelete=false;
     private OnItemClickListner mListener;
-    private MainActivity mainActivity=new MainActivity();
-    Contact getContactAt(int position) {
+    //private MainActivity mainActivity=new MainActivity();
+
+    public Contact getContactAt(int position) {
         return contacts.get(position);
     }
 
@@ -71,7 +75,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactH
         void multiSelect(int adapterPosition,boolean check);
     }
 
-    void setOnItemClickListener(OnItemClickListner listener) {
+    public void setOnItemClickListener(OnItemClickListner listener) {
         mListener = listener;
     }
 
