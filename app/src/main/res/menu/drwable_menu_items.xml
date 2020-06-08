@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <item
+        android:id="@+id/contact_menu_item"
+        android:icon="@drawable/ic_account_circle_black_24dp"
+        android:title="Contacts" />
+    <item
+        android:icon="@drawable/ic_baseline_group_24"
+        android:title="Groups">
+        <menu>
+            <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/family_menu_item"
+                    android:title="Family" />
+                <item
+                    android:id="@+id/friends_menu_item"
+                    android:title="Friends" />
+            </group>
+        </menu>
+    </item>
+    <item android:title="Misc">
+        <menu>
+            <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/import_menu_item"
+                    android:title="Import" />
+                <item
+                    android:id="@+id/export_menu_item"
+                    android:title="Export" />
+                <item
+                    android:id="@+id/sort_menu_item"
+                    android:title="Sort By" />
+            </group>
+        </menu>
+    </item>
+
+</menu>
