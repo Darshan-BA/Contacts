@@ -72,12 +72,10 @@ public class MainActivity extends AppCompatActivity {
     private static final int PICK_VCF_FILE = 7;
 
     public Toolbar toolbar;
-    FloatingActionButton floatingActionButton;
     ContactViewModel contactViewModel;
     ArrayList<Contact> deleteContactList = new ArrayList<>();
     public ContactAdapter adapter;
     List<Contact> exportContacts;
-    private String phoneNumberHolder;
     private SearchView searchView;
     private DrawerLayout drawerLayout;
 
@@ -91,11 +89,7 @@ public class MainActivity extends AppCompatActivity {
         toolbar.setTitleTextColor(getResources().getColor(R.color.primaryTextColor, null));
         //toolbar.setLogo(R.mipmap.contact_icon);
         toolbar.setTitle("Contacts");
-        //setActionBar(toolbar);
         setSupportActionBar(toolbar);
-
-        //Floating Button
-        //floatingActionButton = findViewById(R.id.add_float);
 
         //drawerLayout and navigationView
         drawerLayout = findViewById(R.id.drawerayout);
@@ -115,20 +109,18 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.import_menu_item:
                         if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                             permissionNotGrandted(Manifest.permission.READ_EXTERNAL_STORAGE);
-                            break;
                         } else {
                             ic();
-                            break;
                         }
+                        break;
 
                     case R.id.export_menu_item:
                         if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                             permissionNotGrandted(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-                            break;
                         } else {
                             ec();
-                            break;
                         }
+                        break;
                     case R.id.sort_menu_item:
                         sc();
                         break;
@@ -147,19 +139,18 @@ public class MainActivity extends AppCompatActivity {
         });
 
         if(savedInstanceState==null){
-            getSupportFragmentManager().beginTransaction().add(R.id.framelayout,new MainFragment()).commit();
-            navigationView.setCheckedItem(R.id.contact_menu_item);
+            FragmentManager fm=getSupportFragmentManager();
+            FragmentTransaction fmt=fm.beginTransaction();
+            MainFragment mainFragment=new MainFragment();
+            fmt.add(R.id.framelayout,mainFragment);
+            //fmt.addToBackStack("main_frag");
+            fmt.setPrimaryNavigationFragment(mainFragment);
+            fmt.commit();
         }
 
 
         //RecyclerView Adapter instance
         adapter = new ContactAdapter();
-
-        /*RecyclerView
-        final RecyclerView recyclerView = findViewById(R.id.recyclerview);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        //recyclerView.setHasFixedSize(true);
-        recyclerView.setAdapter(adapter);*/
 
         //SharedPrefrence for Contacts Sort
         SharedPreferences sortPrep = getSharedPreferences("SORT", MODE_PRIVATE);
@@ -186,168 +177,8 @@ public class MainActivity extends AppCompatActivity {
             });
         }
 
-       /* // OnClick listner for deleting and editing
-        adapter.setOnItemClickListener(new ContactAdapter.OnItemClickListner() {
-            @Override
-            public void onPopUpClick(final Contact contact, View view) {
-                //contactViewModel.delete(adapter.getContactAt(position));
-                PopupMenu popupMenu = new PopupMenu(MainActivity.this, view);
-                popupMenu.getMenuInflater().inflate(R.menu.contact_card_menu, popupMenu.getMenu());
-                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        switch (item.getItemId()) {
-                            case R.id.edit:
-                                Intent intent = new Intent(MainActivity.this, EditContact.class);
-                                intent.putExtra("id", contact.getId());
-                                intent.putExtra("first", contact.getFirstName());
-                                intent.putExtra("last", contact.getLastName());
-                                intent.putExtra("primary", contact.getPrimaryPhoneNumber());
-                                intent.putExtra("secondary", contact.getSecondaryPhoneNumber());
-                                intent.putExtra("email", contact.getEmailId());
-                                intent.putExtra("photoPath", contact.getPhotoPath());
-                                startActivity(intent);
-                                return true;
-                            case R.id.delete:
-                                final AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
-                                alertDialog.setTitle("Delete");
-                                alertDialog.setMessage("Are you sure want to delete");
-                                alertDialog.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        contactViewModel.delete(contact);
-                                    }
-                                });
-                                alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        dialog.dismiss();
-                                    }
-                                });
-                                alertDialog.create();
-                                alertDialog.show();
-                                return true;
-                            case R.id.share:
-                                Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                                shareIntent.putExtra(Intent.EXTRA_TEXT, "Name: " + contact.getFirstName() + "\b" + contact.getLastName() + "\n" + "Primary Number: "
-                                        + contact.getPrimaryPhoneNumber() + "\n" + "Secondary Number: " + contact.getSecondaryPhoneNumber() + "\n" + "EmailId :" + contact.getEmailId());
-                                shareIntent.setType("text/plain");
-                                startActivity(Intent.createChooser(shareIntent, "Sharing Contact"));
-                                return true;
-                            default:
-                                return false;
-                        }
-                    }
-                });
-                popupMenu.show();
-            }
-
-            @Override
-            public void onIconClick(int position, View view) {
-                //need to implement adding profile photo
-            }
-
-            @Override
-            public void setContextualActionMode() {
-                adapter.setMultiDelete = true;
-                adapter.notifyDataSetChanged();
-                toolbar.startActionMode(actionModeCallback);
-            }
-
-            @Override
-            public void multiSelect(int adapterPosition, boolean check) {
-                if (check) {
-                    deleteContactList.add(adapter.getContactAt(adapterPosition));
-                } else {
-                    deleteContactList.remove(adapter.getContactAt(adapterPosition));
-                }
-            }
-
-            @Override
-            public void onCardClick(int position) {
-                final String[] dialogList;
-                Contact cardContact = adapter.getContactAt(position);
-                String first = cardContact.getPrimaryPhoneNumber();
-                String second = cardContact.getSecondaryPhoneNumber();
-                String email = cardContact.getEmailId();
-                Log.d("number", first);
-                Log.d("number", second);
-                Log.d("number", email);
-                if (first.isEmpty() && second.isEmpty() && email.isEmpty()) {
-                    dialogList = new String[0];
-                    Toast.makeText(MainActivity.this, "No Phone Numbers to Call", Toast.LENGTH_SHORT).show();
-                } else if (second.isEmpty() && email.isEmpty()) {
-                    dialogList = new String[1];
-                    dialogList[0] = cardContact.getPrimaryPhoneNumber();
-                } else if (first.isEmpty() && email.isEmpty()) {
-                    dialogList = new String[1];
-                    dialogList[0] = cardContact.getSecondaryPhoneNumber();
-                } else if (first.isEmpty() && second.isEmpty()) {
-                    dialogList = new String[1];
-                    dialogList[0] = cardContact.getEmailId();
-                } else if (email.isEmpty()) {
-                    dialogList = new String[2];
-                    dialogList[0] = cardContact.getPrimaryPhoneNumber();
-                    dialogList[1] = cardContact.getSecondaryPhoneNumber();
-                } else if (second.isEmpty()) {
-                    dialogList = new String[2];
-                    dialogList[0] = cardContact.getPrimaryPhoneNumber();
-                    dialogList[1] = cardContact.getEmailId();
-                } else if (first.isEmpty()) {
-                    dialogList = new String[2];
-                    dialogList[0] = cardContact.getSecondaryPhoneNumber();
-                    dialogList[1] = cardContact.getEmailId();
-                } else {
-                    dialogList = new String[3];
-                    dialogList[0] = cardContact.getPrimaryPhoneNumber();
-                    dialogList[1] = cardContact.getSecondaryPhoneNumber();
-                    dialogList[2] = cardContact.getEmailId();
-                }
-
-                final Intent phoneIntent = new Intent((Intent.ACTION_CALL));
-                final Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                builder.setItems(dialogList, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        String var = dialogList[which];
-                        boolean isVarEmail = false;
-                        for (int i = 0; i < var.length(); i++) {
-                            char temp = var.charAt(i);
-                            Log.d("ba", String.valueOf(temp));
-                            if (temp == '@') {
-                                isVarEmail = true;
-                                break;
-                            }
-                        }
-                        if (isVarEmail) {
-                            emailIntent.setData(Uri.parse("mailto:" + dialogList[which]));
-                            startActivity(emailIntent);
-
-                        } else {
-                            phoneNumberHolder = dialogList[which];
-                            if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-                                permissionNotGrandted(Manifest.permission.CALL_PHONE);
-                            } else {
-                                phoneIntent.setData(Uri.parse("tel:" + dialogList[which]));
-                                startActivity(phoneIntent);
-                            }
-                        }
-                    }
-                });
-                builder.create();
-                builder.show();
-            }
-
-        });*/
-
     }//end of onCreate()
 
-    //Floating button click method
-    public void addContact(View view) {
-        Intent intent = new Intent(this, EditContact.class);
-        startActivity(intent);
-    }
 
     //permission Request
     public void permissionNotGrandted(String permission) {
@@ -434,10 +265,10 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == PERMISSION_CALL) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(MainActivity.this, "Call Permission Granted", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(Intent.ACTION_CALL);
-                intent.setData(Uri.parse("tel:" + phoneNumberHolder));
+                //Intent intent = new Intent(Intent.ACTION_CALL);
+                //intent.setData(Uri.parse("tel:" + phoneNumberHolder));
                 if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
-                    startActivity(intent);
+                    //startActivity(intent);
                 }
             }
         }
@@ -531,7 +362,7 @@ public class MainActivity extends AppCompatActivity {
         builder.create();
         builder.show();
 
-    }//end of Import Contacrs
+    }//end of Import Contacts
 
     // Export Contacts
     void ec() {
@@ -729,14 +560,20 @@ public class MainActivity extends AppCompatActivity {
     //on Back Button Pressed
     @Override
     public void onBackPressed() {
+        Log.d("fragment","No of back stacks: "+ getSupportFragmentManager().getBackStackEntryCount());
         /*if (!searchView.isIconified()) {
             searchView.setIconified(true);
             return;
         } else*/ if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
-        } else {
+        }if(getSupportFragmentManager().getBackStackEntryCount()==1){
+            getSupportFragmentManager().popBackStack();
+        }
+        else {
             super.onBackPressed();
         }
+
+
     }
 
 

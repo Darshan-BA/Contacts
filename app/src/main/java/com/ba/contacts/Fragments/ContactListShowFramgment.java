@@ -40,6 +40,13 @@ public class ContactListShowFramgment extends Fragment {
     GroupAdapter groupAdapter;
     String groupName;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Log.d("frag", "onCreate contactlist_frag");
+        Log.d("fragment","No of back stacks contactlist: "+ getParentFragmentManager().getBackStackEntryCount());
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

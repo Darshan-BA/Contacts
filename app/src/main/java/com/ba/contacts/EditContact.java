@@ -142,7 +142,7 @@ public class EditContact extends AppCompatActivity {
 
         //spinner
 
-        String[] groupNames={"Default","Family","Friends"};
+        String[] groupNames={"Family","Friends"};
         ArrayAdapter<String> arrayAdapter=new ArrayAdapter<String>(this,R.layout.spinner_list_item,groupNames);
         autoCompleteTextView=findViewById(R.id.dropdown_edit);
         autoCompleteTextView.setAdapter(arrayAdapter);

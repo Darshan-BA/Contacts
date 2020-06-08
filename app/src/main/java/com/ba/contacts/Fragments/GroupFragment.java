@@ -3,6 +3,9 @@ package com.ba.contacts.Fragments;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -30,14 +33,21 @@ public class GroupFragment extends Fragment {
 
     ContactViewModel contactViewModel1;
     ContactAdapter groupContactAdapter;
-    private FloatingActionButton floatingActionButton;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Log.d("frag", "onCreate group_frag");
+        Log.d("fragment","No of back stacks group: "+ getParentFragmentManager().getBackStackEntryCount());
+    }
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view=inflater.inflate(R.layout.fragment_group,container,false);
         Log.d("frag","onCreateView created ");
         String groupName=getArguments().getString("group_name");
-        Toolbar toolbar=((MainActivity)getActivity()).toolbar;
+        Toolbar toolbar=(Toolbar)getActivity().findViewById(R.id.toolbar);
+        toolbar.inflateMenu(R.menu.toolbar_list);
         //adapter=((MainActivity)getActivity()).adapter;
         groupContactAdapter=new ContactAdapter();
         toolbar.setTitle(groupName);
@@ -62,7 +72,7 @@ public class GroupFragment extends Fragment {
             });
         }
 
-        floatingActionButton=view.findViewById(R.id.group_add_float);
+        FloatingActionButton floatingActionButton = view.findViewById(R.id.group_add_float);
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -106,9 +116,19 @@ public class GroupFragment extends Fragment {
         });
         return view;
     }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        return super.onOptionsItemSelected(item);
+    }
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        Log.d("frag", "onActivityCreated main_frag");
+        Log.d("frag", "onActivityCreated group_frag");
         super.onActivityCreated(savedInstanceState);
     }
 

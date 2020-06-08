@@ -65,6 +65,7 @@ public class MainFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d("frag", "onCreate main_frag");
+        Log.d("fragment","No of back stacks main: "+ getParentFragmentManager().getBackStackEntryCount());
     }
 
 
