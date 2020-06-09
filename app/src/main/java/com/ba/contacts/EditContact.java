@@ -106,6 +106,10 @@ public class EditContact extends AppCompatActivity {
                     saveDialog();
                 if(saveUpdate==1)
                     updateDialog();
+                return true;
+            case (android.R.id.home):
+                onBackPressed();
+                return true;
         }
         return false;
     }
@@ -152,6 +156,9 @@ public class EditContact extends AppCompatActivity {
         toolbar=findViewById(R.id.toolbar);
         toolbar.setTitleTextColor(getResources().getColor(R.color.primaryTextColor,null));
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_baseline_arrow_white_24);
+
 
         //fetched Intent extras
         Intent intent=getIntent();

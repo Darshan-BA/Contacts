@@ -71,6 +71,8 @@ public class MainActivity extends AppCompatActivity {
     private static final int CREATE_VCF_FILE = 6;
     private static final int PICK_VCF_FILE = 7;
 
+    private int fragIndex=0;
+
     public Toolbar toolbar;
     ContactViewModel contactViewModel;
     ArrayList<Contact> deleteContactList = new ArrayList<>();
@@ -78,6 +80,8 @@ public class MainActivity extends AppCompatActivity {
     List<Contact> exportContacts;
     private SearchView searchView;
     private DrawerLayout drawerLayout;
+
+    private FragmentManager fragmentManager=getSupportFragmentManager();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.contact_menu_item:
-                        getSupportFragmentManager().beginTransaction().add(R.id.framelayout,new MainFragment()).commit();
+                        fragmentManager.beginTransaction().replace(R.id.framelayout,new MainFragment()).commit();
                         toolbar.setTitle("Contacts");
                         break;
 
@@ -139,13 +143,12 @@ public class MainActivity extends AppCompatActivity {
         });
 
         if(savedInstanceState==null){
-            FragmentManager fm=getSupportFragmentManager();
-            FragmentTransaction fmt=fm.beginTransaction();
+            //FragmentManager fm=getSupportFragmentManager();
+            FragmentTransaction fmt=fragmentManager.beginTransaction();
             MainFragment mainFragment=new MainFragment();
-            fmt.add(R.id.framelayout,mainFragment);
-            //fmt.addToBackStack("main_frag");
-            fmt.setPrimaryNavigationFragment(mainFragment);
+            fmt.replace(R.id.framelayout,mainFragment);
             fmt.commit();
+            navigationView.setCheckedItem(R.id.contact_menu_item);
         }
 
 
@@ -445,7 +448,7 @@ public class MainActivity extends AppCompatActivity {
 
     // group Contacts
     void gc(int which){
-        FragmentManager fragmentManager=getSupportFragmentManager();
+        //FragmentManager fragmentManager=getSupportFragmentManager();
         FragmentTransaction fragmentTransaction=fragmentManager.beginTransaction();
         GroupFragment groupFragment=new GroupFragment();
         Bundle bundle=new Bundle();
@@ -501,6 +504,22 @@ public class MainActivity extends AppCompatActivity {
         });
         return true;
     }//end of Option Menu Create
+
+    public void setFragIndex(int fragIndex) {
+        this.fragIndex = fragIndex;
+        invalidateOptionsMenu();
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        switch (fragIndex){
+            case 2:
+                menu.findItem(R.id.search_toolbar).setVisible(false);
+        }
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+
 
     // Action CallBack for Multiple Delete
     private ActionMode.Callback actionModeCallback = new ActionMode.Callback() {
@@ -560,20 +579,16 @@ public class MainActivity extends AppCompatActivity {
     //on Back Button Pressed
     @Override
     public void onBackPressed() {
-        Log.d("fragment","No of back stacks: "+ getSupportFragmentManager().getBackStackEntryCount());
+        Log.d("fragment","No of back 1 stacks: "+ getSupportFragmentManager().getBackStackEntryCount());
         /*if (!searchView.isIconified()) {
             searchView.setIconified(true);
             return;
         } else*/ if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
-        }if(getSupportFragmentManager().getBackStackEntryCount()==1){
-            getSupportFragmentManager().popBackStack();
-        }
-        else {
+        }else {
             super.onBackPressed();
+            Log.d("fragment","No of back 3 stacks: "+ getSupportFragmentManager().getBackStackEntryCount());
         }
-
-
     }
 
 

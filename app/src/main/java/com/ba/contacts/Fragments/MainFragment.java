@@ -18,12 +18,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.SearchView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
@@ -55,6 +57,8 @@ public class MainFragment extends Fragment {
     private String phoneNumberHolder;
     private SearchView searchView;
 
+   // private Toolbar toolbar;
+
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
@@ -69,15 +73,59 @@ public class MainFragment extends Fragment {
     }
 
 
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.toolbar_menu, menu);
+        SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
+        searchView = (SearchView) menu.findItem(R.id.search_toolbar).getActionView();
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
+        searchView.setIconifiedByDefault(false);
+        searchView.setFocusable(true);
+        searchView.setIconified(false);
+        searchView.requestFocusFromTouch();
+        searchView.setMinimumWidth(Integer.MAX_VALUE);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                adapter.getFilter().filter(query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                adapter.getFilter().filter(newText);
+                return false;
+            }
+        });
+        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                searchView.setIconified(true);
+                View view =getActivity().getCurrentFocus();
+                //InputMethodManager inputMethodManager=(InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                //inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(),0);
+                return false;
+            }
+        });
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Log.d("frag", "onCreateView main_frag");
         View view = inflater.inflate(R.layout.fragment_main, container, false);
-
+        //setHasOptionsMenu(true);
         //toolbar
         //Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
         Toolbar toolbar=((MainActivity)getActivity()).toolbar;
+        /*toolbar=view.findViewById(R.id.toolbar);
+        toolbar.setTitle(R.string.app_name);
+        toolbar.inflateMenu(R.menu.toolbar_menu);
+        ((AppCompatActivity) getActivity()).getSupportActionBar();
+        AppCompatActivity activity = (AppCompatActivity) getActivity();
+        activity.setSupportActionBar(toolbar);
+        activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);*/
 
         SharedPreferences sortPrep = getActivity().getSharedPreferences("SORT", MODE_PRIVATE);
         int sortId = sortPrep.getInt("name", 0);

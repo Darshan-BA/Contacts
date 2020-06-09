@@ -27,12 +27,12 @@
 
                 android:elevation="4dp" />
         </com.google.android.material.appbar.AppBarLayout>
-
         <FrameLayout
             android:id="@+id/framelayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior" />
+
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <com.google.android.material.navigation.NavigationView
