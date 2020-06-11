@@ -7,5 +7,5 @@
         android:orderInCategory="1"
         android:title="Search"
         app:actionViewClass="android.widget.SearchView"
-        app:showAsAction="collapseActionView|always" />
+        app:showAsAction="ifRoom|collapseActionView" />
 </menu>

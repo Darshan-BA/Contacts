@@ -41,8 +41,6 @@ public class GroupFragment extends Fragment {
         super.onCreate(savedInstanceState);
         ((MainActivity)getActivity()).setFragIndex(2);
         //getActivity().invalidateOptionsMenu();
-        Log.d("frag", "onCreate group_frag");
-        Log.d("fragment","No of back stacks group: "+ getParentFragmentManager().getBackStackEntryCount());
     }
     @Nullable
     @Override

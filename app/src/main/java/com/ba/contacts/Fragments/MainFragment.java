@@ -119,8 +119,8 @@ public class MainFragment extends Fragment {
         //toolbar
         //Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
         Toolbar toolbar=((MainActivity)getActivity()).toolbar;
-        /*toolbar=view.findViewById(R.id.toolbar);
         toolbar.setTitle(R.string.app_name);
+        /*toolbar=view.findViewById(R.id.toolbar);
         toolbar.inflateMenu(R.menu.toolbar_menu);
         ((AppCompatActivity) getActivity()).getSupportActionBar();
         AppCompatActivity activity = (AppCompatActivity) getActivity();
@@ -131,7 +131,6 @@ public class MainFragment extends Fragment {
         int sortId = sortPrep.getInt("name", 0);
         //adapter = new ContactAdapter();
         adapter=((MainActivity)getActivity()).adapter;
-        
         floatingActionButton = view.findViewById(R.id.add_float);
         final RecyclerView recyclerView = view.findViewById(R.id.recyclerview);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));

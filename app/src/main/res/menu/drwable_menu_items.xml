@@ -9,7 +9,7 @@
         android:icon="@drawable/ic_baseline_group_24"
         android:title="Groups">
         <menu>
-            <group android:checkableBehavior="single">
+            <group android:checkableBehavior="none">
                 <item
                     android:id="@+id/family_menu_item"
                     android:title="Family" />

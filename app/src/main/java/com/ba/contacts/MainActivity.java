@@ -2,6 +2,7 @@ package com.ba.contacts;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -12,8 +13,9 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.provider.DocumentsContract;
+
 import android.view.ActionMode;
-import android.view.inputmethod.InputMethodManager;
+import android.view.inputmethod.EditorInfo;
 import android.widget.SearchView;
 
 import androidx.appcompat.widget.Toolbar;
@@ -26,9 +28,6 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -39,19 +38,13 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.PopupMenu;
 import android.widget.Toast;
-
 import com.ba.contacts.Fragments.GroupFragment;
 import com.ba.contacts.Fragments.MainFragment;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -78,10 +71,11 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<Contact> deleteContactList = new ArrayList<>();
     public ContactAdapter adapter;
     List<Contact> exportContacts;
-    private SearchView searchView;
+    //private SearchView searchView;
     private DrawerLayout drawerLayout;
+    private NavigationView navigationView;
 
-    private FragmentManager fragmentManager=getSupportFragmentManager();
+    private Fragment fragment=null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,60 +91,53 @@ public class MainActivity extends AppCompatActivity {
 
         //drawerLayout and navigationView
         drawerLayout = findViewById(R.id.drawerayout);
-        NavigationView navigationView = findViewById(R.id.navigation_view);
+        navigationView = findViewById(R.id.navigation_view);
         ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.openNavigation, R.string.closeNavigation);
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.contact_menu_item:
-                        fragmentManager.beginTransaction().replace(R.id.framelayout,new MainFragment()).commit();
-                        toolbar.setTitle("Contacts");
-                        break;
+        navigationView.setNavigationItemSelectedListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.contact_menu_item:
+                    getSupportFragmentManager().beginTransaction().replace(R.id.framelayout,new MainFragment()).commit();
+                    toolbar.setTitle("Contacts");
+                    break;
 
-                    case R.id.import_menu_item:
-                        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                            permissionNotGrandted(Manifest.permission.READ_EXTERNAL_STORAGE);
-                        } else {
-                            ic();
-                        }
-                        break;
+                case R.id.import_menu_item:
+                    if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                        permissionNotGrandted(Manifest.permission.READ_EXTERNAL_STORAGE);
+                    } else {
+                        ic();
+                    }
+                    break;
 
-                    case R.id.export_menu_item:
-                        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                            permissionNotGrandted(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-                        } else {
-                            ec();
-                        }
-                        break;
-                    case R.id.sort_menu_item:
-                        sc();
-                        break;
-                    case R.id.family_menu_item:
-                        gc(0);
-                        break;
+                case R.id.export_menu_item:
+                    if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                        permissionNotGrandted(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+                    } else {
+                        ec();
+                    }
+                    break;
+                case R.id.sort_menu_item:
+                    sc();
+                    break;
+                case R.id.family_menu_item:
+                    gc(0);
+                    break;
 
-                    case R.id.friends_menu_item:
-                        gc(1);
-                        break;
+                case R.id.friends_menu_item:
+                    gc(1);
+                    break;
 
-                }
-                drawerLayout.closeDrawer(GravityCompat.START);
-                return true;
             }
+            drawerLayout.closeDrawer(GravityCompat.START);
+            return true;
         });
 
         if(savedInstanceState==null){
-            //FragmentManager fm=getSupportFragmentManager();
-            FragmentTransaction fmt=fragmentManager.beginTransaction();
-            MainFragment mainFragment=new MainFragment();
-            fmt.replace(R.id.framelayout,mainFragment);
-            fmt.commit();
-            navigationView.setCheckedItem(R.id.contact_menu_item);
+            if(fragment==null){
+                gc(2);
+            }
         }
-
 
         //RecyclerView Adapter instance
         adapter = new ContactAdapter();
@@ -448,21 +435,25 @@ public class MainActivity extends AppCompatActivity {
 
     // group Contacts
     void gc(int which){
-        //FragmentManager fragmentManager=getSupportFragmentManager();
+        FragmentManager fragmentManager=getSupportFragmentManager();
         FragmentTransaction fragmentTransaction=fragmentManager.beginTransaction();
-        GroupFragment groupFragment=new GroupFragment();
+        fragment=new GroupFragment();
         Bundle bundle=new Bundle();
         if(which==0) {
-            fragmentTransaction.replace(R.id.framelayout, groupFragment);
+            fragmentTransaction.replace(R.id.framelayout, fragment);
             bundle.putString("group_name","Family");
-            groupFragment.setArguments(bundle);
+            fragment.setArguments(bundle);
             fragmentTransaction.commit();
         }
         if(which==1) {
-            fragmentTransaction.replace(R.id.framelayout, groupFragment);
+            fragmentTransaction.replace(R.id.framelayout, fragment);
             bundle.putString("group_name","Friends");
-            groupFragment.setArguments(bundle);
+            fragment.setArguments(bundle);
             fragmentTransaction.commit();
+        } if(which==2){
+            fragment=new MainFragment();
+            fragmentTransaction.replace(R.id.framelayout,fragment).commit();
+            navigationView.setCheckedItem(R.id.contact_menu_item);
         }
 
     }
@@ -472,13 +463,20 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.toolbar_menu, menu);
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        searchView = (SearchView) menu.findItem(R.id.search_toolbar).getActionView();
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        SearchView searchView = (SearchView) menu.findItem(R.id.search_toolbar).getActionView();
         searchView.setIconifiedByDefault(false);
         searchView.setFocusable(true);
         searchView.setIconified(false);
         searchView.requestFocusFromTouch();
-        searchView.setMinimumWidth(Integer.MAX_VALUE);
+        searchView.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        searchView.setOnCloseListener(new  SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                Log.d("searchview","search view on close listner");
+                return false;
+            }
+        });
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -489,16 +487,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onQueryTextChange(String newText) {
                 adapter.getFilter().filter(newText);
-                return false;
-            }
-        });
-        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
-            @Override
-            public boolean onClose() {
-                searchView.setIconified(true);
-                View view =getCurrentFocus();
-                InputMethodManager inputMethodManager=(InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-                inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(),0);
                 return false;
             }
         });
@@ -579,15 +567,16 @@ public class MainActivity extends AppCompatActivity {
     //on Back Button Pressed
     @Override
     public void onBackPressed() {
-        Log.d("fragment","No of back 1 stacks: "+ getSupportFragmentManager().getBackStackEntryCount());
         /*if (!searchView.isIconified()) {
             searchView.setIconified(true);
             return;
         } else*/ if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
-        }else {
+        }else if(!(fragment instanceof MainFragment)){
+            gc(2);
+        }
+        else {
             super.onBackPressed();
-            Log.d("fragment","No of back 3 stacks: "+ getSupportFragmentManager().getBackStackEntryCount());
         }
     }
 
