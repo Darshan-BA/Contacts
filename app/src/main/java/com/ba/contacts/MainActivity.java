@@ -1,23 +1,33 @@
 package com.ba.contacts;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.SearchManager;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.os.Environment;
 import android.provider.DocumentsContract;
-
+import android.util.Log;
 import android.view.ActionMode;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.inputmethod.EditorInfo;
 import android.widget.SearchView;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -28,23 +38,15 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import android.Manifest;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.net.Uri;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.widget.Toast;
+
 import com.ba.contacts.Fragments.GroupFragment;
 import com.ba.contacts.Fragments.MainFragment;
 import com.google.android.material.navigation.NavigationView;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -63,6 +65,8 @@ public class MainActivity extends AppCompatActivity {
     private static final int PICK_JSON_FILE = 5;
     private static final int CREATE_VCF_FILE = 6;
     private static final int PICK_VCF_FILE = 7;
+    private static final int PERMISSION_WRITE_CONTACTS=8;
+    private static final int PERMISSION_READ_CONTACTS=9;
 
     private int fragIndex=0;
 
@@ -100,6 +104,9 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.contact_menu_item:
                     getSupportFragmentManager().beginTransaction().replace(R.id.framelayout,new MainFragment()).commit();
                     toolbar.setTitle("Contacts");
+                    break;
+                case R.id.sim_menu_item:
+
                     break;
 
                 case R.id.import_menu_item:
@@ -244,8 +251,31 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_EXTERNAL_WRITE);
             }
-        }
 
+        }
+        if(permission.equals(Manifest.permission.WRITE_CONTACTS)){
+            if(ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,Manifest.permission.WRITE_CONTACTS)){
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Need Permission");
+                builder.setMessage("To Export contacts to SIM allow to write contacts ");
+                builder.setPositiveButton("Grant", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_CONTACTS}, PERMISSION_WRITE_CONTACTS);
+                    }
+                });
+                builder.setNegativeButton("Decline", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                builder.create();
+                builder.show();
+            } else {
+                ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_CONTACTS}, PERMISSION_WRITE_CONTACTS);
+            }
+        }
     }//end of permission Request
 
     // Permission Result
@@ -274,6 +304,12 @@ public class MainActivity extends AppCompatActivity {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(MainActivity.this, "Write External Storage Granted", Toast.LENGTH_SHORT).show();
                 ec();
+            }
+        }
+        if(requestCode == PERMISSION_WRITE_CONTACTS){
+            if(grantResults.length>0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                Toast.makeText(MainActivity.this,"Write Contact Permission Granted",Toast.LENGTH_SHORT).show();
+                new ExportToSimAsyncTask().execute();
             }
         }
     }//end of Permission Result
@@ -330,22 +366,27 @@ public class MainActivity extends AppCompatActivity {
 
     // Import Contacts
     void ic() {
-        final String[] dialogList = new String[]{"Import .json", "Import .vcf"};
+        final String[] dialogList = new String[]{"Import .json", "Import .vcf","Import to SIM"};
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setItems(dialogList, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                if (which == 0) {
-                    Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-                    intent.addCategory(Intent.CATEGORY_OPENABLE);
-                    intent.setType("*/*");
-                    startActivityForResult(intent, PICK_JSON_FILE);
-                }
-                if (which == 1) {
-                    Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-                    intent.addCategory(Intent.CATEGORY_OPENABLE);
-                    intent.setType("*/*");
-                    startActivityForResult(intent, PICK_VCF_FILE);
+                switch (which) {
+                    case 0: {
+                        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                        intent.addCategory(Intent.CATEGORY_OPENABLE);
+                        intent.setType("*/*");
+                        startActivityForResult(intent, PICK_JSON_FILE);
+                    }
+                    case 1: {
+                        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                        intent.addCategory(Intent.CATEGORY_OPENABLE);
+                        intent.setType("*/*");
+                        startActivityForResult(intent, PICK_VCF_FILE);
+                    }
+                    case 2:{
+
+                    }
                 }
             }
         });
@@ -356,32 +397,32 @@ public class MainActivity extends AppCompatActivity {
 
     // Export Contacts
     void ec() {
-        final String[] dialogList = new String[]{"Export to .json", "Export to .vcf"};
+        final String[] dialogList = new String[]{"Export to .json", "Export to .vcf","Export to SIM"};
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setItems(dialogList, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                if (which == 0) {
-                    Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
-                    intent.addCategory(Intent.CATEGORY_OPENABLE);
-                    intent.setType("text/json");
-                    intent.putExtra(Intent.EXTRA_TITLE, "contacts.json");
-                    startActivityForResult(intent, CREATE_JSON_FILE);
-                }
-                if (which == 1) {
-                    if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                        if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                            Toast.makeText(MainActivity.this, "Need WRITE permission to Export Contacts", Toast.LENGTH_LONG).show();
-                            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_EXTERNAL_WRITE);
-                        } else {
-                            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_EXTERNAL_WRITE);
-                        }
-                    } else {
+                switch (which) {
+                    case 0:{
+                        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+                        intent.addCategory(Intent.CATEGORY_OPENABLE);
+                        intent.setType("text/json");
+                        intent.putExtra(Intent.EXTRA_TITLE, "contacts.json");
+                        startActivityForResult(intent, CREATE_JSON_FILE);
+                    }
+                    case 1:{
                         Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
                         intent.addCategory(Intent.CATEGORY_OPENABLE);
                         intent.setType("text/json");
                         intent.putExtra(Intent.EXTRA_TITLE, "contacts.vcf");
                         startActivityForResult(intent, CREATE_VCF_FILE);
+                    }
+                    case 2:{
+                        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
+                            permissionNotGrandted(Manifest.permission.WRITE_CONTACTS);
+                        }else{
+                            new ExportToSimAsyncTask().execute();
+                        }
                     }
                 }
             }
@@ -455,7 +496,6 @@ public class MainActivity extends AppCompatActivity {
             fragmentTransaction.replace(R.id.framelayout,fragment).commit();
             navigationView.setCheckedItem(R.id.contact_menu_item);
         }
-
     }
 
     // Option Menu Create
@@ -725,6 +765,37 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             return "";
+        }
+    }
+    private class ExportToSimAsyncTask extends AsyncTask<Void,Void,Void>{
+        Uri simUri=Uri.parse("content://icc/adn");
+        ContentValues contentValues=new ContentValues();
+        ContentResolver contentResolver = getContentResolver();
+        @Override
+        protected Void doInBackground(Void... voids) {
+            for(Contact contact:exportContacts){
+                String name=contact.getFirstName()+" "+contact.getLastName();
+                if(!contact.getPrimaryPhoneNumber().equals("")){
+                    String phonenumber=contact.getPrimaryPhoneNumber();
+                    contentValues.put("tag",name);
+                    contentValues.put("number",phonenumber);
+                    Uri insteredPrimary=contentResolver.insert(simUri,contentValues);
+                    if(insteredPrimary!=null)
+                        //Toast.makeText(MainActivity.this,name+" exported to sim",Toast.LENGTH_SHORT).show();
+                        Log.d("sim", String.valueOf(insteredPrimary));
+                }
+                if(!contact.getSecondaryPhoneNumber().equals("")){
+                    String phonenumber=contact.getSecondaryPhoneNumber();
+                    contentValues.put("tag",name);
+                    contentValues.put("number",phonenumber);
+                    Uri insteredSecondary=contentResolver.insert(simUri,contentValues);
+                    if(insteredSecondary!=null)
+                        //Toast.makeText(MainActivity.this,name+" exported to sim",Toast.LENGTH_SHORT).show();
+                        Log.d("sim", String.valueOf(insteredSecondary));
+                }
+
+            }
+            return null;
         }
     }
 
