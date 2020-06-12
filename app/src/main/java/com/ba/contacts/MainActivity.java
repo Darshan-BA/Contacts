@@ -11,6 +11,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -276,6 +277,29 @@ public class MainActivity extends AppCompatActivity {
                 ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_CONTACTS}, PERMISSION_WRITE_CONTACTS);
             }
         }
+        if(permission.equals(Manifest.permission.READ_CONTACTS)){
+            if(ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,Manifest.permission.READ_CONTACTS)){
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Need Permission");
+                builder.setMessage("To Import contacts from SIM allow read contacts permission");
+                builder.setPositiveButton("Grant", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_CONTACTS}, PERMISSION_READ_CONTACTS);
+                    }
+                });
+                builder.setNegativeButton("Decline", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                builder.create();
+                builder.show();
+            } else {
+                ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_CONTACTS}, PERMISSION_READ_CONTACTS);
+            }
+        }
     }//end of permission Request
 
     // Permission Result
@@ -310,6 +334,12 @@ public class MainActivity extends AppCompatActivity {
             if(grantResults.length>0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
                 Toast.makeText(MainActivity.this,"Write Contact Permission Granted",Toast.LENGTH_SHORT).show();
                 new ExportToSimAsyncTask().execute();
+            }
+        }
+        if(requestCode== PERMISSION_READ_CONTACTS){
+            if(grantResults.length>0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                Toast.makeText(MainActivity.this,"Read Contact Permission Granted",Toast.LENGTH_SHORT).show();
+                new ImportFromSimAsyncTask().execute();
             }
         }
     }//end of Permission Result
@@ -377,15 +407,21 @@ public class MainActivity extends AppCompatActivity {
                         intent.addCategory(Intent.CATEGORY_OPENABLE);
                         intent.setType("*/*");
                         startActivityForResult(intent, PICK_JSON_FILE);
+                        break;
                     }
                     case 1: {
                         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
                         intent.addCategory(Intent.CATEGORY_OPENABLE);
                         intent.setType("*/*");
                         startActivityForResult(intent, PICK_VCF_FILE);
+                        break;
                     }
                     case 2:{
-
+                        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
+                            permissionNotGrandted(Manifest.permission.READ_CONTACTS);
+                        }else {
+                            new ImportFromSimAsyncTask().execute();
+                        }
                     }
                 }
             }
@@ -765,6 +801,23 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             return "";
+        }
+    }
+    private class ImportFromSimAsyncTask extends AsyncTask<Void,Void,String>{
+        Uri simUri=Uri.parse("content://icc/adn");
+        ContentResolver contentResolver = getContentResolver();
+        Cursor cursor=contentResolver.query(simUri,null,null,null,"ASC");
+
+        @Override
+        protected String doInBackground(Void... voids) {
+            while (cursor.moveToNext()){
+                String name=cursor.getString(cursor.getColumnIndex("name"));
+                String number=cursor.getString(cursor.getColumnIndex("number"));
+                Log.d("simImport","name="+name);
+                Log.d("simImport","number="+number);
+            }
+
+            return null;
         }
     }
     private class ExportToSimAsyncTask extends AsyncTask<Void,Void,Void>{
