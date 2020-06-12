@@ -2,6 +2,7 @@ package com.ba.contacts;
 
 import android.app.Application;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 
@@ -43,10 +44,6 @@ class ContactRepository {
     void insetWithGroup(Contact contact,String group){
         new InsertContactAsyncTask(contactDao,familyDao,friendsDao,group).execute(contact);
     }
-    void addContactToGroup(String group, int... ids){
-        new GroupAsyncTak(familyDao,friendsDao,group).execute(ids[0]);
-
-    }
 
     void update(Contact contact) {
         new UpdateContactAsyncTask(contactDao).execute(contact);
@@ -67,6 +64,14 @@ class ContactRepository {
     }
     void insertFriends(FriendsList friendsList,int which){
         new FriendsListAsyncTask(friendsDao,which).execute(friendsList);
+    }
+
+    void addContactToGroup(String group, Integer... ids){
+        new GroupAsyncTak(familyDao,friendsDao,group).execute(ids);
+    }
+
+    void removeContactFromGroup(String group, Integer... ids){
+        new RemoveContactFromGroup(familyDao,friendsDao,group).execute(ids);
     }
 
     LiveData<List<Contact>> getAllContacts() {
@@ -125,6 +130,28 @@ class ContactRepository {
             return null;
         }
     }
+    private static class RemoveContactFromGroup extends AsyncTask<Integer,Void,Void>{
+        private FamilyDao familyDao;
+        private FriendsDao friendsDao;
+        private String group;
+
+        public RemoveContactFromGroup(FamilyDao familyDao, FriendsDao friendsDao, String group) {
+            this.familyDao = familyDao;
+            this.friendsDao = friendsDao;
+            this.group = group;
+        }
+
+        @Override
+        protected Void doInBackground(Integer... integers) {
+            if(group.equals("Friends")){
+                friendsDao.removeFriendsContacts(integers[0].intValue());
+            }
+            if(group.equals("Family")){
+                familyDao.removeFamilyContacts(integers[0].intValue());
+            }
+            return null;
+        }
+    }
 
     private static class DeleteContactAsyncTask extends AsyncTask<Contact, Void, Void> {
         private ContactDao contactDao;
@@ -141,7 +168,7 @@ class ContactRepository {
         protected Void doInBackground(Contact... contacts) {
             int id=contactDao.delete(contacts[0]);
             familyDao.removeFamilyContacts(id);
-            friendsDao.removeFamilyContacts(id);
+            friendsDao.removeFriendsContacts(id);
             return null;
         }
     }

@@ -106,6 +106,10 @@ public class EditContact extends AppCompatActivity {
                     saveDialog();
                 if(saveUpdate==1)
                     updateDialog();
+                return true;
+            case (android.R.id.home):
+                onBackPressed();
+                return true;
         }
         return false;
     }
@@ -142,7 +146,7 @@ public class EditContact extends AppCompatActivity {
 
         //spinner
 
-        String[] groupNames={"Default","Family","Friends"};
+        String[] groupNames={"Family","Friends"};
         ArrayAdapter<String> arrayAdapter=new ArrayAdapter<String>(this,R.layout.spinner_list_item,groupNames);
         autoCompleteTextView=findViewById(R.id.dropdown_edit);
         autoCompleteTextView.setAdapter(arrayAdapter);
@@ -152,6 +156,9 @@ public class EditContact extends AppCompatActivity {
         toolbar=findViewById(R.id.toolbar);
         toolbar.setTitleTextColor(getResources().getColor(R.color.primaryTextColor,null));
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_baseline_arrow_white_24);
+
 
         //fetched Intent extras
         Intent intent=getIntent();

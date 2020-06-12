@@ -6,10 +6,16 @@
         android:icon="@drawable/ic_account_circle_black_24dp"
         android:title="Contacts" />
     <item
+        android:id="@+id/sim_menu_item"
+        android:title="SIM Contacts"
+        android:icon="@drawable/ic_baseline_sim_card_black__24"
+        />
+
+    <item
         android:icon="@drawable/ic_baseline_group_24"
         android:title="Groups">
         <menu>
-            <group android:checkableBehavior="single">
+            <group android:checkableBehavior="none">
                 <item
                     android:id="@+id/family_menu_item"
                     android:title="Family" />
@@ -21,7 +27,7 @@
     </item>
     <item android:title="Misc">
         <menu>
-            <group android:checkableBehavior="single">
+            <group android:checkableBehavior="none">
                 <item
                     android:id="@+id/import_menu_item"
                     android:title="Import" />

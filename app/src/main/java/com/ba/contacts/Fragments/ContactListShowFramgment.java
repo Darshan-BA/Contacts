@@ -40,6 +40,13 @@ public class ContactListShowFramgment extends Fragment {
     GroupAdapter groupAdapter;
     String groupName;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Log.d("frag", "onCreate contactlist_frag");
+        Log.d("fragment","No of back stacks contactlist: "+ getParentFragmentManager().getBackStackEntryCount());
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -65,21 +72,9 @@ public class ContactListShowFramgment extends Fragment {
             @Override
             public void onClick(View view, int position) {
                 Contact cardContact = groupAdapter.getContactAt(position);
-                int id = cardContact.getId();
-                Log.d("id", "id=" + id);
-                FamilyList familyList;
-                FriendsList friendsList;
-                if(groupName.equals("Family")){
-                    familyList=new FamilyList(id);
-                    contactViewModel.insertFamily(familyList,0);
-                    getFragmentManager().popBackStack();
-                }
-                if(groupName.equals("Friends")){
-                    friendsList=new FriendsList(id);
-                    contactViewModel.insertFriend(friendsList,0);
-                    getFragmentManager().popBackStack();
-                }
-
+                Integer id = cardContact.getId();
+                contactViewModel.addContactToGroup(groupName,id);
+                getParentFragmentManager().popBackStack();
             }
 
             @Override

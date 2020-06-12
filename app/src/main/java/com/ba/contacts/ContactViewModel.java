@@ -1,6 +1,7 @@
 package com.ba.contacts;
 
 import android.app.Application;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -52,8 +53,13 @@ public class ContactViewModel extends AndroidViewModel {
     public void insertFamily(FamilyList familyList,int which){
         repository.insertFamilies(familyList,which);
     }
-    public void addContactToGroup(String group,int... ids){
+
+    public void addContactToGroup(String group,Integer... ids){
         repository.addContactToGroup(group,ids);
+    }
+
+    public void removeContactFromGroup(String group,Integer... ids){
+        repository.removeContactFromGroup(group,ids);
     }
 
     public LiveData<List<Contact>>getAllContacts(){
