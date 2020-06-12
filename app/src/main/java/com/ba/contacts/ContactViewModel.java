@@ -1,5 +1,6 @@
 package com.ba.contacts;
 
+import android.app.Activity;
 import android.app.Application;
 import android.util.Log;
 
@@ -19,6 +20,8 @@ public class ContactViewModel extends AndroidViewModel {
 
     private LiveData<List<Contact>> allFamilyContacts;
     private LiveData<List<Contact>> allFriendsContacts;
+
+    private LiveData<List<Contact>>allSimContacts;
 
     public ContactViewModel(@NonNull Application application) {
         super(application);
@@ -60,6 +63,13 @@ public class ContactViewModel extends AndroidViewModel {
 
     public void removeContactFromGroup(String group,Integer... ids){
         repository.removeContactFromGroup(group,ids);
+    }
+
+    public List<Contact>getAllSimContacts(Activity activity){
+        return repository.getAllSimContacts(activity);
+    }
+    public int deleteSimContact(Activity activity,Contact contact){
+        return repository.deleteSimContact(activity,contact);
     }
 
     public LiveData<List<Contact>>getAllContacts(){

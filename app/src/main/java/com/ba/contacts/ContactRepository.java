@@ -1,8 +1,8 @@
 package com.ba.contacts;
 
+import android.app.Activity;
 import android.app.Application;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 
@@ -25,6 +25,9 @@ class ContactRepository {
 
     private LiveData<List<Contact>> allFamilyContacts;
     private LiveData<List<Contact>> allFriendsContacts;
+
+    private List<Contact> allSimContacts;
+    private SimUtil simUtil;
 
     ContactRepository(Application application) {
         ContactDatabase database = ContactDatabase.getInstance(application);
@@ -87,6 +90,17 @@ class ContactRepository {
     }
     LiveData<List<Contact>>getAllFriendsContacts(){
         return allFriendsContacts;
+    }
+
+    List<Contact>getAllSimContacts(Activity activity){
+        simUtil=new SimUtil(activity);
+        allSimContacts=simUtil.getSimContacts();
+        return allSimContacts;
+    }
+
+    public int deleteSimContact(Activity activity,Contact contact){
+        simUtil=new SimUtil(activity);
+        return simUtil.deleteSimContact(contact);
     }
 
     private static class InsertContactAsyncTask extends AsyncTask<Contact, Void, Void> {

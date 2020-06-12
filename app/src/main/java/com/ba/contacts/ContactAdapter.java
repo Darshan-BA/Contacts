@@ -22,6 +22,7 @@ import java.util.List;
 public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactHolder> implements Filterable {
 
     private List<Contact> contacts = new ArrayList<>();
+    private List<Contact> simContacts=new ArrayList<>();
     private List<Contact> duplicateContacts;
 
     public void setSetMultiDelete(boolean setMultiDelete) {
@@ -122,6 +123,10 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactH
     public void setContacts(List<Contact> contacts) {
         this.contacts = contacts;
         duplicateContacts=contacts;
+        notifyDataSetChanged();
+    }
+    public void setSimContacts(List<Contact> contacts){
+        this.simContacts=contacts;
         notifyDataSetChanged();
     }
 

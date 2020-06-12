@@ -100,22 +100,22 @@ public class GroupFragment extends Fragment {
                 PopupMenu popupMenu=new PopupMenu(getContext(),view);
                 popupMenu.getMenuInflater().inflate(R.menu.group_card_menu,popupMenu.getMenu());
                 popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        switch (item.getItemId()){
-                            case R.id.remove:
-                                int id=contact.getId();
-                                    contactViewModel1.removeContactFromGroup(groupName,id);
-                                return true;
-                            case R.id.share:
-                                Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                                shareIntent.putExtra(Intent.EXTRA_TEXT, "Name: " + contact.getFirstName() + "\b" + contact.getLastName() + "\n" + "Primary Number: "
-                                        + contact.getPrimaryPhoneNumber() + "\n" + "Secondary Number: " + contact.getSecondaryPhoneNumber() + "\n" + "EmailId :" + contact.getEmailId());
-                                shareIntent.setType("text/plain");
-                                startActivity(Intent.createChooser(shareIntent, "Sharing Contact"));
-                                return true;
-                        }
-                        return false;
+                            @Override
+                            public boolean onMenuItemClick(MenuItem item) {
+                                switch (item.getItemId()){
+                                    case R.id.remove:
+                                        int id=contact.getId();
+                                        contactViewModel1.removeContactFromGroup(groupName,id);
+                                        return true;
+                                    case R.id.share:
+                                        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                                        shareIntent.putExtra(Intent.EXTRA_TEXT, "Name: " + contact.getFirstName() + "\b" + contact.getLastName() + "\n" + "Primary Number: "
+                                                + contact.getPrimaryPhoneNumber() + "\n" + "Secondary Number: " + contact.getSecondaryPhoneNumber() + "\n" + "EmailId :" + contact.getEmailId());
+                                        shareIntent.setType("text/plain");
+                                        startActivity(Intent.createChooser(shareIntent, "Sharing Contact"));
+                                        return true;
+                                }
+                                return false;
                     }
                 });
                 popupMenu.show();
