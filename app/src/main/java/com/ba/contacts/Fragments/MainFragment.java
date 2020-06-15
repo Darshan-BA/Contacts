@@ -134,7 +134,7 @@ public class MainFragment extends Fragment {
         floatingActionButton = view.findViewById(R.id.add_float);
         final RecyclerView recyclerView = view.findViewById(R.id.recyclerview);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        //recyclerView.setHasFixedSize(true);
+        recyclerView.setHasFixedSize(true);
         recyclerView.setAdapter(adapter);
         contactViewModel = new ViewModelProvider(this).get(ContactViewModel.class);
         if (sortId == 1) {
@@ -164,7 +164,6 @@ public class MainFragment extends Fragment {
         adapter.setOnItemClickListener(new ContactAdapter.OnItemClickListner() {
             @Override
             public void onPopUpClick(final Contact contact, View view) {
-                //contactViewModel.delete(adapter.getContactAt(position));
                 PopupMenu popupMenu = new PopupMenu(getContext(), view);
                 popupMenu.getMenuInflater().inflate(R.menu.contact_card_menu, popupMenu.getMenu());
                 popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
@@ -232,8 +231,10 @@ public class MainFragment extends Fragment {
             public void multiSelect(int adapterPosition, boolean check) {
                 if (check) {
                     deleteContactList.add(adapter.getContactAt(adapterPosition));
+                    adapter.notifyDataSetChanged();
                 } else {
                     deleteContactList.remove(adapter.getContactAt(adapterPosition));
+                    adapter.notifyDataSetChanged();
                 }
             }
 
@@ -271,7 +272,7 @@ public class MainFragment extends Fragment {
                     dialogList = new String[2];
                     dialogList[0] = cardContact.getSecondaryPhoneNumber();
                     dialogList[1] = cardContact.getEmailId();
-                } else {
+                }else {
                     dialogList = new String[3];
                     dialogList[0] = cardContact.getPrimaryPhoneNumber();
                     dialogList[1] = cardContact.getSecondaryPhoneNumber();

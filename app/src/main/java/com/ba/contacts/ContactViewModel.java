@@ -71,6 +71,10 @@ public class ContactViewModel extends AndroidViewModel {
     public int deleteSimContact(Activity activity,Contact contact){
         return repository.deleteSimContact(activity,contact);
     }
+    public int addSimContact(Activity activity,SimContact simContact){
+        return repository.addSimContact(activity,simContact);
+
+    }
 
     public LiveData<List<Contact>>getAllContacts(){
         return allContacts;

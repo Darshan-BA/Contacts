@@ -102,6 +102,10 @@ class ContactRepository {
         simUtil=new SimUtil(activity);
         return simUtil.deleteSimContact(contact);
     }
+    public int addSimContact(Activity activity,SimContact simContact){
+        simUtil=new SimUtil(activity);
+        return simUtil.addSimContact(simContact);
+    }
 
     private static class InsertContactAsyncTask extends AsyncTask<Contact, Void, Void> {
         private ContactDao contactDao;

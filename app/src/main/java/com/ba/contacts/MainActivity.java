@@ -69,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int PICK_VCF_FILE = 7;
     private static final int PERMISSION_WRITE_CONTACTS=8;
     private static final int PERMISSION_READ_CONTACTS=9;
+    private static final int PERMISSION_READ_WRITE_CONTACTS=10;
 
     private int fragIndex=0;
 
@@ -109,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case R.id.sim_menu_item:
                     if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
-                        permissionNotGrandted(Manifest.permission.READ_CONTACTS,1);
+                        permissionForSimContactsList();
                     }else {
                         gc(3);
                     }
@@ -184,8 +185,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     //permission Request
-    public void permissionNotGrandted(String permission,int extra) {
-        if (extra==1) {
+    public void permissionForSimContactsList() {
             if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.READ_CONTACTS)) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle("Need Permission");
@@ -208,8 +208,6 @@ public class MainActivity extends AppCompatActivity {
             else{
                 ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_CONTACTS,Manifest.permission.WRITE_CONTACTS}, 10);
             }
-
-        }
     }
     public void permissionNotGrandted(String permission) {
 
@@ -331,6 +329,7 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_CONTACTS}, PERMISSION_READ_CONTACTS);
             }
+
         }
     }//end of permission Request
 
@@ -374,7 +373,7 @@ public class MainActivity extends AppCompatActivity {
                 new ImportFromSimAsyncTask().execute();
             }
         }
-        if(requestCode==10){
+        if(requestCode==PERMISSION_READ_WRITE_CONTACTS){
             if(grantResults.length>0 && grantResults[0]== PackageManager.PERMISSION_GRANTED){
                 Toast.makeText(MainActivity.this,"Read/Write Contact Permission Granted",Toast.LENGTH_SHORT).show();
                 fragment=new SimListFragment();
@@ -625,6 +624,7 @@ public class MainActivity extends AppCompatActivity {
         switch (fragIndex){
             case 2:
                 menu.findItem(R.id.search_toolbar).setVisible(false);
+
         }
         return super.onPrepareOptionsMenu(menu);
     }

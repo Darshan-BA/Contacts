@@ -6,6 +6,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,30 +16,40 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.PopupMenu;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.ba.contacts.Activities.AddSimContact;
 import com.ba.contacts.Contact;
 import com.ba.contacts.ContactAdapter;
 import com.ba.contacts.ContactViewModel;
+import com.ba.contacts.MainActivity;
 import com.ba.contacts.R;
 
-
-import java.util.List;
 
 public class SimListFragment extends Fragment {
     private ContactViewModel simContactViewModel;
     private ContactAdapter simContactAdapter;
     private Uri simUri=Uri.parse("content://icc/adn");
-    private ContentResolver contentResolver;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        ((MainActivity)getActivity()).setFragIndex(2);
+        //getActivity().invalidateOptionsMenu();
+        setHasOptionsMenu(true);
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view=inflater.inflate(R.layout.fragment_sim,container,false);
-        contentResolver=getActivity().getContentResolver();
+        Toolbar toolbar=((MainActivity)getActivity()).toolbar;
+        ContentResolver contentResolver = getActivity().getContentResolver();
         RecyclerView recyclerView=view.findViewById(R.id.sim_recyclerview);
         simContactAdapter=new ContactAdapter();
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -59,11 +71,13 @@ public class SimListFragment extends Fragment {
                     public boolean onMenuItemClick(MenuItem item) {
                         switch (item.getItemId()){
                             case R.id.sim_delete_menu_item:{
+                                int id=contact.getId();
                                 int deleteStatus=simContactViewModel.deleteSimContact(getActivity(),contact);
                                 if(deleteStatus==0){
                                     Toast.makeText(getContext(),"Couldn't deleted",Toast.LENGTH_SHORT).show();
-                                }else {
+                                }if(deleteStatus>0) {
                                     simContactAdapter.notifyDataSetChanged();
+                                    simContactAdapter.setContacts(simContactViewModel.getAllSimContacts(getActivity()));
                                     Toast.makeText(getContext(),"Contact in SIM deleted",Toast.LENGTH_SHORT).show();
                                 }
                                 return true;
@@ -96,5 +110,30 @@ public class SimListFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.addsimcontact_toolbar_menu,menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if(item.getItemId()==R.id.addNew){
+            Intent intent=new Intent(getActivity(), AddSimContact.class);
+            startActivityForResult(intent,1);
+        }
+        return true;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(data.getIntExtra("addStatus",0)==1){
+            simContactAdapter.notifyDataSetChanged();
+            simContactAdapter.setContacts(simContactViewModel.getAllSimContacts(getActivity()));
+            Toast.makeText(getContext(),"Contact added to SIM",Toast.LENGTH_SHORT).show();
+        }
     }
 }

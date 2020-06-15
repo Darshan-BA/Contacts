@@ -1,15 +1,11 @@
 package com.ba.contacts;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.room.PrimaryKey;
-
 import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -26,21 +22,15 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -53,12 +43,12 @@ public class EditContact extends AppCompatActivity {
     Toolbar toolbar;
     TextInputLayout firstNameLay,lastNameLay,emailAddressLay,primaryPhoneNumberLay,secondaryPhoneNumberLay,spinnerLay;
     TextInputEditText firstName,lastName,emailAddress,primaryPhoneNumber,secondaryPhoneNumber;
-    //MaterialButton cancelButton,saveButton,editButton;
     ImageView photo;
     private Uri pUri;
     private String photoPath;
     private Bitmap photoBitmap;
-    private AutoCompleteTextView autoCompleteTextView;
+    private AutoCompleteTextView groupAutoCompleteTextView,saveOptionAutoCompleteText;
+
     private int saveUpdate;
 
     @Override
@@ -67,28 +57,6 @@ public class EditContact extends AppCompatActivity {
         if(requestCode==1 && resultCode == RESULT_OK && data != null){
             Uri uri=data.getData();
             new PhotoLoaderAsyncTask(this.getContentResolver()).execute(uri);
-            Log.d("edit",String.valueOf(uri));
-            /*try {
-                assert uri != null;
-                Bitmap bitmap= ImageDecoder.decodeBitmap(ImageDecoder.createSource(this.getContentResolver(),uri));
-                File file=new File(getApplicationContext().getFilesDir(),"Photos");
-                Log.d("edit","filepath1="+file.getAbsolutePath());
-                File photoFile=new File(file,"Photo-"+dateTime+".png");
-                if(!file.exists()){
-                    file.mkdir();
-                    Log.d("edit","filepath2="+file.getAbsolutePath());
-                }
-                try(FileOutputStream fileOutputStream=new FileOutputStream(photoFile)){
-                    bitmap.compress(Bitmap.CompressFormat.PNG,50,fileOutputStream);
-                    String pf=photoFile.getAbsolutePath();
-                    Log.d("edit","pf="+photoFile.getAbsolutePath());
-                }
-                FileInputStream fileInputStream=new FileInputStream(photoFile);
-                Bitmap bitmap1= BitmapFactory.decodeStream(fileInputStream);
-                photo.setImageBitmap(bitmap1);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }*/
         }
     }
 
@@ -131,9 +99,6 @@ public class EditContact extends AppCompatActivity {
         emailAddress=findViewById(R.id.email_edit);
         primaryPhoneNumber=findViewById(R.id.primary_edit);
         secondaryPhoneNumber=findViewById(R.id.secondary_edit);
-        //cancelButton=findViewById(R.id.cancel_button);
-        //saveButton=findViewById(R.id.save_button);
-        //editButton=findViewById(R.id.update_button);
         photo=findViewById(R.id.circlr_image);
         photo.setImageResource(R.drawable.add_photo);
         photo.setOnClickListener(new View.OnClickListener() {
@@ -145,12 +110,12 @@ public class EditContact extends AppCompatActivity {
         });
 
         //spinner
-
         String[] groupNames={"Family","Friends"};
-        ArrayAdapter<String> arrayAdapter=new ArrayAdapter<String>(this,R.layout.spinner_list_item,groupNames);
-        autoCompleteTextView=findViewById(R.id.dropdown_edit);
-        autoCompleteTextView.setAdapter(arrayAdapter);
-        autoCompleteTextView.setInputType(InputType.TYPE_NULL);
+        ArrayAdapter<String> groupDropDownArrayAdapter=new ArrayAdapter<String>(this,R.layout.spinner_list_item,groupNames);
+        groupAutoCompleteTextView =findViewById(R.id.dropdown_edit);
+        groupAutoCompleteTextView.setAdapter(groupDropDownArrayAdapter);
+        groupAutoCompleteTextView.setInputType(InputType.TYPE_NULL);
+
 
         //Toolbar initialization
         toolbar=findViewById(R.id.toolbar);
@@ -311,7 +276,7 @@ public class EditContact extends AppCompatActivity {
                 String primary=primaryPhoneNumber.getText().toString().trim();
                 String secondary=secondaryPhoneNumber.getText().toString().trim();
                 String email=emailAddress.getText().toString().trim();
-                String selectedGroup=autoCompleteTextView.getText().toString().trim();
+                String selectedGroup= groupAutoCompleteTextView.getText().toString().trim();
                 if(first.isEmpty() && !second.isEmpty()){
                     firstNameLay.setError("Is Empty");
                 }
@@ -322,7 +287,7 @@ public class EditContact extends AppCompatActivity {
                 }else{
                     if(first.isEmpty() && !primary.isEmpty())
                         first=primary;
-                    if(first.isEmpty() && primary.isEmpty() && !secondary.isEmpty())
+                    if(first.isEmpty() && !secondary.isEmpty() && primary.isEmpty())
                         first=secondary;
                     new PhotoSaveAsyncTask(0).execute(first,second,primary,secondary,email,selectedGroup);
                     finish();
