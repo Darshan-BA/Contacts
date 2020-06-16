@@ -1,15 +1,16 @@
-package com.ba.contacts;
+package com.ba.contacts.ViewModels;
 
 import android.app.Activity;
 import android.app.Application;
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
+import com.ba.contacts.ContactRepository;
+import com.ba.contacts.Entities.Contact;
 import com.ba.contacts.Entities.FamilyList;
 import com.ba.contacts.Entities.FriendsList;
+import com.ba.contacts.SimContact;
 
 import java.util.List;
 
@@ -71,7 +72,7 @@ public class ContactViewModel extends AndroidViewModel {
     public int deleteSimContact(Activity activity,Contact contact){
         return repository.deleteSimContact(activity,contact);
     }
-    public int addSimContact(Activity activity,SimContact simContact){
+    public int addSimContact(Activity activity, SimContact simContact){
         return repository.addSimContact(activity,simContact);
 
     }

@@ -4,8 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,10 +20,10 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.ba.contacts.Contact;
-import com.ba.contacts.ContactAdapter;
-import com.ba.contacts.ContactViewModel;
-import com.ba.contacts.MainActivity;
+import com.ba.contacts.Entities.Contact;
+import com.ba.contacts.Adapters.ContactAdapter;
+import com.ba.contacts.ViewModels.ContactViewModel;
+import com.ba.contacts.Activities.MainActivity;
 import com.ba.contacts.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 

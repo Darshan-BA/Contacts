@@ -1,4 +1,4 @@
-package com.ba.contacts;
+package com.ba.contacts.Activities;
 
 import android.Manifest;
 import android.app.Activity;
@@ -40,9 +40,13 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.ba.contacts.Entities.Contact;
+import com.ba.contacts.Adapters.ContactAdapter;
+import com.ba.contacts.ViewModels.ContactViewModel;
 import com.ba.contacts.Fragments.GroupFragment;
 import com.ba.contacts.Fragments.MainFragment;
 import com.ba.contacts.Fragments.SimListFragment;
+import com.ba.contacts.R;
 import com.google.android.material.navigation.NavigationView;
 
 import org.json.JSONArray;
@@ -78,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<Contact> deleteContactList = new ArrayList<>();
     public ContactAdapter adapter;
     List<Contact> exportContacts;
-    //private SearchView searchView;
+    private SearchView searchView;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
 
@@ -584,7 +588,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.toolbar_menu, menu);
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView) menu.findItem(R.id.search_toolbar).getActionView();
+        searchView = (SearchView) menu.findItem(R.id.search_toolbar).getActionView();
         searchView.setIconifiedByDefault(false);
         searchView.setFocusable(true);
         searchView.setIconified(false);
@@ -656,7 +660,8 @@ public class MainActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         contactViewModel.multipleDelete(deleteContactList.toArray(new Contact[deleteContactList.size()]));
                         deleteContactList.clear();
-                        adapter.setMultiDelete = false;
+                        //adapter.setMultiDelete = false;
+                        adapter.setSetMultiDelete(false);
                         adapter.notifyDataSetChanged();
                         Toast.makeText(MainActivity.this, "Contacts Deleted", Toast.LENGTH_SHORT).show();
                         mode.finish();
@@ -680,7 +685,8 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onDestroyActionMode(ActionMode mode) {
-            adapter.setMultiDelete = false;
+            //adapter.setMultiDelete = false;
+            adapter.setSetMultiDelete(false);
             adapter.notifyDataSetChanged();
         }
     };//end of Action CallBack for Multiple Delete
@@ -690,9 +696,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         /*if (!searchView.isIconified()) {
-            searchView.setIconified(true);
+            //searchView.setIconified(true);
+            searchView.clearFocus();
             return;
-        } else*/ if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+        } else */if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
         }else if(!(fragment instanceof MainFragment)){
             gc(2);

@@ -1,4 +1,4 @@
-package com.ba.contacts;
+package com.ba.contacts.Activities;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
@@ -27,6 +27,9 @@ import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.ba.contacts.Entities.Contact;
+import com.ba.contacts.ViewModels.ContactViewModel;
+import com.ba.contacts.R;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 

@@ -9,8 +9,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,12 +21,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.ba.contacts.Adapters.GroupAdapter;
 import com.ba.contacts.Adapters.GroupAdapterTouchListner;
-import com.ba.contacts.Contact;
-import com.ba.contacts.ContactAdapter;
-import com.ba.contacts.ContactViewModel;
+import com.ba.contacts.Entities.Contact;
+import com.ba.contacts.Adapters.ContactAdapter;
+import com.ba.contacts.ViewModels.ContactViewModel;
 import com.ba.contacts.Entities.FamilyList;
 import com.ba.contacts.Entities.FriendsList;
-import com.ba.contacts.MainActivity;
+import com.ba.contacts.Activities.MainActivity;
 import com.ba.contacts.R;
 
 import java.util.List;

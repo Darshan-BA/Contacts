@@ -11,9 +11,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.ba.contacts.Contact;
-import com.ba.contacts.ContactAdapter;
-import com.ba.contacts.Entities.FamilyList;
+import com.ba.contacts.Entities.Contact;
 import com.ba.contacts.R;
 import com.google.android.material.checkbox.MaterialCheckBox;
 
@@ -96,6 +94,7 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.GroupHolder>
                     Contact cardContact = getContactAt(position);
                     int id=cardContact.getId();
                     if (checkBox.isChecked()) {
+                        Log.d("check", "Check box checked");
                         ids.add(id);
                     } else {
                         ids.remove(id);

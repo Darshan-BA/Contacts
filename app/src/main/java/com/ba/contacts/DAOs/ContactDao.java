@@ -1,4 +1,4 @@
-package com.ba.contacts;
+package com.ba.contacts.DAOs;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
@@ -7,6 +7,8 @@ import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
+
+import com.ba.contacts.Entities.Contact;
 
 import java.util.List;
 //import com.ba.contacts.DAOs.*;

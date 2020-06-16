@@ -6,16 +6,17 @@ import android.os.AsyncTask;
 
 import androidx.lifecycle.LiveData;
 
+import com.ba.contacts.DAOs.ContactDao;
 import com.ba.contacts.DAOs.FamilyDao;
 import com.ba.contacts.DAOs.FriendsDao;
+import com.ba.contacts.Entities.Contact;
 import com.ba.contacts.Entities.FamilyList;
 import com.ba.contacts.Entities.FriendsList;
 
 import java.util.List;
 
-class ContactRepository {
+public class ContactRepository {
     private ContactDao contactDao;
-
     //group
     private FriendsDao friendsDao;
     private FamilyDao familyDao;
@@ -29,7 +30,7 @@ class ContactRepository {
     private List<Contact> allSimContacts;
     private SimUtil simUtil;
 
-    ContactRepository(Application application) {
+   public ContactRepository(Application application) {
         ContactDatabase database = ContactDatabase.getInstance(application);
         contactDao = database.contactDao();
         friendsDao = database.friendsDao();
@@ -40,59 +41,59 @@ class ContactRepository {
         allFriendsContacts=contactDao.getAllFriendsContacts();
     }
 
-    void insert(Contact contact) {
+    public void insert(Contact contact) {
       new InsertContactAsyncTask(contactDao,familyDao,friendsDao,"").execute(contact);
     }
 
-    void insetWithGroup(Contact contact,String group){
+    public void insetWithGroup(Contact contact,String group){
         new InsertContactAsyncTask(contactDao,familyDao,friendsDao,group).execute(contact);
     }
 
-    void update(Contact contact) {
+    public void update(Contact contact) {
         new UpdateContactAsyncTask(contactDao).execute(contact);
     }
 
-    void delete(Contact contact) {
+    public void delete(Contact contact) {
         new DeleteContactAsyncTask(contactDao,familyDao,friendsDao).execute(contact);
     }
 
     //multiple delete
-    void multipleDelete(Contact... contacts) {
+    public void multipleDelete(Contact... contacts) {
         new multipleDeleteContactAsyncTask(contactDao).execute(contacts);
     }
 
     //group
-    void insertFamilies(FamilyList familyList,int which){
+    public void insertFamilies(FamilyList familyList,int which){
         new FamilyListAsyncTask(familyDao,which).execute(familyList);
     }
-    void insertFriends(FriendsList friendsList,int which){
+    public void insertFriends(FriendsList friendsList,int which){
         new FriendsListAsyncTask(friendsDao,which).execute(friendsList);
     }
 
-    void addContactToGroup(String group, Integer... ids){
+    public void addContactToGroup(String group, Integer... ids){
         new GroupAsyncTak(familyDao,friendsDao,group).execute(ids);
     }
 
-    void removeContactFromGroup(String group, Integer... ids){
+    public void removeContactFromGroup(String group, Integer... ids){
         new RemoveContactFromGroup(familyDao,friendsDao,group).execute(ids);
     }
 
-    LiveData<List<Contact>> getAllContacts() {
+    public LiveData<List<Contact>> getAllContacts() {
         return allContacts;
     }
 
-    LiveData<List<Contact>> getAllContactsByLastName() {
+    public LiveData<List<Contact>> getAllContactsByLastName() {
         return allContactsByLastName;
     }
 
-    LiveData<List<Contact>>getAllFamilyContacts(){
+    public LiveData<List<Contact>>getAllFamilyContacts(){
         return allFamilyContacts;
     }
-    LiveData<List<Contact>>getAllFriendsContacts(){
+    public LiveData<List<Contact>>getAllFriendsContacts(){
         return allFriendsContacts;
     }
 
-    List<Contact>getAllSimContacts(Activity activity){
+    public List<Contact>getAllSimContacts(Activity activity){
         simUtil=new SimUtil(activity);
         allSimContacts=simUtil.getSimContacts();
         return allSimContacts;

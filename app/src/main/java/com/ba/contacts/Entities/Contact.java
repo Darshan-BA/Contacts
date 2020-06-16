@@ -1,10 +1,7 @@
-package com.ba.contacts;
-
-import android.net.Uri;
+package com.ba.contacts.Entities;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
-import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 @Entity(tableName ="contacts")

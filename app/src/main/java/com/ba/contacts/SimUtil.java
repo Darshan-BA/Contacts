@@ -6,7 +6,8 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.Contacts;
-import android.util.Log;
+
+import com.ba.contacts.Entities.Contact;
 
 import java.util.ArrayList;
 import java.util.List;

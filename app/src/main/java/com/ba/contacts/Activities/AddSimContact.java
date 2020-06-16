@@ -8,11 +8,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Toolbar;
 
-import com.ba.contacts.ContactViewModel;
-import com.ba.contacts.Fragments.SimListFragment;
-import com.ba.contacts.MainActivity;
+import com.ba.contacts.ViewModels.ContactViewModel;
 import com.ba.contacts.R;
 import com.ba.contacts.SimContact;
 import com.google.android.material.appbar.MaterialToolbar;

@@ -1,7 +1,6 @@
 package com.ba.contacts.Fragments;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -18,14 +17,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.SearchView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
@@ -35,11 +32,11 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.ba.contacts.Contact;
-import com.ba.contacts.ContactAdapter;
-import com.ba.contacts.ContactViewModel;
-import com.ba.contacts.EditContact;
-import com.ba.contacts.MainActivity;
+import com.ba.contacts.Entities.Contact;
+import com.ba.contacts.Adapters.ContactAdapter;
+import com.ba.contacts.ViewModels.ContactViewModel;
+import com.ba.contacts.Activities.EditContact;
+import com.ba.contacts.Activities.MainActivity;
 import com.ba.contacts.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -47,7 +44,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static android.content.Context.MODE_PRIVATE;
-import static androidx.core.content.ContextCompat.getSystemService;
 
 public class MainFragment extends Fragment {
     ContactViewModel contactViewModel;
@@ -229,12 +225,10 @@ public class MainFragment extends Fragment {
 
             @Override
             public void multiSelect(int adapterPosition, boolean check) {
-                if (check) {
+               if(check) {
                     deleteContactList.add(adapter.getContactAt(adapterPosition));
-                    adapter.notifyDataSetChanged();
-                } else {
+                }else {
                     deleteContactList.remove(adapter.getContactAt(adapterPosition));
-                    adapter.notifyDataSetChanged();
                 }
             }
 
@@ -346,9 +340,6 @@ public class MainFragment extends Fragment {
                         adapter.notifyDataSetChanged();
                         Toast.makeText(getContext(), "Contacts Deleted", Toast.LENGTH_SHORT).show();
                         mode.finish();
-                        //finish();
-                        //Intent intent = new Intent(getActivity(), MainActivity.class);
-                        //startActivity(intent);
                     }
                 });
                 alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {

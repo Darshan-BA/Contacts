@@ -1,7 +1,6 @@
 package com.ba.contacts;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.AsyncTask;
 
 import androidx.annotation.NonNull;
@@ -10,8 +9,10 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
+import com.ba.contacts.DAOs.ContactDao;
 import com.ba.contacts.DAOs.FamilyDao;
 import com.ba.contacts.DAOs.FriendsDao;
+import com.ba.contacts.Entities.Contact;
 import com.ba.contacts.Entities.FamilyList;
 import com.ba.contacts.Entities.FriendsList;
 

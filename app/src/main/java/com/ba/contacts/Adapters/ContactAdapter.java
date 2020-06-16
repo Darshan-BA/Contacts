@@ -1,7 +1,6 @@
-package com.ba.contacts;
+package com.ba.contacts.Adapters;
 
 
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,7 +14,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.io.File;
+import com.ba.contacts.Entities.Contact;
+import com.ba.contacts.R;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,13 +26,14 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactH
     private List<Contact> simContacts=new ArrayList<>();
     private List<Contact> duplicateContacts;
 
+    private List<Contact> multiSelectedContacts=new ArrayList<>();
+
+    private boolean setMultiDelete=false;
+    private OnItemClickListner mListener;
+
     public void setSetMultiDelete(boolean setMultiDelete) {
         this.setMultiDelete = setMultiDelete;
     }
-
-    boolean setMultiDelete=false;
-    private OnItemClickListner mListener;
-    //private MainActivity mainActivity=new MainActivity();
 
     public Contact getContactAt(int position) {
         return contacts.get(position);
@@ -106,12 +108,12 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactH
         }
         if(!setMultiDelete){
             holder.checkBox.setVisibility(View.GONE);
+            holder.popUpOption.setVisibility(View.VISIBLE);
         }else {
+            holder.popUpOption.setVisibility(View.GONE);
             holder.checkBox.setVisibility(View.VISIBLE);
-            holder.popUpOption.setVisibility(View.INVISIBLE);
             holder.checkBox.setChecked(false);
         }
-
     }
 
 
@@ -130,6 +132,10 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactH
         notifyDataSetChanged();
     }
 
+    public List<Contact> getMultiSelectedContacts(){
+        return multiSelectedContacts;
+    }
+
     class ContactHolder extends RecyclerView.ViewHolder {
         private TextView first, last, email, primary, secondary;
         private ImageView popUpOption,icon;
@@ -144,20 +150,8 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactH
             secondary = itemView.findViewById(R.id.secondary);
             popUpOption = itemView.findViewById(R.id.popup_option);
             icon =itemView.findViewById(R.id.icon);
-            checkBox=itemView.findViewById(R.id.recyclerview_checkbox);
+            checkBox =itemView.findViewById(R.id.recyclerview_checkbox);
 
-            checkBox.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (checkBox.isChecked()) {
-                        listener.multiSelect(getAdapterPosition(), true);
-                        Log.d("check", "Check box checked");
-                    } else {
-                        listener.multiSelect(getAdapterPosition(), false);
-                        Log.d("check", "Check box un checked");
-                    }
-                }
-            });
             itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
@@ -174,6 +168,18 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactH
                         if(position!=RecyclerView.NO_POSITION){
                             listener.onCardClick(position);
                         }
+                    }
+                }
+            });
+            checkBox.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(checkBox.isChecked()){
+                        listener.multiSelect(getAdapterPosition(), true);
+                        Log.d("check", "Check box checked");
+                    }else {
+                        listener.multiSelect(getAdapterPosition(), false);
+                        Log.d("check", "Check box un checked");
                     }
                 }
             });
