@@ -59,7 +59,9 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -392,48 +394,31 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PICK_JSON_FILE && resultCode == Activity.RESULT_OK) {
-            Uri uri = null;
-            if (data != null) {
-                uri = data.getData();
-                final String docId = DocumentsContract.getDocumentId(uri);
-                Log.d("split", "doc=" + docId);
-                final String[] split = docId.split(":");
-                Log.d("split", "split 0=" + split[0]);
-                Log.d("split", "split 1=" + split[1]);
-                new ImportAsyncTask(0).execute(split[1]);
-            }
+            if (data != null)
+                new ImportDeviceContactsAsyncTask(adapter,0).execute(data.getData());
+            else
+                Toast.makeText(MainActivity.this,"Import Failed",Toast.LENGTH_SHORT).show();
         }
 
         if (requestCode == CREATE_JSON_FILE && resultCode == Activity.RESULT_OK) {
-            Uri uri = null;
-            if (data != null) {
-                uri = data.getData();
-                final String docId = DocumentsContract.getDocumentId(uri);
-                final String[] split = docId.split(":");
-                new ExportAsyncTask(adapter, 0).execute(split[1]);
-            }
+            if (data != null)
+                new ExportDeviceContactsAsyncTask(adapter,0).execute(data.getData());
+            else
+                Toast.makeText(MainActivity.this,"Export Failed",Toast.LENGTH_SHORT).show();
         }
 
         if (requestCode == PICK_VCF_FILE && resultCode == Activity.RESULT_OK) {
-            Uri uri = null;
-            if (data != null) {
-                uri = data.getData();
-                final String docId = DocumentsContract.getDocumentId(uri);
-                final String[] split = docId.split(":");
-                new ImportAsyncTask(1).execute(split[1]);
-            }
+            if (data != null)
+                new ImportDeviceContactsAsyncTask(adapter,1).execute(data.getData());
+            else
+                Toast.makeText(MainActivity.this,"Import Failed",Toast.LENGTH_SHORT).show();
         }
 
         if (requestCode == CREATE_VCF_FILE && resultCode == Activity.RESULT_OK) {
-            Uri uri = null;
-            if (data != null) {
-                uri = data.getData();
-                final String docId = DocumentsContract.getDocumentId(uri);
-                final String[] split = docId.split(":");
-                new ExportAsyncTask(adapter, 1).execute(split[1]);
-            } else {
+            if (data != null)
+                new ExportDeviceContactsAsyncTask(adapter,1).execute(data.getData());
+             else
                 Toast.makeText(MainActivity.this, "Export Failed", Toast.LENGTH_SHORT).show();
-            }
         }
     }//end of Activity Results
 
@@ -488,6 +473,7 @@ public class MainActivity extends AppCompatActivity {
                         intent.setType("text/json");
                         intent.putExtra(Intent.EXTRA_TITLE, "contacts.json");
                         startActivityForResult(intent, CREATE_JSON_FILE);
+                        break;
                     }
                     case 1:{
                         Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
@@ -495,6 +481,7 @@ public class MainActivity extends AppCompatActivity {
                         intent.setType("text/json");
                         intent.putExtra(Intent.EXTRA_TITLE, "contacts.vcf");
                         startActivityForResult(intent, CREATE_VCF_FILE);
+                        break;
                     }
                     case 2:{
                         if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
@@ -502,6 +489,7 @@ public class MainActivity extends AppCompatActivity {
                         }else{
                             new ExportToSimAsyncTask().execute();
                         }
+                        break;
                     }
                 }
             }
@@ -618,6 +606,7 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }//end of Option Menu Create
 
+
     public void setFragIndex(int fragIndex) {
         this.fragIndex = fragIndex;
         invalidateOptionsMenu();
@@ -695,11 +684,13 @@ public class MainActivity extends AppCompatActivity {
     //on Back Button Pressed
     @Override
     public void onBackPressed() {
-        /*if (!searchView.isIconified()) {
+        if(searchView.isIconified()) {
             //searchView.setIconified(true);
+            Log.d("searchwidget","has focus");
             searchView.clearFocus();
-            return;
-        } else */if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            adapter.getFilter().filter("");
+            super.onBackPressed();
+        } else if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
         }else if(!(fragment instanceof MainFragment)){
             gc(2);
@@ -709,153 +700,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
-    // Start of ImportAsyncTask
-    private class ImportAsyncTask extends AsyncTask<String, Void, String> {
-        int which;
-
-        ImportAsyncTask(int which) {
-            this.which = which;
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-            Toast.makeText(MainActivity.this, s, Toast.LENGTH_SHORT).show();
-        }
-
-        @Override
-        protected String doInBackground(String... strings) {
-            String path = strings[0];
-            Log.d("import", path);
-            File file = new File(Environment.getExternalStorageDirectory(), path);
-            String filePath = fileExtenstion(path, which);
-            Log.d("filepath", filePath);
-            if (which == 0) {
-                if (!filePath.equals(".json")) {
-                    return "Select JSON format file";
-                } else {
-                    try (FileReader fileReader = new FileReader(file)) {
-                        BufferedReader bufferedReader = new BufferedReader(fileReader);
-                        StringBuilder stringBuilder = new StringBuilder();
-                        String line = bufferedReader.readLine();
-                        while (line != null) {
-                            stringBuilder.append(line).append("\n");
-                            line = bufferedReader.readLine();
-                        }
-                        bufferedReader.close();
-                        String jsonString = stringBuilder.toString();
-                        Log.d("object", jsonString);
-                        JSONObject jsonObject = new JSONObject(jsonString);
-                        JSONArray jsonArray = jsonObject.getJSONArray("Contacts");
-                        for (int i = 0; i < jsonArray.length(); i++) {
-                            JSONObject tempObject = jsonArray.getJSONObject(i);
-                            String first = tempObject.getString("first");
-                            String last = tempObject.getString("last");
-                            String primary = tempObject.getString("primary");
-                            String secondary = tempObject.getString("secondary");
-                            String email = tempObject.getString("email");
-                            Contact contact = new Contact(first, last, primary, secondary, email, "");
-                            contactViewModel.insert(contact);
-                        }
-                    } catch (IOException | JSONException e) {
-                        e.printStackTrace();
-                    }
-                    return "Contacts Imported";
-                }
-            }
-            if (which == 1) {
-                if (!filePath.equals(".vcf")) {
-                    return "Select vcf format";
-                } else {
-                    try (FileInputStream fileInputStream = new FileInputStream(file)) {
-                        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fileInputStream));
-                        String line = bufferedReader.readLine();
-                        boolean hasNext = false;
-                        if (line.equals("BEGIN:VCARD"))
-                            hasNext = true;
-                        String first = "", last = "", primary = "", secondary = "", email = "";
-                        List<String> phonenumbers = new ArrayList<>();
-                        while (hasNext) {
-                            String s = bufferedReader.readLine();
-                            if (s.lastIndexOf("N:", 2) == 0) {
-                                String[] temp = s.split(";", 3);
-                                last = temp[0].substring(temp[0].lastIndexOf(":") + 1);
-                                first = temp[1];
-                                Log.d("con", "last:" + temp[0]);
-                                Log.d("con", "first:" + temp[1]);
-                            }
-                            if (s.contains("TEL;") && s.lastIndexOf(":") != 0) {
-                                phonenumbers.add(s.substring(s.lastIndexOf(":") + 1));
-                                //primary = s.substring(s.lastIndexOf(":") + 1);
-                                //Log.d("con", "primary" + primary);
-                                Log.d("con", "primary:" + s.substring(s.lastIndexOf(":") + 1));
-                                Log.d("con", "Now phonenumber size is:" + String.valueOf(phonenumbers.size()));
-                            }
-                            /*if (s.contains("TEL;") && s.lastIndexOf(":") != 0 ) {
-                                secondary = s.substring(s.lastIndexOf(":") + 1);
-                                Log.d("con", "secondary:" + secondary);
-                            }*/
-                            if (s.contains("EMAIL") && s.lastIndexOf(":") != 0) {
-                                email = s.substring(s.lastIndexOf(":") + 1);
-                                Log.d("con", "email:" + email);
-                            }
-                            if (s.equals("END:VCARD")) {
-                                if (phonenumbers.size() == 1) {
-                                    Contact importContact = new Contact(first, last, phonenumbers.get(0), "", email, "");
-                                    contactViewModel.insert(importContact);
-                                } else if (phonenumbers.size() >= 2) {
-                                    Contact importContact = new Contact(first, last, phonenumbers.get(0), phonenumbers.get(1), email, "");
-                                    contactViewModel.insert(importContact);
-                                }
-                                first = "";
-                                last = "";
-                                primary = "";
-                                secondary = "";
-                                email = "";
-                                phonenumbers.clear();
-                                String next = bufferedReader.readLine();
-                                if (next == null)
-                                    hasNext = false;
-                            }
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    return "Contacts Imported";
-                }
-            }
-            return "Import failed";
-        }
-
-        private String fileExtenstion(String path, int which) {
-            if (path.lastIndexOf(".") != -1 && path.lastIndexOf(".") != 0) {
-                if (which == 0) {
-                    int index = path.lastIndexOf(".");
-                    String p = path.substring(index);
-                    if (p.length() <= 4) {
-                        Log.d("file", p);
-                        return p;
-                    } else {
-                        return path.substring(index, index + 5);
-                    }
-                    //Log.d("file", path.substring(index, index + 5));
-                }
-                if (which == 1) {
-                    int index = path.lastIndexOf(".");
-                    String p = path.substring(index);
-                    if (p.length() <= 4) {
-                        Log.d("file", p);
-                        return p;
-                    } else {
-                        Log.d("file", path.substring(index, index + 4));
-                        return path.substring(index, index + 4);
-                    }
-                }
-            }
-            return "";
-        }
-    }
     private class ImportFromSimAsyncTask extends AsyncTask<Void,Void,String>{
         Uri simUri=Uri.parse("content://icc/adn");
         ContentResolver contentResolver = getContentResolver();
@@ -911,12 +755,127 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // start of ExportAsyncTask
-    private class ExportAsyncTask extends AsyncTask<String, Void, String> {
+    private class ImportDeviceContactsAsyncTask extends AsyncTask<Uri,Void,String>{
         private ContactAdapter adapter;
-        int which;
+        private int which;
 
-        private ExportAsyncTask(ContactAdapter adapter, int which) {
+        public ImportDeviceContactsAsyncTask(ContactAdapter adapter, int which) {
+            this.adapter = adapter;
+            this.which = which;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            Toast.makeText(MainActivity.this,"Import started in Background... ", Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            Toast.makeText(MainActivity.this, s, Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        protected String doInBackground(Uri... uris) {
+            Uri path=uris[0];
+            try(InputStream importStream=getContentResolver().openInputStream(path)){
+                switch (which){
+                    case 0:{
+                        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(importStream));
+                        StringBuilder stringBuilder = new StringBuilder();
+                        String line = bufferedReader.readLine();
+                        while (line != null) {
+                            stringBuilder.append(line).append("\n");
+                            line = bufferedReader.readLine();
+                        }
+                        bufferedReader.close();
+                        String jsonString = stringBuilder.toString();
+                        Log.d("object", jsonString);
+                        JSONObject jsonObject = new JSONObject(jsonString);
+                        JSONArray jsonArray = jsonObject.getJSONArray("Contacts");
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            JSONObject tempObject = jsonArray.getJSONObject(i);
+                            String first = tempObject.getString("first");
+                            String last = tempObject.getString("last");
+                            String primary = tempObject.getString("primary");
+                            String secondary = tempObject.getString("secondary");
+                            String email = tempObject.getString("email");
+                            Contact contact = new Contact(first, last, primary, secondary, email, "");
+                            contactViewModel.insert(contact);
+                        }
+                        return "Contacts Imported";
+                    }
+                    case 1:{
+                        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(importStream));
+                        String line = bufferedReader.readLine();
+                        boolean hasNext = false;
+                        if (line.equals("BEGIN:VCARD"))
+                            hasNext = true;
+                        else
+                            return "Select vcf format";
+                        String first = "", last = "", primary = "", secondary = "", email = "";
+                        List<String> phonenumbers = new ArrayList<>();
+                        while (hasNext) {
+                            String s = bufferedReader.readLine();
+                            if (s.lastIndexOf("N:", 2) == 0) {
+                                String[] temp = s.split(";", 3);
+                                last = temp[0].substring(temp[0].lastIndexOf(":") + 1);
+                                first = temp[1];
+                                Log.d("con", "last:" + temp[0]);
+                                Log.d("con", "first:" + temp[1]);
+                            }
+                            if (s.contains("TEL;") && s.lastIndexOf(":") != 0) {
+                                phonenumbers.add(s.substring(s.lastIndexOf(":") + 1));
+                                //primary = s.substring(s.lastIndexOf(":") + 1);
+                                //Log.d("con", "primary" + primary);
+                                Log.d("con", "primary:" + s.substring(s.lastIndexOf(":") + 1));
+                                Log.d("con", "Now phonenumber size is:" + String.valueOf(phonenumbers.size()));
+                            }
+                            /*if (s.contains("TEL;") && s.lastIndexOf(":") != 0 ) {
+                                secondary = s.substring(s.lastIndexOf(":") + 1);
+                                Log.d("con", "secondary:" + secondary);
+                            }*/
+                            if (s.contains("EMAIL") && s.lastIndexOf(":") != 0) {
+                                email = s.substring(s.lastIndexOf(":") + 1);
+                                Log.d("con", "email:" + email);
+                            }
+                            if (s.equals("END:VCARD")) {
+                                if (phonenumbers.size() == 1) {
+                                    Contact importContact = new Contact(first, last, phonenumbers.get(0), "", email, "");
+                                    contactViewModel.insert(importContact);
+                                } else if (phonenumbers.size() >= 2) {
+                                    Contact importContact = new Contact(first, last, phonenumbers.get(0), phonenumbers.get(1), email, "");
+                                    contactViewModel.insert(importContact);
+                                }
+                                first = "";
+                                last = "";
+                                primary = "";
+                                secondary = "";
+                                email = "";
+                                phonenumbers.clear();
+                                String next = bufferedReader.readLine();
+                                if (next == null)
+                                    hasNext = false;
+                            }
+                        }
+                        break;
+                    }
+                }
+
+            }catch (IOException | JSONException e){
+                e.printStackTrace();
+            }
+            return "Contacts Imported";
+        }
+    }
+
+    private class ExportDeviceContactsAsyncTask extends AsyncTask<Uri,Void,String>{
+
+        private ContactAdapter adapter;
+        private int which;
+
+        public ExportDeviceContactsAsyncTask(ContactAdapter adapter, int which) {
             this.adapter = adapter;
             this.which = which;
         }
@@ -928,75 +887,58 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        protected String doInBackground(String... strings) {
-            String path = strings[0];
-            File dir = new File(Environment.getExternalStorageDirectory(), path);
-            dir.mkdirs();
-            if (which == 0) {
-                JSONObject jsonObject = new JSONObject();
-                JSONArray jsonArray = new JSONArray();
-                for (int i = 0; i < adapter.getItemCount(); i++) {
-                    Contact contact = adapter.getContactAt(i);
-                    JSONObject tempObject = new JSONObject();
-                    try {
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            Toast.makeText(MainActivity.this, s, Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        protected String doInBackground(Uri... uris) {
+            Uri path=uris[0];
+            try(OutputStream exportStream=getContentResolver().openOutputStream(path)){
+                if(which==0){
+                    JSONObject jsonObject = new JSONObject();
+                    JSONArray jsonArray = new JSONArray();
+                    for (int i = 0; i < adapter.getItemCount(); i++) {
+                        Contact contact = adapter.getContactAt(i);
+                        JSONObject tempObject = new JSONObject();
                         tempObject.put("first", contact.getFirstName());
                         tempObject.put("last", contact.getLastName());
                         tempObject.put("primary", contact.getPrimaryPhoneNumber());
                         tempObject.put("secondary", contact.getSecondaryPhoneNumber());
                         tempObject.put("email", contact.getEmailId());
                         jsonArray.put(tempObject);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    try {
                         jsonObject.put("Contacts", jsonArray);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    try (FileOutputStream fileOutputStream = new FileOutputStream(dir)) {
-                        fileOutputStream.write(jsonObject.toString().getBytes());
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                        exportStream.write(jsonObject.toString().getBytes());
                     }
                 }
-                return "Contacts Exported to: " + path;
-            }
-            if (which == 1) {
-                try (FileOutputStream fileOutputStream = new FileOutputStream(dir)) {
+                if(which==1) {
                     byte[] begin = "BEGIN:VCARD\n".getBytes();
                     byte[] version = "VERSION:2.1\n".getBytes();
                     byte[] end = "END:VCARD\n".getBytes();
                     for (int i = 0; i < adapter.getItemCount(); i++) {
                         Contact contact = adapter.getContactAt(i);
-                        fileOutputStream.write(begin);
-                        fileOutputStream.write(version);
+                        exportStream.write(begin);
+                        exportStream.write(version);
                         byte[] n = ("N:" + contact.getLastName() + ";" + contact.getFirstName() + ";;;\n").getBytes();
-                        fileOutputStream.write(n);
+                        exportStream.write(n);
                         byte[] fn = ("FN:" + contact.getFirstName() + " " + contact.getLastName() + "\n").getBytes();
-                        fileOutputStream.write(fn);
+                        exportStream.write(fn);
                         byte[] tel1 = ("TEL;CELL;PREF:" + contact.getPrimaryPhoneNumber() + "\n").getBytes();
-                        fileOutputStream.write(tel1);
+                        exportStream.write(tel1);
                         byte[] tel2 = ("TEL;CELL:" + contact.getSecondaryPhoneNumber() + "\n").getBytes();
-                        fileOutputStream.write(tel2);
+                        exportStream.write(tel2);
                         byte[] email = ("EMAIL;HOME:" + contact.getEmailId() + "\n").getBytes();
-                        fileOutputStream.write(email);
-                        fileOutputStream.write(end);
+                        exportStream.write(email);
+                        exportStream.write(end);
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
                 }
-                return "Contacts Exported to: " + path;
+            } catch (IOException | JSONException e){
+                e.printStackTrace();
             }
-
-            return "Export Failed";
+            return "Contacts Exported to: " + path;
         }
-
-        @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-            Toast.makeText(MainActivity.this, s, Toast.LENGTH_SHORT).show();
-        }
-    }//end of exportAsyncTask
+    }
 
 } //end of main activity
 
