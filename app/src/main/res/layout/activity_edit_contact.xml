@@ -5,18 +5,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Activities.EditContact">
-
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbarlayout_edit_activity"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/primaryColor"
-        android:elevation="4dp"
-        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-        app:popupTheme="@style/Theme.AppCompat.Light" />
-
+        android:layout_height="wrap_content"
+        app:liftOnScroll="true">
+        <include
+            layout="@layout/toolbar"
+            android:id="@+id/toolbar_edit_activity"
+            app:layout_scrollFlags="scroll|enterAlways" />
+    </com.google.android.material.appbar.AppBarLayout>
     <ScrollView
-        android:layout_below="@+id/toolbar"
+        android:layout_below="@+id/appbarlayout_edit_activity"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 

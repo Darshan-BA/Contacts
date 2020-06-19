@@ -55,5 +55,8 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:4.11.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
 
+    //Preference library
+    def preference_version = "1.1.1"
+    implementation "androidx.preference:preference:$preference_version"
 
 }

@@ -7,14 +7,16 @@
     android:layout_height="match_parent"
     tools:context=".Activities.AddSimContact"
     android:orientation="vertical">
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar_addSimContact"
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbarlayout_add_sim_activity"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/primaryColor"
-        android:elevation="4dp"
-        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-        app:popupTheme="@style/Theme.AppCompat.Light" />
+        android:layout_height="wrap_content"
+        app:liftOnScroll="true">
+    <include
+        layout="@layout/toolbar"
+        android:id="@+id/toolbar_add_sim_activity"
+        app:layout_scrollFlags="scroll|enterAlways" />
+    </com.google.android.material.appbar.AppBarLayout>
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/name_addSimContact_txtlay"

@@ -39,9 +39,12 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.preference.Preference;
+import androidx.preference.PreferenceManager;
 
 import com.ba.contacts.Entities.Contact;
 import com.ba.contacts.Adapters.ContactAdapter;
+import com.ba.contacts.Fragments.SettingFragment;
 import com.ba.contacts.ViewModels.ContactViewModel;
 import com.ba.contacts.Fragments.GroupFragment;
 import com.ba.contacts.Fragments.MainFragment;
@@ -78,12 +81,10 @@ public class MainActivity extends AppCompatActivity {
     private static final int PERMISSION_READ_WRITE_CONTACTS=10;
 
     private int fragIndex=0;
-
-    public Toolbar toolbar;
-    ContactViewModel contactViewModel;
-    ArrayList<Contact> deleteContactList = new ArrayList<>();
+    private ContactViewModel contactViewModel;
+    private ArrayList<Contact> deleteContactList = new ArrayList<>();
     public ContactAdapter adapter;
-    List<Contact> exportContacts;
+    private List<Contact> exportContacts;
     private SearchView searchView;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
@@ -95,24 +96,17 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //action bar
-        toolbar = findViewById(R.id.toolbar);
-        toolbar.setTitleTextColor(getResources().getColor(R.color.primaryTextColor, null));
-        //toolbar.setLogo(R.mipmap.contact_icon);
-        toolbar.setTitle("Contacts");
-        setSupportActionBar(toolbar);
-
         //drawerLayout and navigationView
         drawerLayout = findViewById(R.id.drawerayout);
         navigationView = findViewById(R.id.navigation_view);
-        ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.openNavigation, R.string.closeNavigation);
-        drawerLayout.addDrawerListener(actionBarDrawerToggle);
-        actionBarDrawerToggle.syncState();
+        //ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.openNavigation, R.string.closeNavigation);
+        //drawerLayout.addDrawerListener(actionBarDrawerToggle);
+        //actionBarDrawerToggle.syncState();
         navigationView.setNavigationItemSelectedListener(item -> {
             switch (item.getItemId()) {
                 case R.id.contact_menu_item:
                     getSupportFragmentManager().beginTransaction().replace(R.id.framelayout,new MainFragment()).commit();
-                    toolbar.setTitle("Contacts");
+
                     break;
                 case R.id.sim_menu_item:
                     if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
@@ -138,7 +132,8 @@ public class MainActivity extends AppCompatActivity {
                     }
                     break;
                 case R.id.sort_menu_item:
-                    sc();
+                    //sc();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.framelayout, new SettingFragment()).commit();
                     break;
                 case R.id.family_menu_item:
                     gc(0);
@@ -166,6 +161,19 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences sortPrep = getSharedPreferences("SORT", MODE_PRIVATE);
         int sortId = sortPrep.getInt("name", 0);
 
+        SharedPreferences sharedPreferences =
+                PreferenceManager.getDefaultSharedPreferences(this);
+        String name = sharedPreferences.getString("sort", "");
+        Log.d("preference",name);
+        sharedPreferences.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener() {
+            @Override
+            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                Log.d("preference","Preference value was updated to:" + sharedPreferences.getString(key,""));
+            }
+        });
+
+
+
         //ViewModel instance
         contactViewModel = new ViewModelProvider(this).get(ContactViewModel.class);
         if (sortId == 1) {
@@ -188,6 +196,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }//end of onCreate()
+
 
 
     //permission Request
@@ -384,7 +393,6 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this,"Read/Write Contact Permission Granted",Toast.LENGTH_SHORT).show();
                 fragment=new SimListFragment();
                 getSupportFragmentManager().beginTransaction().replace(R.id.framelayout,fragment).commit();
-                toolbar.setTitle("SIM Contacts");
             }
         }
     }//end of Permission Result
@@ -461,7 +469,7 @@ public class MainActivity extends AppCompatActivity {
 
     // Export Contacts
     void ec() {
-        final String[] dialogList = new String[]{"Export to .json", "Export to .vcf","Export to SIM"};
+        final String[] dialogList = new String[]{"Export as .json", "Export as .vcf","Export to SIM"};
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setItems(dialogList, new DialogInterface.OnClickListener() {
             @Override
@@ -567,7 +575,6 @@ public class MainActivity extends AppCompatActivity {
             fragment=new SimListFragment();
             fragmentTransaction.replace(R.id.framelayout,fragment);
             fragmentTransaction.commit();
-            toolbar.setTitle("Sim Contacts");
         }
     }
 
@@ -684,13 +691,7 @@ public class MainActivity extends AppCompatActivity {
     //on Back Button Pressed
     @Override
     public void onBackPressed() {
-        if(searchView.isIconified()) {
-            //searchView.setIconified(true);
-            Log.d("searchwidget","has focus");
-            searchView.clearFocus();
-            adapter.getFilter().filter("");
-            super.onBackPressed();
-        } else if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
         }else if(!(fragment instanceof MainFragment)){
             gc(2);

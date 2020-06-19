@@ -4,6 +4,7 @@ import android.content.ContentResolver;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -12,10 +13,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import androidx.annotation.NavigationRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -33,20 +37,28 @@ public class SimListFragment extends Fragment {
     private ContactViewModel simContactViewModel;
     private ContactAdapter simContactAdapter;
     private Uri simUri=Uri.parse("content://icc/adn");
+    private Toolbar toolbar;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ((MainActivity)getActivity()).setFragIndex(2);
-        //getActivity().invalidateOptionsMenu();
-        setHasOptionsMenu(true);
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view=inflater.inflate(R.layout.fragment_sim,container,false);
-        Toolbar toolbar=((MainActivity)getActivity()).toolbar;
+        toolbar=view.findViewById(R.id.toolbar_sim_fragment);
+        toolbar.setTitle("SIM Contacts");
+        toolbar.setNavigationIcon(R.drawable.icon_hamburger);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("toolba","toolbar clicked");
+                DrawerLayout drawerLayout = ((MainActivity)getActivity()).findViewById(R.id.drawerayout);
+                drawerLayout.openDrawer(GravityCompat.START);
+            }
+        });
         ContentResolver contentResolver = getActivity().getContentResolver();
         RecyclerView recyclerView=view.findViewById(R.id.sim_recyclerview);
         simContactAdapter=new ContactAdapter();

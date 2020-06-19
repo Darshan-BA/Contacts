@@ -31,12 +31,12 @@ import com.ba.contacts.R;
 
 import java.util.List;
 
-public class ContactListShowFramgment extends Fragment {
+public class ContactListShowFragment extends Fragment {
 
-    ContactViewModel contactViewModel;
-    ContactAdapter adapter;
-    GroupAdapter groupAdapter;
-    String groupName;
+    private ContactViewModel contactViewModel;
+    private ContactAdapter adapter;
+    private GroupAdapter groupAdapter;
+    private String groupName;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -51,9 +51,6 @@ public class ContactListShowFramgment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_contact_list_show, container, false);
 
         groupName = getArguments().getString("group_name");
-        Toolbar toolbar = ((MainActivity) getActivity()).toolbar;
-        toolbar.setTitle(groupName);
-        //adapter=((MainActivity)getActivity()).adapter;
         adapter = new ContactAdapter();
         groupAdapter = new GroupAdapter();
         final RecyclerView recyclerView = view.findViewById(R.id.contactList_recyclerview);

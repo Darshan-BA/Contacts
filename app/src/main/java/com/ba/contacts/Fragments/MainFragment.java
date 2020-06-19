@@ -26,6 +26,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -46,14 +48,13 @@ import java.util.List;
 import static android.content.Context.MODE_PRIVATE;
 
 public class MainFragment extends Fragment {
-    ContactViewModel contactViewModel;
-    ContactAdapter adapter;
-    FloatingActionButton floatingActionButton;
-    ArrayList<Contact> deleteContactList = new ArrayList<>();
+    private ContactViewModel contactViewModel;
+    private ContactAdapter adapter;
+    private FloatingActionButton floatingActionButton;
+    private ArrayList<Contact> deleteContactList = new ArrayList<>();
     private String phoneNumberHolder;
     private SearchView searchView;
-
-   // private Toolbar toolbar;
+    private Toolbar toolbar;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -69,55 +70,37 @@ public class MainFragment extends Fragment {
     }
 
 
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.toolbar_menu, menu);
-        SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
-        searchView = (SearchView) menu.findItem(R.id.search_toolbar).getActionView();
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
-        searchView.setIconifiedByDefault(false);
-        searchView.setFocusable(true);
-        searchView.setIconified(false);
-        searchView.requestFocusFromTouch();
-        searchView.setMinimumWidth(Integer.MAX_VALUE);
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                adapter.getFilter().filter(query);
-                return false;
-            }
 
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                adapter.getFilter().filter(newText);
-                return false;
-            }
-        });
-        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
-            @Override
-            public boolean onClose() {
-                searchView.setIconified(true);
-                View view =getActivity().getCurrentFocus();
-                //InputMethodManager inputMethodManager=(InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-                //inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(),0);
-                return false;
-            }
-        });
-    }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Log.d("frag", "onCreateView main_frag");
         View view = inflater.inflate(R.layout.fragment_main, container, false);
-        //setHasOptionsMenu(true);
         //toolbar
-        //Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
-        Toolbar toolbar=((MainActivity)getActivity()).toolbar;
+        toolbar=view.findViewById(R.id.toolbar_main_fragment);
         toolbar.setTitle(R.string.app_name);
-        /*toolbar=view.findViewById(R.id.toolbar);
         toolbar.inflateMenu(R.menu.toolbar_menu);
+        toolbar.setNavigationIcon(R.drawable.icon_hamburger);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("toolba","toolbar clicked");
+                DrawerLayout drawerLayout = ((MainActivity)getActivity()).findViewById(R.id.drawerayout);
+                drawerLayout.openDrawer(GravityCompat.START);
+            }
+        });
+        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                if(item.getItemId()==R.id.search_toolbar){
+
+                }
+                return false;
+            }
+        });
+        /*
+
         ((AppCompatActivity) getActivity()).getSupportActionBar();
         AppCompatActivity activity = (AppCompatActivity) getActivity();
         activity.setSupportActionBar(toolbar);
@@ -220,7 +203,7 @@ public class MainFragment extends Fragment {
             public void setContextualActionMode() {
                 adapter.setSetMultiDelete(true);
                 adapter.notifyDataSetChanged();
-                toolbar.startActionMode(actionModeCallback);
+                //toolbar.startActionMode(actionModeCallback);
             }
 
             @Override
@@ -361,6 +344,42 @@ public class MainFragment extends Fragment {
             adapter.notifyDataSetChanged();
         }
     };
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.toolbar_menu, menu);
+        SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
+        searchView = (SearchView) menu.findItem(R.id.search_toolbar).getActionView();
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
+        searchView.setIconifiedByDefault(false);
+        searchView.setFocusable(true);
+        searchView.setIconified(false);
+        searchView.requestFocusFromTouch();
+        searchView.setMinimumWidth(Integer.MAX_VALUE);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                adapter.getFilter().filter(query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                adapter.getFilter().filter(newText);
+                return false;
+            }
+        });
+        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                searchView.setIconified(true);
+                View view =getActivity().getCurrentFocus();
+                //InputMethodManager inputMethodManager=(InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                //inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(),0);
+                return false;
+            }
+        });
+    }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {

@@ -12,6 +12,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -31,8 +33,8 @@ import java.util.List;
 
 public class GroupFragment extends Fragment {
 
-    ContactViewModel contactViewModel1;
-    ContactAdapter groupContactAdapter;
+    private ContactViewModel contactViewModel1;
+    private ContactAdapter groupContactAdapter;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -46,9 +48,18 @@ public class GroupFragment extends Fragment {
         View view=inflater.inflate(R.layout.fragment_group,container,false);
         Log.d("frag","onCreateView created ");
         String groupName=getArguments().getString("group_name");
-        Toolbar toolbar=(Toolbar)getActivity().findViewById(R.id.toolbar);
-        //Toolbar toolbar=view.findViewById(R.id.toolbar);
+        //Toolbar toolbar=(Toolbar)getActivity().findViewById(R.id.toolbar);
+        Toolbar toolbar=view.findViewById(R.id.toolbar_group_fragment);
         //toolbar.inflateMenu(R.menu.toolbar_list);
+        toolbar.setNavigationIcon(R.drawable.icon_hamburger);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("toolba","toolbar clicked");
+                DrawerLayout drawerLayout = ((MainActivity)getActivity()).findViewById(R.id.drawerayout);
+                drawerLayout.openDrawer(GravityCompat.START);
+            }
+        });
         groupContactAdapter=new ContactAdapter();
         toolbar.setTitle(groupName);
         final RecyclerView recyclerView = view.findViewById(R.id.group_recyclerview);
@@ -78,7 +89,7 @@ public class GroupFragment extends Fragment {
             public void onClick(View v) {
                 FragmentManager fm=getFragmentManager();
                 FragmentTransaction transaction=fm.beginTransaction();
-                ContactListShowFramgment contactListShowFramgment=new ContactListShowFramgment();
+                ContactListShowFragment contactListShowFramgment=new ContactListShowFragment();
                 Bundle bundle=new Bundle();
                 bundle.putString("group_name",groupName);
                 contactListShowFramgment.setArguments(bundle);

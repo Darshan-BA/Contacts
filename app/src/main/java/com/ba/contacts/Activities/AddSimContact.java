@@ -28,7 +28,7 @@ public class AddSimContact extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_sim_contact);
-        toolbar=findViewById(R.id.toolbar_addSimContact);
+        toolbar=findViewById(R.id.toolbar_add_sim_activity);
         toolbar.setTitle("Add SIM Contact");
         toolbar.setTitleTextColor(getResources().getColor(R.color.primaryTextColor, null));
         save = findViewById(R.id.save_addSimContact);

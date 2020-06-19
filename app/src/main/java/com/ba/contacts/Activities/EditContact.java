@@ -41,49 +41,19 @@ import java.util.Date;
 import java.util.Objects;
 
 public class EditContact extends AppCompatActivity {
-    Contact contact;
-    ContactViewModel contactViewModel;
-    Toolbar toolbar;
-    TextInputLayout firstNameLay,lastNameLay,emailAddressLay,primaryPhoneNumberLay,secondaryPhoneNumberLay,spinnerLay;
-    TextInputEditText firstName,lastName,emailAddress,primaryPhoneNumber,secondaryPhoneNumber;
-    ImageView photo;
+    private Contact contact;
+    private ContactViewModel contactViewModel;
+    private Toolbar toolbar;
+    private TextInputLayout firstNameLay,lastNameLay,emailAddressLay,primaryPhoneNumberLay,secondaryPhoneNumberLay,spinnerLay;
+    private TextInputEditText firstName,lastName,emailAddress,primaryPhoneNumber,secondaryPhoneNumber;
+    private ImageView photo;
     private Uri pUri;
     private String photoPath;
     private Bitmap photoBitmap;
     private AutoCompleteTextView groupAutoCompleteTextView,saveOptionAutoCompleteText;
-
     private int saveUpdate;
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode==1 && resultCode == RESULT_OK && data != null){
-            Uri uri=data.getData();
-            new PhotoLoaderAsyncTask(this.getContentResolver()).execute(uri);
-        }
-    }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.editcontact_toolbar_ment, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()){
-            case (R.id.save_editcontact_toolbar):
-                if(saveUpdate==0)
-                    saveDialog();
-                if(saveUpdate==1)
-                    updateDialog();
-                return true;
-            case (android.R.id.home):
-                onBackPressed();
-                return true;
-        }
-        return false;
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,7 +91,7 @@ public class EditContact extends AppCompatActivity {
 
 
         //Toolbar initialization
-        toolbar=findViewById(R.id.toolbar);
+        toolbar=findViewById(R.id.toolbar_edit_activity);
         toolbar.setTitleTextColor(getResources().getColor(R.color.primaryTextColor,null));
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -156,6 +126,36 @@ public class EditContact extends AppCompatActivity {
         }
         contactViewModel=new ViewModelProvider(this).get(ContactViewModel.class);
 
+    }//end of on create
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode==1 && resultCode == RESULT_OK && data != null){
+            Uri uri=data.getData();
+            new PhotoLoaderAsyncTask(this.getContentResolver()).execute(uri);
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.editcontact_toolbar_ment, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case (R.id.save_editcontact_toolbar):
+                if(saveUpdate==0)
+                    saveDialog();
+                if(saveUpdate==1)
+                    updateDialog();
+                return true;
+            case (android.R.id.home):
+                onBackPressed();
+                return true;
+        }
+        return false;
     }
     private class PhotoSaveAsyncTask extends AsyncTask<String,Void,String>{
         int which;
