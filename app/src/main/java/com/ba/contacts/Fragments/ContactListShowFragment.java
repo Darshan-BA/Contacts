@@ -41,8 +41,6 @@ public class ContactListShowFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d("frag", "onCreate contactlist_frag");
-        Log.d("fragment","No of back stacks contactlist: "+ getParentFragmentManager().getBackStackEntryCount());
     }
 
     @Nullable
@@ -50,7 +48,7 @@ public class ContactListShowFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_contact_list_show, container, false);
 
-        groupName = getArguments().getString("group_name");
+        groupName = getArguments().getString("group_name","");
         adapter = new ContactAdapter();
         groupAdapter = new GroupAdapter();
         final RecyclerView recyclerView = view.findViewById(R.id.contactList_recyclerview);

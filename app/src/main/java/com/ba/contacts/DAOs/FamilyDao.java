@@ -19,6 +19,7 @@ public interface FamilyDao {
     @Query("DELETE FROM family_list WHERE family_key= :ids")
     void removeFamilyContacts(int... ids);
 
+    @OnConflictStrategy
     @Query("INSERT INTO family_list(family_key) VALUES(:ids) ")
     void addToFamilyList(int... ids);
 

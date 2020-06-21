@@ -22,8 +22,6 @@ public class ContactViewModel extends AndroidViewModel {
     private LiveData<List<Contact>> allFamilyContacts;
     private LiveData<List<Contact>> allFriendsContacts;
 
-    private LiveData<List<Contact>>allSimContacts;
-
     public ContactViewModel(@NonNull Application application) {
         super(application);
         repository=new ContactRepository(application);

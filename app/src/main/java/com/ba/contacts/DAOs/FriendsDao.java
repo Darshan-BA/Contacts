@@ -16,6 +16,7 @@ public interface FriendsDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertFriends(FriendsList... friendsList);
 
+
     @Query("DELETE FROM friends_list WHERE friends_key= :ids")
     void removeFriendsContacts(int... ids);
 
@@ -23,7 +24,7 @@ public interface FriendsDao {
     @Query("INSERT INTO friends_list(friends_key) VALUES(:ids)  ")
     void  addToFriendsList(int... ids);
 
-    @OnConflictStrategy
+   @OnConflictStrategy
     @Query("INSERT INTO friends_list(friends_key) VALUES(:ids)")
     void  addToFriendsList(Integer[] ids);
 }

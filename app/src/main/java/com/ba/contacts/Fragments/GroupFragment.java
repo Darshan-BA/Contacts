@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -35,12 +36,11 @@ public class GroupFragment extends Fragment {
 
     private ContactViewModel contactViewModel1;
     private ContactAdapter groupContactAdapter;
+    private TextView textView;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ((MainActivity)getActivity()).setFragIndex(2);
-        //getActivity().invalidateOptionsMenu();
     }
     @Nullable
     @Override
@@ -48,6 +48,7 @@ public class GroupFragment extends Fragment {
         View view=inflater.inflate(R.layout.fragment_group,container,false);
         Log.d("frag","onCreateView created ");
         String groupName=getArguments().getString("group_name");
+        textView=view.findViewById(R.id.empty_text);
         //Toolbar toolbar=(Toolbar)getActivity().findViewById(R.id.toolbar);
         Toolbar toolbar=view.findViewById(R.id.toolbar_group_fragment);
         //toolbar.inflateMenu(R.menu.menu_actionmodecallback);
@@ -55,7 +56,6 @@ public class GroupFragment extends Fragment {
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d("toolba","toolbar clicked");
                 DrawerLayout drawerLayout = ((MainActivity)getActivity()).findViewById(R.id.drawerayout);
                 drawerLayout.openDrawer(GravityCompat.START);
             }
@@ -71,6 +71,12 @@ public class GroupFragment extends Fragment {
                 @Override
                 public void onChanged(List<Contact> contacts) {
                     groupContactAdapter.setContacts(contacts);
+                    if(contacts.isEmpty()){
+                        textView.setVisibility(View.VISIBLE);
+                        textView.setText("Empty List, click button below to add friends to list.");
+                    }else {
+                        textView.setVisibility(View.INVISIBLE);
+                    }
                 }
             });
         }
@@ -79,6 +85,12 @@ public class GroupFragment extends Fragment {
                 @Override
                 public void onChanged(List<Contact> contacts) {
                     groupContactAdapter.setContacts(contacts);
+                    if(contacts.isEmpty()){
+                        textView.setVisibility(View.VISIBLE);
+                        textView.setText("Empty List, click button below to add contacts to family.");
+                    }else {
+                        textView.setVisibility(View.INVISIBLE);
+                    }
                 }
             });
         }

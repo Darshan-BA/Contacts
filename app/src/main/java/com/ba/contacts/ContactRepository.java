@@ -103,6 +103,7 @@ public class ContactRepository {
         simUtil=new SimUtil(activity);
         return simUtil.deleteSimContact(contact);
     }
+
     public int addSimContact(Activity activity,SimContact simContact){
         simUtil=new SimUtil(activity);
         return simUtil.addSimContact(simContact);
@@ -261,12 +262,14 @@ public class ContactRepository {
         protected Void doInBackground(Integer... integers) {
             if(group.equals("Friends")){
                 for (int i = 0; i< integers.length; i++){
-                    friendsDao.addToFriendsList(integers[i].intValue());
+                    friendsDao.insertFriends(new FriendsList(integers[i]));
+                    //friendsDao.addToFriendsList(integers[i]);
                 }
             }
             if(group.equals("Family")){
                 for (int i = 0; i< integers.length; i++) {
-                    familyDao.addToFamilyList(integers[i].intValue());
+                    familyDao.insertFamilies(new FamilyList(integers[i]));
+                    //familyDao.addToFamilyList(integers[i]);
                 }
             }
             return null;
