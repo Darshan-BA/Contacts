@@ -3,17 +3,16 @@
     xmlns:tools="http://schemas.android.com/tools">
     <item
         android:id="@+id/contact_menu_item"
-        android:icon="@drawable/ic_account_circle_black_24dp"
-        android:title="Contacts" />
+        android:icon="@drawable/icon_account_circle"
+        android:title="@string/contacts" />
     <item
         android:id="@+id/sim_menu_item"
-        android:title="SIM Contacts"
-        android:icon="@drawable/ic_baseline_sim_card_black__24"
-        />
+        android:icon="@drawable/icon_sim_card_black"
+        android:title="@string/sim_contacts" />
 
     <item
-        android:icon="@drawable/ic_baseline_group_24"
-        android:title="Groups">
+        android:icon="@drawable/icon_group"
+        android:title="@string/groups">
         <menu>
             <group android:checkableBehavior="none">
                 <item
@@ -30,15 +29,21 @@
             <group android:checkableBehavior="none">
                 <item
                     android:id="@+id/import_menu_item"
-                    android:title="Import" />
+                    android:icon="@drawable/icon_import_export"
+                    android:title="@string/import_contacts" />
                 <item
                     android:id="@+id/export_menu_item"
-                    android:title="Export" />
+                    android:icon="@drawable/icon_import_export"
+                    android:title="@string/export_contacts" />
                 <item
                     android:id="@+id/sort_menu_item"
-                    android:title="Sort By" />
+                    android:icon="@drawable/icon_sort"
+                    android:title="@string/sort_by" />
             </group>
         </menu>
     </item>
-
+    <item
+        android:id="@+id/settings"
+        android:icon="@drawable/icon_settings"
+        android:title="@string/settings" />
 </menu>

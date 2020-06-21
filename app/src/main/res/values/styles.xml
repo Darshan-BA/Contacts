@@ -1,15 +1,40 @@
 <resources>
 
     <!-- Base application theme. -->
+    <!-- light them  -->
     <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
-        <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/primaryColor</item>
-        <item name="colorPrimaryDark">@color/primaryDarkColor</item>
-        <item name="colorAccent">@color/primaryLightColor</item>
-        <item name="colorSecondary">@color/secondaryColor</item>
-        <item name="colorSecondaryVariant">@color/secondaryDarkColor</item>
-        <item name="colorOnSecondary">@color/secondaryLightColor</item>
-        <item name="actionModeBackground">@color/secondaryLightColor</item>
+        <item name="colorPrimary">@color/lightColorPrimary</item>
+        <item name="colorPrimaryVariant">@color/lightColorPrimaryVariant</item>
+        <item name="colorPrimaryDark">@color/lightColorPrimaryDark</item>
+        <item name="colorSecondary">@color/lightColorSecondary</item>
+        <item name="colorSecondaryVariant">@color/lightColorSecondaryVariant</item>
+        <item name="colorAccent">@color/lightColorAccent</item>
+        <item name="background">@color/lightColorBackground</item>
+        <item name="colorError">@color/lightColorError</item>
+        <item name="colorOnPrimary">@color/lightColorOnPrimary</item>
+        <item name="colorOnSecondary">@color/lightColorOnSecondary</item>
+        <item name="colorOnBackground">@color/lightColorOnBackground</item>
+        <item name="colorOnError">@color/lightColorOnError</item>
+        <item name="textColorOnCard">@color/lightColorPrimaryVariant</item>
+        <item name="windowActionModeOverlay">true</item>
+    </style>
+
+
+    <!-- dark them  -->
+    <style name="darkTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/darkColorPrimary</item>
+        <item name="colorPrimaryVariant">@color/darkColorPrimaryVariant</item>
+        <item name="colorPrimaryDark">@color/darkColorPrimaryDark</item>
+        <item name="colorSecondary">@color/darkColorSecondary</item>
+        <item name="colorSecondaryVariant">@color/darkColorSecondaryVariant</item>
+        <item name="colorAccent">@color/darkColorAccent</item>
+        <item name="background">@color/darkColorBackground</item>
+        <item name="colorError">@color/darkColorError</item>
+        <item name="colorOnPrimary">@color/darkColorOnPrimary</item>
+        <item name="colorOnSecondary">@color/darkColorOnSecondary</item>
+        <item name="colorOnBackground">@color/darkColorOnBackground</item>
+        <item name="colorOnError">@color/darkColorOnError</item>
+        <item name="textColorOnCard">@color/darkColorOnPrimary</item>
         <item name="windowActionModeOverlay">true</item>
     </style>
 
@@ -23,5 +48,4 @@
     <style name="navigation" parent="AppTheme">
         <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
-
 </resources>

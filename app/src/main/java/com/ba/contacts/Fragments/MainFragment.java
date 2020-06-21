@@ -19,7 +19,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SearchView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -33,7 +32,6 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.ba.contacts.Entities.Contact;
 import com.ba.contacts.Adapters.ContactAdapter;
 import com.ba.contacts.ViewModels.ContactViewModel;
@@ -41,10 +39,8 @@ import com.ba.contacts.Activities.EditContact;
 import com.ba.contacts.Activities.MainActivity;
 import com.ba.contacts.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import static android.content.Context.MODE_PRIVATE;
 
 public class MainFragment extends Fragment {
@@ -68,8 +64,6 @@ public class MainFragment extends Fragment {
         Log.d("frag", "onCreate main_frag");
         Log.d("fragment","No of back stacks main: "+ getParentFragmentManager().getBackStackEntryCount());
     }
-
-
 
 
     @Nullable
@@ -203,7 +197,9 @@ public class MainFragment extends Fragment {
             public void setContextualActionMode() {
                 adapter.setSetMultiDelete(true);
                 adapter.notifyDataSetChanged();
-                //toolbar.startActionMode(actionModeCallback);
+                toolbar.startActionMode(actionModeCallback);
+                toolbar.hideOverflowMenu();
+                floatingActionButton.hide();
             }
 
             @Override
@@ -298,7 +294,7 @@ public class MainFragment extends Fragment {
     private ActionMode.Callback actionModeCallback = new ActionMode.Callback() {
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            mode.getMenuInflater().inflate(R.menu.toolbar_list, menu);
+            mode.getMenuInflater().inflate(R.menu.menu_actionmodecallback, menu);
             mode.setTitle("Delete Contact");
             return true;
         }
@@ -310,7 +306,7 @@ public class MainFragment extends Fragment {
 
         @Override
         public boolean onActionItemClicked(final ActionMode mode, MenuItem item) {
-            if (item.getItemId() == R.id.delete_toolbar) {
+            if (item.getItemId() == R.id.multiple_delete) {
                 final android.app.AlertDialog.Builder alertDialog = new android.app.AlertDialog.Builder(getContext());
                 alertDialog.setTitle("Delete Selected");
                 alertDialog.setMessage("Are you sure want to delete selected contacts");
@@ -322,6 +318,7 @@ public class MainFragment extends Fragment {
                         adapter.setSetMultiDelete(false);
                         adapter.notifyDataSetChanged();
                         Toast.makeText(getContext(), "Contacts Deleted", Toast.LENGTH_SHORT).show();
+                        floatingActionButton.show();
                         mode.finish();
                     }
                 });
@@ -342,6 +339,7 @@ public class MainFragment extends Fragment {
         public void onDestroyActionMode(ActionMode mode) {
             adapter.setSetMultiDelete(false);
             adapter.notifyDataSetChanged();
+            floatingActionButton.show();
         }
     };
     @Override
@@ -427,5 +425,9 @@ public class MainFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         Log.d("frag", "onDetach main_frag");
+    }
+
+    private void hideToolbar(){
+
     }
 }

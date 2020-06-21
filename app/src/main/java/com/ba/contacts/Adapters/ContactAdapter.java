@@ -86,7 +86,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactH
     @NonNull
     @Override
     public ContactHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.contacts_cardview, parent, false);
+        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.cardview_contacts, parent, false);
         return new ContactHolder(itemView, mListener);
     }
 

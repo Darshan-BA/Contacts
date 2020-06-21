@@ -23,7 +23,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
-        tools:listitem="@layout/contacts_cardview" />
+        tools:listitem="@layout/cardview_contacts" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/group_add_float"
@@ -34,7 +34,7 @@
         android:layout_margin="32dp"
         android:backgroundTint="@color/secondaryColor"
         android:elevation="8dp"
-        android:src="@drawable/ic_baseline_person_add_24"
+        android:src="@drawable/icon_person_add"
         android:tint="@color/secondaryLightColor"
         app:backgroundTint="@color/secondaryColor"
         app:borderWidth="2dp"

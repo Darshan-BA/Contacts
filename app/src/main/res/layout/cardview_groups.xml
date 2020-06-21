@@ -4,10 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="60dp"
-    android:elevation="8dp"
-    android:outlineAmbientShadowColor="@color/primaryColor"
-    app:strokeColor="@color/primaryColor"
-    app:strokeWidth="0.5dp">
+    android:elevation="24dp"
+    app:strokeColor="?attr/colorPrimary"
+    app:strokeWidth="1dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,65 +15,67 @@
         android:weightSum="1">
 
         <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_marginStart="16dp">
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginStart="16dp">
 
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_centerHorizontal="true"
-                    android:layout_centerVertical="true"
-                    app:cardCornerRadius="75dp"
-                    app:strokeColor="@color/primaryColor"
-                    app:strokeWidth="0.5dp">
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                app:cardCornerRadius="75dp"
+                app:strokeWidth="1dp">
 
-                    <ImageView
-                        android:id="@+id/group_icon"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:scaleType="centerCrop"
-                        android:src="@drawable/photo_icon"/>
-                </com.google.android.material.card.MaterialCardView>
-            </RelativeLayout>
+                <ImageView
+                    android:id="@+id/group_icon"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/photo_icon" />
+            </com.google.android.material.card.MaterialCardView>
+        </RelativeLayout>
+
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="1">
+
             <TextView
                 android:id="@+id/group_firstname"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:maxLines="1"
-                android:layout_margin="16dp"
-                android:text="@string/firstname"
                 android:layout_alignBaseline="@+id/lastname"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                android:textColor="@color/primaryLightColor"
-                android:textStyle="bold|italic"
                 android:layout_centerVertical="true"
-                />
+                android:layout_margin="16dp"
+                android:maxLines="1"
+                android:text="@string/firstname"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="?attr/textColorOnCard"
+                android:textStyle="bold" />
+
             <TextView
                 android:id="@+id/group_lastname"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
                 android:layout_marginEnd="4dp"
-                android:layout_toEndOf="@+id/group_firstname"
                 android:layout_toStartOf="@+id/popup_option"
+                android:layout_toEndOf="@+id/group_firstname"
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:text="@string/lastname"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                android:textColor="@color/primaryLightColor"
-                android:textStyle="bold|italic"
-                android:layout_centerVertical="true"/>
+                android:textColor="?attr/textColorOnCard"
+                android:textStyle="bold" />
         </RelativeLayout>
+
         <com.google.android.material.checkbox.MaterialCheckBox
             android:id="@+id/group_checkbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:visibility="invisible"/>
+            android:visibility="invisible" />
 
 
     </LinearLayout>

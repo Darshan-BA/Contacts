@@ -15,8 +15,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.DocumentsContract;
 import android.util.Log;
 import android.view.ActionMode;
 import android.view.Menu;
@@ -27,9 +25,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
@@ -39,8 +35,8 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.preference.Preference;
-import androidx.preference.PreferenceManager;
+//import androidx.preference.Preference;
+//import androidx.preference.PreferenceManager;
 
 import com.ba.contacts.Entities.Contact;
 import com.ba.contacts.Adapters.ContactAdapter;
@@ -57,10 +53,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -132,8 +124,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                     break;
                 case R.id.sort_menu_item:
-                    //sc();
-                    getSupportFragmentManager().beginTransaction().replace(R.id.framelayout, new SettingFragment()).commit();
+                    sc();
                     break;
                 case R.id.family_menu_item:
                     gc(0);
@@ -141,6 +132,10 @@ public class MainActivity extends AppCompatActivity {
 
                 case R.id.friends_menu_item:
                     gc(1);
+                    break;
+                case R.id.settings:
+                    fragment=new SettingFragment();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.framelayout,fragment).commit();
                     break;
 
             }
@@ -161,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences sortPrep = getSharedPreferences("SORT", MODE_PRIVATE);
         int sortId = sortPrep.getInt("name", 0);
 
-        SharedPreferences sharedPreferences =
+       /* SharedPreferences sharedPreferences =
                 PreferenceManager.getDefaultSharedPreferences(this);
         String name = sharedPreferences.getString("sort", "");
         Log.d("preference",name);
@@ -170,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
                 Log.d("preference","Preference value was updated to:" + sharedPreferences.getString(key,""));
             }
-        });
+        });*/
 
 
 
@@ -635,7 +630,7 @@ public class MainActivity extends AppCompatActivity {
     private ActionMode.Callback actionModeCallback = new ActionMode.Callback() {
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            mode.getMenuInflater().inflate(R.menu.toolbar_list, menu);
+            mode.getMenuInflater().inflate(R.menu.menu_actionmodecallback, menu);
             mode.setTitle("Delete Contact");
             return true;
         }
@@ -647,7 +642,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public boolean onActionItemClicked(final ActionMode mode, MenuItem item) {
-            if (item.getItemId() == R.id.delete_toolbar) {
+            if (item.getItemId() == R.id.multiple_delete) {
                 final AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
                 alertDialog.setTitle("Delete Selected");
                 alertDialog.setMessage("Are you sure want to delete selected contacts");

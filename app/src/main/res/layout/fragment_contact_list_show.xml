@@ -9,6 +9,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
-        tools:listitem="@layout/group_cardview" />
+        tools:listitem="@layout/cardview_groups" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

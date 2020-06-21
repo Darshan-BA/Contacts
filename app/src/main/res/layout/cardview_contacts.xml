@@ -6,8 +6,9 @@
     android:layout_width="match_parent"
     android:layout_height="80dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    app:strokeColor="@color/secondaryColor"
-    app:strokeWidth="0.5dp">
+    android:elevation="24dp"
+    app:strokeColor="?attr/colorPrimary"
+    app:strokeWidth="1dp">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -25,7 +26,6 @@
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 app:cardCornerRadius="75dp"
-                app:strokeColor="@color/primaryColor"
                 app:strokeWidth="1dp"
                 android:layout_centerVertical="true"
                 android:layout_centerHorizontal="true">
@@ -53,7 +53,7 @@
         android:text="@string/firstname"
         android:layout_alignBaseline="@+id/lastname"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        android:textColor="@color/primaryLightColor"
+        android:textColor="?attr/textColorOnCard"
         android:textStyle="bold" />
 
     <TextView
@@ -67,7 +67,7 @@
         android:maxLines="1"
         android:text="@string/lastname"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        android:textColor="@color/primaryLightColor"
+        android:textColor="?attr/textColorOnCard"
         android:textStyle="bold" />
 
     <TextView
@@ -81,8 +81,8 @@
         android:maxLines="1"
         android:text="@string/primarynumber"
         android:textAppearance="@style/TextAppearance.AppCompat.Small"
-        android:textColor="@color/secondaryDarkColor"
-        tools:ignore="UnknownId" />
+        android:textColor="?attr/colorOnSecondary"
+        tools:ignore="UnknownId"/>
 
     <TextView
         android:id="@+id/secondary"
@@ -95,7 +95,7 @@
         android:maxLines="1"
         android:text="@string/secondaryNumber"
         android:textAppearance="@style/TextAppearance.AppCompat.Small"
-        android:textColor="@color/secondaryDarkColor"
+        android:textColor="?attr/colorOnSecondary"
         />
 
     <TextView
@@ -117,7 +117,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_alignParentEnd="true"
-        android:src="@drawable/ic_more_vert_black_24dp"
+        android:src="@drawable/icon_vert"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="8dp"

@@ -9,4 +9,31 @@
   <color name="primaryTextColor">#ffffff</color>
   <color name="secondaryTextColor">#000000</color>
     <color name="accentColor">#ffffff</color>
+  <!-- light color -->
+  <color name="lightColorPrimary">#a50034</color>
+  <color name="lightColorPrimaryVariant">#dc475d</color>
+  <color name="lightColorPrimaryDark">#6f000f</color>
+  <color name="lightColorSecondary">#6b6b6b</color>
+  <color name="lightColorSecondaryVariant">#999999</color>
+  <color name="lightColorAccent">#9e9e9e</color>
+  <color name="lightColorBackground">#ffffff</color>
+  <color name="lightColorError">#6f000f</color>
+  <color name="lightColorOnPrimary">#ffffff</color>
+  <color name="lightColorOnSecondary">#000000</color>
+  <color name="lightColorOnBackground">#ffffff</color>
+  <color name="lightColorOnError">#ffffff</color>
+
+  <!-- dark color -->
+  <color name="darkColorPrimary">#121212</color>
+  <color name="darkColorPrimaryVariant">#383838</color>
+  <color name="darkColorPrimaryDark">#000000</color>
+  <color name="darkColorSecondary">#a50034</color>
+  <color name="darkColorSecondaryVariant">#dc475d</color>
+  <color name="darkColorAccent">#9e9e9e</color>
+  <color name="darkColorBackground">#000000</color>
+  <color name="darkColorError">#6f000f</color>
+  <color name="darkColorOnPrimary">#ffffff</color>
+  <color name="darkColorOnSecondary">#ffffff</color>
+  <color name="darkColorOnBackground">#ffffff</color>
+  <color name="darkColorOnError">#ffffff</color>
 </resources>

@@ -50,7 +50,7 @@ public class GroupFragment extends Fragment {
         String groupName=getArguments().getString("group_name");
         //Toolbar toolbar=(Toolbar)getActivity().findViewById(R.id.toolbar);
         Toolbar toolbar=view.findViewById(R.id.toolbar_group_fragment);
-        //toolbar.inflateMenu(R.menu.toolbar_list);
+        //toolbar.inflateMenu(R.menu.menu_actionmodecallback);
         toolbar.setNavigationIcon(R.drawable.icon_hamburger);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override

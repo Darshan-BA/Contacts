@@ -24,4 +24,5 @@ public class SettingFragment extends PreferenceFragmentCompat {
         screen.addPreference(sortPreference);
         setPreferenceScreen(screen);
     }
+
 }

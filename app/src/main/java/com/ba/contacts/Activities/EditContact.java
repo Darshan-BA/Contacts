@@ -95,7 +95,7 @@ public class EditContact extends AppCompatActivity {
         toolbar.setTitleTextColor(getResources().getColor(R.color.primaryTextColor,null));
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_baseline_arrow_white_24);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.icon_baseline_arrow);
 
 
         //fetched Intent extras
