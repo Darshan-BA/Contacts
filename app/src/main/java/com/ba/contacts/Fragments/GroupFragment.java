@@ -23,6 +23,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.ba.contacts.Activities.ContactSelectActivity;
 import com.ba.contacts.Entities.Contact;
 import com.ba.contacts.Adapters.ContactAdapter;
 import com.ba.contacts.ViewModels.ContactViewModel;
@@ -99,7 +100,7 @@ public class GroupFragment extends Fragment {
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FragmentManager fm=getFragmentManager();
+               /* FragmentManager fm=getFragmentManager();
                 FragmentTransaction transaction=fm.beginTransaction();
                 ContactListShowFragment contactListShowFramgment=new ContactListShowFragment();
                 Bundle bundle=new Bundle();
@@ -107,7 +108,10 @@ public class GroupFragment extends Fragment {
                 contactListShowFramgment.setArguments(bundle);
                 transaction.add(R.id.framelayout,contactListShowFramgment);
                 transaction.addToBackStack(null);
-                transaction.commit();
+                transaction.commit();*/
+               Intent intent=new Intent(getActivity(),ContactSelectActivity.class);
+               intent.putExtra("group_name",groupName);
+               startActivity(intent);
         }
         });
         groupContactAdapter.setOnItemClickListener(new ContactAdapter.OnItemClickListner() {

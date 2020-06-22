@@ -40,6 +40,8 @@
             android:parentActivityName=".Activities.MainActivity"></activity>
         <activity android:name=".Activities.AddSimContact"
             android:parentActivityName=".Activities.MainActivity"/>
+        <activity android:name=".Activities.ContactSelectActivity"
+            android:parentActivityName=".Activities.MainActivity"/>
     </application>
 
 

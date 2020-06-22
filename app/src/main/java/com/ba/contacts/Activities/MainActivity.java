@@ -900,7 +900,7 @@ public class MainActivity extends AppCompatActivity {
             super.onPostExecute(s);
             //Toast.makeText(MainActivity.this, s, Toast.LENGTH_SHORT).show();
             NotificationCompat.Builder exportFinishedBuilder=new NotificationCompat.Builder(MainActivity.this)
-                    .setSmallIcon(R.mipmap.contact_icon)
+                    .setSmallIcon(R.drawable.photo_icon)
                     .setLargeIcon(BitmapFactory.decodeResource(getResources(),R.mipmap.contact_icon))
                     .setContentTitle("Export")
                     .setContentText("Export Contacts Finished Successfully")
