@@ -1,35 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Activities.EditContact">
+
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appbarlayout_edit_activity"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:liftOnScroll="true">
+
         <include
-            layout="@layout/toolbar"
             android:id="@+id/toolbar_edit_activity"
+            layout="@layout/toolbar"
             app:layout_scrollFlags="scroll|enterAlways" />
     </com.google.android.material.appbar.AppBarLayout>
+
     <ScrollView
-        android:layout_below="@+id/appbarlayout_edit_activity"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_below="@+id/appbarlayout_edit_activity"
+        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
 
             <RelativeLayout
                 android:id="@+id/profile_photo"
                 android:layout_width="156dp"
                 android:layout_height="156dp"
-                android:layout_below="@+id/toolbar"
                 android:layout_centerHorizontal="true"
                 android:layout_gravity="center"
                 android:layout_margin="16dp"
@@ -56,7 +59,6 @@
                 style="@style/TextInputLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/profile_photo"
                 android:layout_margin="8dp"
                 android:hint="@string/firstname">
 
@@ -72,7 +74,6 @@
                 style="@style/TextInputLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/firstname_edit_layout"
                 android:layout_margin="8dp"
                 android:hint="@string/lastname">
 
@@ -88,7 +89,6 @@
                 style="@style/TextInputLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/lastname_edit_layout"
                 android:layout_margin="8dp"
                 android:hint="@string/primarynumber">
 
@@ -104,7 +104,6 @@
                 style="@style/TextInputLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/primary_edit_layout"
                 android:layout_margin="8dp"
                 android:hint="@string/secondaryNumber">
 
@@ -120,7 +119,6 @@
                 style="@style/TextInputLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/secondary_edit_layout"
                 android:layout_margin="8dp"
                 android:hint="@string/emailId">
 
@@ -128,21 +126,23 @@
                     android:id="@+id/email_edit"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textEmailAddress"
-                    android:imeOptions="actionDone"/>
+                    android:imeOptions="actionDone"
+                    android:inputType="textEmailAddress" />
             </com.google.android.material.textfield.TextInputLayout>
+
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/spinner_edit_layout"
-                android:layout_margin="8dp"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Group"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+                android:layout_margin="8dp"
+                android:hint="Group">
+
                 <AutoCompleteTextView
                     android:id="@+id/dropdown_edit"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="none"/>
+                    android:inputType="none" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!--<LinearLayout
@@ -189,4 +189,4 @@
         </LinearLayout>
     </ScrollView>
 
-</RelativeLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

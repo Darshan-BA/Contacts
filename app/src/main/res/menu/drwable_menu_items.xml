@@ -35,10 +35,10 @@
                     android:id="@+id/export_menu_item"
                     android:icon="@drawable/icon_import_export"
                     android:title="@string/export_contacts" />
-                <item
+               <!-- <item
                     android:id="@+id/sort_menu_item"
                     android:icon="@drawable/icon_sort"
-                    android:title="@string/sort_by" />
+                    android:title="@string/sort_by" />-->
             </group>
         </menu>
     </item>

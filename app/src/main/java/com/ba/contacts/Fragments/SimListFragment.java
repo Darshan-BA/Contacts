@@ -59,6 +59,17 @@ public class SimListFragment extends Fragment {
                 drawerLayout.openDrawer(GravityCompat.START);
             }
         });
+        toolbar.inflateMenu(R.menu.addsimcontact_toolbar_menu);
+        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                if(item.getItemId()==R.id.addNew){
+                    Intent intent=new Intent(getActivity(), AddSimContact.class);
+                    startActivityForResult(intent,1);
+                }
+                return true;
+            }
+        });
         ContentResolver contentResolver = getActivity().getContentResolver();
         RecyclerView recyclerView=view.findViewById(R.id.sim_recyclerview);
         simContactAdapter=new ContactAdapter();

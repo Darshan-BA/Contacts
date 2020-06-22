@@ -40,13 +40,12 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="32dp"
-        android:backgroundTint="@color/secondaryColor"
+        android:backgroundTint="?attr/colorSecondary"
         android:elevation="8dp"
         android:src="@drawable/icon_person_add"
-        android:tint="@color/secondaryLightColor"
-        app:backgroundTint="@color/secondaryColor"
+        android:tint="?attr/colorSecondary"
         app:borderWidth="2dp"
         app:fabSize="normal"
-        app:rippleColor="@color/secondaryLightColor" />
+        app:rippleColor="?attr/colorSecondaryVariant" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

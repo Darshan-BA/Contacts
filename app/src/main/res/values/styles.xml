@@ -2,7 +2,7 @@
 
     <!-- Base application theme. -->
     <!-- light them  -->
-    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <style name="lightTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="colorPrimary">@color/lightColorPrimary</item>
         <item name="colorPrimaryVariant">@color/lightColorPrimaryVariant</item>
         <item name="colorPrimaryDark">@color/lightColorPrimaryDark</item>
@@ -17,6 +17,7 @@
         <item name="colorOnError">@color/lightColorOnError</item>
         <item name="textColorOnCard">@color/lightColorPrimaryVariant</item>
         <item name="windowActionModeOverlay">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 
 
@@ -36,16 +37,17 @@
         <item name="colorOnError">@color/darkColorOnError</item>
         <item name="textColorOnCard">@color/darkColorOnPrimary</item>
         <item name="windowActionModeOverlay">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 
     <style name="TextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-        <item name="boxStrokeColor">@color/primaryColor</item>
+        <item name="boxStrokeColor">?attr/colorSecondary</item>
         <item name="android:enabled">true</item>
-        <item name="android:textColorHint">@color/secondaryColor</item>
-        <item name="hintTextColor">@color/primaryLightColor</item>
+        <item name="android:textColorHint">?attr/colorOnSecondary</item>
+        <item name="hintTextColor">?attr/colorOnSecondary</item>
     </style>
 
-    <style name="navigation" parent="AppTheme">
+   <!-- <style name="navigation" parent="AppTheme">
         <item name="android:statusBarColor">@android:color/transparent</item>
-    </style>
+    </style>-->
 </resources>

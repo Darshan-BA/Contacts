@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
+import com.ba.contacts.SettingsSharedPref;
 import com.ba.contacts.ViewModels.ContactViewModel;
 import com.ba.contacts.R;
 import com.ba.contacts.SimContact;
@@ -16,6 +17,8 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+
+import java.util.Objects;
 
 public class AddSimContact extends AppCompatActivity {
     MaterialButton save, cancel;
@@ -27,10 +30,16 @@ public class AddSimContact extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (SettingsSharedPref.getInstance().getTheme().equals("0"))
+            setTheme(R.style.darkTheme);
+        else
+            setTheme(R.style.lightTheme);
         setContentView(R.layout.activity_add_sim_contact);
         toolbar=findViewById(R.id.toolbar_add_sim_activity);
         toolbar.setTitle("Add SIM Contact");
-        toolbar.setTitleTextColor(getResources().getColor(R.color.primaryTextColor, null));
+        setSupportActionBar(toolbar);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.icon_baseline_arrow);
         save = findViewById(R.id.save_addSimContact);
         cancel = findViewById(R.id.cancel_addSimContact);
         phone = findViewById(R.id.primary_addSimContact_txtlay);

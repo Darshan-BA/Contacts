@@ -1,14 +1,5 @@
 <!--?xml version="1.0" encoding="UTF-8"?-->
 <resources>
-  <color name="primaryColor">#a50034</color>
-  <color name="primaryLightColor">#dc475d</color>
-  <color name="primaryDarkColor">#6f000f</color>
-  <color name="secondaryColor">#6b6b6b</color>
-  <color name="secondaryLightColor">#999999</color>
-  <color name="secondaryDarkColor">#404040</color>
-  <color name="primaryTextColor">#ffffff</color>
-  <color name="secondaryTextColor">#000000</color>
-    <color name="accentColor">#ffffff</color>
   <!-- light color -->
   <color name="lightColorPrimary">#a50034</color>
   <color name="lightColorPrimaryVariant">#dc475d</color>

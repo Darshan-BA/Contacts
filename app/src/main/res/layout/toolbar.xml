@@ -5,5 +5,6 @@
     android:layout_height="?attr/actionBarSize"
     style="@style/ThemeOverlay.MaterialComponents.Toolbar.Primary"
     android:background="?attr/colorPrimary"
-    app:titleTextColor="?attr/colorOnPrimary">
+    app:titleTextColor="?attr/colorOnPrimary"
+    android:elevation="24dp">
 </com.google.android.material.appbar.MaterialToolbar>

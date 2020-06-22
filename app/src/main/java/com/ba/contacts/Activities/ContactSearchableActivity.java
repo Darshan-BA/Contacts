@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.ba.contacts.Adapters.ContactAdapter;
 import com.ba.contacts.Entities.Contact;
 import com.ba.contacts.R;
+import com.ba.contacts.SettingsSharedPref;
 import com.ba.contacts.ViewModels.ContactViewModel;
 
 import java.util.List;
@@ -22,8 +23,11 @@ class ContactSearchableActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (SettingsSharedPref.getInstance().getTheme().equals("0"))
+            setTheme(R.style.darkTheme);
+        else
+            setTheme(R.style.lightTheme);
         setContentView(R.layout.activity_contact_searchable);
-
         searchableAdapter=new ContactAdapter();
         searchableContactViewModel = new ViewModelProvider(this).get(ContactViewModel.class);
         searchableContactViewModel.getAllContacts().observe(this, new Observer<List<Contact>>() {

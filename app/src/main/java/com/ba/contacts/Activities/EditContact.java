@@ -28,6 +28,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.ba.contacts.Entities.Contact;
+import com.ba.contacts.SettingsSharedPref;
 import com.ba.contacts.ViewModels.ContactViewModel;
 import com.ba.contacts.R;
 import com.google.android.material.textfield.TextInputEditText;
@@ -58,8 +59,11 @@ public class EditContact extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (SettingsSharedPref.getInstance().getTheme().equals("1"))
+            setTheme(R.style.lightTheme);
+        else
+            setTheme(R.style.darkTheme);
         setContentView(R.layout.activity_edit_contact);
-
         //View widgets initialization
         firstNameLay=findViewById(R.id.firstname_edit_layout);
         lastNameLay=findViewById(R.id.lastname_edit_layout);
@@ -92,7 +96,6 @@ public class EditContact extends AppCompatActivity {
 
         //Toolbar initialization
         toolbar=findViewById(R.id.toolbar_edit_activity);
-        toolbar.setTitleTextColor(getResources().getColor(R.color.primaryTextColor,null));
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.icon_baseline_arrow);

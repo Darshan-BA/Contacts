@@ -40,7 +40,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.ba.contacts.Entities.Contact;
 import com.ba.contacts.Adapters.ContactAdapter;
-import com.ba.contacts.Fragments.SettingFragment;
+import com.ba.contacts.SettingsSharedPref;
 import com.ba.contacts.ViewModels.ContactViewModel;
 import com.ba.contacts.Fragments.GroupFragment;
 import com.ba.contacts.Fragments.MainFragment;
@@ -68,11 +68,12 @@ public class MainActivity extends AppCompatActivity {
     private static final int PICK_JSON_FILE = 5;
     private static final int CREATE_VCF_FILE = 6;
     private static final int PICK_VCF_FILE = 7;
-    private static final int PERMISSION_WRITE_CONTACTS=8;
-    private static final int PERMISSION_READ_CONTACTS=9;
-    private static final int PERMISSION_READ_WRITE_CONTACTS=10;
+    private static final int PERMISSION_WRITE_CONTACTS = 8;
+    private static final int PERMISSION_READ_CONTACTS = 9;
+    private static final int PERMISSION_READ_WRITE_CONTACTS = 10;
+    private static final int SettingsResultCode=11;
 
-    private int fragIndex=0;
+    private int fragIndex = 0;
     private ContactViewModel contactViewModel;
     private ArrayList<Contact> deleteContactList = new ArrayList<>();
     public ContactAdapter adapter;
@@ -80,14 +81,17 @@ public class MainActivity extends AppCompatActivity {
     private SearchView searchView;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
-
-    private Fragment fragment=null;
+    private Fragment fragment = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SettingsSharedPref.initSettingsSharedPref(getApplicationContext());
+        if (SettingsSharedPref.getInstance().getTheme().equals("1"))
+            setTheme(R.style.lightTheme);
+        else
+            setTheme(R.style.darkTheme);
         setContentView(R.layout.activity_main);
-
         //drawerLayout and navigationView
         drawerLayout = findViewById(R.id.drawerayout);
         navigationView = findViewById(R.id.navigation_view);
@@ -97,13 +101,13 @@ public class MainActivity extends AppCompatActivity {
         navigationView.setNavigationItemSelectedListener(item -> {
             switch (item.getItemId()) {
                 case R.id.contact_menu_item:
-                    getSupportFragmentManager().beginTransaction().replace(R.id.framelayout,new MainFragment()).commit();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.framelayout, new MainFragment()).commit();
 
                     break;
                 case R.id.sim_menu_item:
                     if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
                         permissionForSimContactsList();
-                    }else {
+                    } else {
                         gc(3);
                     }
                     break;
@@ -123,9 +127,9 @@ public class MainActivity extends AppCompatActivity {
                         ec();
                     }
                     break;
-                case R.id.sort_menu_item:
+                /*case R.id.sort_menu_item:
                     sc();
-                    break;
+                    break;*/
                 case R.id.family_menu_item:
                     gc(0);
                     break;
@@ -134,17 +138,16 @@ public class MainActivity extends AppCompatActivity {
                     gc(1);
                     break;
                 case R.id.settings:
-                    fragment=new SettingFragment();
-                    getSupportFragmentManager().beginTransaction().replace(R.id.framelayout,fragment).commit();
+                    Intent intent = new Intent(this, Settings.class);
+                    startActivityForResult(intent,SettingsResultCode);
                     break;
-
             }
             drawerLayout.closeDrawer(GravityCompat.START);
             return true;
         });
 
-        if(savedInstanceState==null){
-            if(fragment==null){
+        if (savedInstanceState == null) {
+            if (fragment == null) {
                 gc(2);
             }
         }
@@ -168,10 +171,9 @@ public class MainActivity extends AppCompatActivity {
         });*/
 
 
-
         //ViewModel instance
         contactViewModel = new ViewModelProvider(this).get(ContactViewModel.class);
-        if (sortId == 1) {
+        if (SettingsSharedPref.getInstance().getSort().equals("1")) {
             contactViewModel.getAllContactsByLastName().observe(this, new Observer<List<Contact>>() {
                 @Override
                 public void onChanged(List<Contact> contacts) {
@@ -180,7 +182,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         }
-        if (sortId == 0) {
+        if (SettingsSharedPref.getInstance().getSort().equals("1")) {
             contactViewModel.getAllContacts().observe(this, new Observer<List<Contact>>() {
                 @Override
                 public void onChanged(List<Contact> contacts) {
@@ -193,32 +195,31 @@ public class MainActivity extends AppCompatActivity {
     }//end of onCreate()
 
 
-
     //permission Request
     public void permissionForSimContactsList() {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.READ_CONTACTS)) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle("Need Permission");
-                builder.setMessage("To show SIM contacts allow read contacts permission");
-                builder.setPositiveButton("Grant", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_CONTACTS,Manifest.permission.WRITE_CONTACTS}, 10);
-                    }
-                });
-                builder.setNegativeButton("Decline", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-                builder.create();
-                builder.show();
-            }
-            else{
-                ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_CONTACTS,Manifest.permission.WRITE_CONTACTS}, 10);
-            }
+        if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.READ_CONTACTS)) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Need Permission");
+            builder.setMessage("To show SIM contacts allow read contacts permission");
+            builder.setPositiveButton("Grant", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_CONTACTS, Manifest.permission.WRITE_CONTACTS}, 10);
+                }
+            });
+            builder.setNegativeButton("Decline", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            builder.create();
+            builder.show();
+        } else {
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_CONTACTS, Manifest.permission.WRITE_CONTACTS}, 10);
+        }
     }
+
     public void permissionNotGrandted(String permission) {
 
         if (permission.equals(Manifest.permission.CALL_PHONE)) {
@@ -294,8 +295,8 @@ public class MainActivity extends AppCompatActivity {
             }
 
         }
-        if(permission.equals(Manifest.permission.WRITE_CONTACTS)){
-            if(ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,Manifest.permission.WRITE_CONTACTS)){
+        if (permission.equals(Manifest.permission.WRITE_CONTACTS)) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.WRITE_CONTACTS)) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle("Need Permission");
                 builder.setMessage("To Export contacts to SIM allow to write contacts ");
@@ -317,8 +318,8 @@ public class MainActivity extends AppCompatActivity {
                 ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_CONTACTS}, PERMISSION_WRITE_CONTACTS);
             }
         }
-        if(permission.equals(Manifest.permission.READ_CONTACTS)){
-            if(ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,Manifest.permission.READ_CONTACTS)){
+        if (permission.equals(Manifest.permission.READ_CONTACTS)) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.READ_CONTACTS)) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle("Need Permission");
                 builder.setMessage("To Import contacts from SIM allow read contacts permission");
@@ -371,23 +372,23 @@ public class MainActivity extends AppCompatActivity {
                 ec();
             }
         }
-        if(requestCode == PERMISSION_WRITE_CONTACTS){
-            if(grantResults.length>0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                Toast.makeText(MainActivity.this,"Write Contact Permission Granted",Toast.LENGTH_SHORT).show();
+        if (requestCode == PERMISSION_WRITE_CONTACTS) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(MainActivity.this, "Write Contact Permission Granted", Toast.LENGTH_SHORT).show();
                 new ExportToSimAsyncTask().execute();
             }
         }
-        if(requestCode== PERMISSION_READ_CONTACTS){
-            if(grantResults.length>0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                Toast.makeText(MainActivity.this,"Read Contact Permission Granted",Toast.LENGTH_SHORT).show();
+        if (requestCode == PERMISSION_READ_CONTACTS) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(MainActivity.this, "Read Contact Permission Granted", Toast.LENGTH_SHORT).show();
                 new ImportFromSimAsyncTask().execute();
             }
         }
-        if(requestCode==PERMISSION_READ_WRITE_CONTACTS){
-            if(grantResults.length>0 && grantResults[0]== PackageManager.PERMISSION_GRANTED){
-                Toast.makeText(MainActivity.this,"Read/Write Contact Permission Granted",Toast.LENGTH_SHORT).show();
-                fragment=new SimListFragment();
-                getSupportFragmentManager().beginTransaction().replace(R.id.framelayout,fragment).commit();
+        if (requestCode == PERMISSION_READ_WRITE_CONTACTS) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(MainActivity.this, "Read/Write Contact Permission Granted", Toast.LENGTH_SHORT).show();
+                fragment = new SimListFragment();
+                getSupportFragmentManager().beginTransaction().replace(R.id.framelayout, fragment).commit();
             }
         }
     }//end of Permission Result
@@ -398,36 +399,41 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PICK_JSON_FILE && resultCode == Activity.RESULT_OK) {
             if (data != null)
-                new ImportDeviceContactsAsyncTask(adapter,0).execute(data.getData());
+                new ImportDeviceContactsAsyncTask(adapter, 0).execute(data.getData());
             else
-                Toast.makeText(MainActivity.this,"Import Failed",Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "Import Failed", Toast.LENGTH_SHORT).show();
         }
 
         if (requestCode == CREATE_JSON_FILE && resultCode == Activity.RESULT_OK) {
             if (data != null)
-                new ExportDeviceContactsAsyncTask(adapter,0).execute(data.getData());
+                new ExportDeviceContactsAsyncTask(adapter, 0).execute(data.getData());
             else
-                Toast.makeText(MainActivity.this,"Export Failed",Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "Export Failed", Toast.LENGTH_SHORT).show();
         }
 
         if (requestCode == PICK_VCF_FILE && resultCode == Activity.RESULT_OK) {
             if (data != null)
-                new ImportDeviceContactsAsyncTask(adapter,1).execute(data.getData());
+                new ImportDeviceContactsAsyncTask(adapter, 1).execute(data.getData());
             else
-                Toast.makeText(MainActivity.this,"Import Failed",Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "Import Failed", Toast.LENGTH_SHORT).show();
         }
 
         if (requestCode == CREATE_VCF_FILE && resultCode == Activity.RESULT_OK) {
             if (data != null)
-                new ExportDeviceContactsAsyncTask(adapter,1).execute(data.getData());
-             else
+                new ExportDeviceContactsAsyncTask(adapter, 1).execute(data.getData());
+            else
                 Toast.makeText(MainActivity.this, "Export Failed", Toast.LENGTH_SHORT).show();
+        }
+
+        if(requestCode==SettingsResultCode){
+            Log.d("restart","request code="+5);
+            recreate();
         }
     }//end of Activity Results
 
     // Import Contacts
     void ic() {
-        final String[] dialogList = new String[]{"Import .json", "Import .vcf","Import from SIM"};
+        final String[] dialogList = new String[]{"Import .json", "Import .vcf", "Import from SIM"};
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setItems(dialogList, new DialogInterface.OnClickListener() {
             @Override
@@ -447,10 +453,10 @@ public class MainActivity extends AppCompatActivity {
                         startActivityForResult(intent, PICK_VCF_FILE);
                         break;
                     }
-                    case 2:{
+                    case 2: {
                         if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
                             permissionNotGrandted(Manifest.permission.READ_CONTACTS);
-                        }else {
+                        } else {
                             new ImportFromSimAsyncTask().execute();
                         }
                     }
@@ -464,13 +470,13 @@ public class MainActivity extends AppCompatActivity {
 
     // Export Contacts
     void ec() {
-        final String[] dialogList = new String[]{"Export as .json", "Export as .vcf","Export to SIM"};
+        final String[] dialogList = new String[]{"Export as .json", "Export as .vcf", "Export to SIM"};
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setItems(dialogList, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 switch (which) {
-                    case 0:{
+                    case 0: {
                         Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
                         intent.addCategory(Intent.CATEGORY_OPENABLE);
                         intent.setType("text/json");
@@ -478,7 +484,7 @@ public class MainActivity extends AppCompatActivity {
                         startActivityForResult(intent, CREATE_JSON_FILE);
                         break;
                     }
-                    case 1:{
+                    case 1: {
                         Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
                         intent.addCategory(Intent.CATEGORY_OPENABLE);
                         intent.setType("text/json");
@@ -486,10 +492,10 @@ public class MainActivity extends AppCompatActivity {
                         startActivityForResult(intent, CREATE_VCF_FILE);
                         break;
                     }
-                    case 2:{
+                    case 2: {
                         if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
                             permissionNotGrandted(Manifest.permission.WRITE_CONTACTS);
-                        }else{
+                        } else {
                             new ExportToSimAsyncTask().execute();
                         }
                         break;
@@ -545,30 +551,31 @@ public class MainActivity extends AppCompatActivity {
     }//end of Sort Contacts*/
 
     // group Contacts
-    void gc(int which){
-        FragmentManager fragmentManager=getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction=fragmentManager.beginTransaction();
-        fragment=new GroupFragment();
-        Bundle bundle=new Bundle();
-        if(which==0) {
+    void gc(int which) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragment = new GroupFragment();
+        Bundle bundle = new Bundle();
+        if (which == 0) {
             fragmentTransaction.replace(R.id.framelayout, fragment);
-            bundle.putString("group_name","Family");
+            bundle.putString("group_name", "Family");
             fragment.setArguments(bundle);
             fragmentTransaction.commit();
         }
-        if(which==1) {
+        if (which == 1) {
             fragmentTransaction.replace(R.id.framelayout, fragment);
-            bundle.putString("group_name","Friends");
+            bundle.putString("group_name", "Friends");
             fragment.setArguments(bundle);
             fragmentTransaction.commit();
-        } if(which==2){
-            fragment=new MainFragment();
-            fragmentTransaction.replace(R.id.framelayout,fragment).commit();
+        }
+        if (which == 2) {
+            fragment = new MainFragment();
+            fragmentTransaction.replace(R.id.framelayout, fragment).commit();
             navigationView.setCheckedItem(R.id.contact_menu_item);
         }
-        if(which == 3){
-            fragment=new SimListFragment();
-            fragmentTransaction.replace(R.id.framelayout,fragment);
+        if (which == 3) {
+            fragment = new SimListFragment();
+            fragmentTransaction.replace(R.id.framelayout, fragment);
             fragmentTransaction.commit();
         }
     }
@@ -585,10 +592,10 @@ public class MainActivity extends AppCompatActivity {
         searchView.requestFocusFromTouch();
         searchView.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        searchView.setOnCloseListener(new  SearchView.OnCloseListener() {
+        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
             @Override
             public boolean onClose() {
-                Log.d("searchview","search view on close listner");
+                Log.d("searchview", "search view on close listner");
                 return false;
             }
         });
@@ -616,14 +623,13 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        switch (fragIndex){
+        switch (fragIndex) {
             case 2:
                 menu.findItem(R.id.search_toolbar).setVisible(false);
 
         }
         return super.onPrepareOptionsMenu(menu);
     }
-
 
 
     // Action CallBack for Multiple Delete
@@ -688,55 +694,56 @@ public class MainActivity extends AppCompatActivity {
     public void onBackPressed() {
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
-        }else if(!(fragment instanceof MainFragment)){
+        } else if (!(fragment instanceof MainFragment)) {
             gc(2);
-        }
-        else {
+        } else {
             super.onBackPressed();
         }
     }
 
-    private class ImportFromSimAsyncTask extends AsyncTask<Void,Void,String>{
-        Uri simUri=Uri.parse("content://icc/adn");
+    private class ImportFromSimAsyncTask extends AsyncTask<Void, Void, String> {
+        Uri simUri = Uri.parse("content://icc/adn");
         ContentResolver contentResolver = getContentResolver();
-        Cursor cursor=contentResolver.query(simUri,null,null,null,"ASC");
+        Cursor cursor = contentResolver.query(simUri, null, null, null, "ASC");
 
         @Override
         protected String doInBackground(Void... voids) {
-            while (cursor.moveToNext()){
-                String name=cursor.getString(cursor.getColumnIndex("name"));
-                String number=cursor.getString(cursor.getColumnIndex("number"));
-                Log.d("simImport","name="+name);
-                Log.d("simImport","number="+number);
-                Contact contact=new Contact(name,"",number,"","","");
+            while (cursor.moveToNext()) {
+                String name = cursor.getString(cursor.getColumnIndex("name"));
+                String number = cursor.getString(cursor.getColumnIndex("number"));
+                Log.d("simImport", "name=" + name);
+                Log.d("simImport", "number=" + number);
+                Contact contact = new Contact(name, "", number, "", "", "");
                 contactViewModel.insert(contact);
             }
             return null;
         }
     }
-    private class ExportToSimAsyncTask extends AsyncTask<Void,Void,String>{
-        Uri simUri=Uri.parse("content://icc/adn");
-        ContentValues contentValues=new ContentValues();
+
+    private class ExportToSimAsyncTask extends AsyncTask<Void, Void, String> {
+        Uri simUri = Uri.parse("content://icc/adn");
+        ContentValues contentValues = new ContentValues();
         ContentResolver contentResolver = getContentResolver();
+
         @Override
         protected String doInBackground(Void... voids) {
-            for(Contact contact:exportContacts){
-                String name=contact.getFirstName()+" "+contact.getLastName();
-                if(!contact.getPrimaryPhoneNumber().equals("")){
-                    String phonenumber=contact.getPrimaryPhoneNumber();
-                    contentValues.put("tag",name);
-                    contentValues.put("number",phonenumber);
-                    Uri insteredPrimary=contentResolver.insert(simUri,contentValues);
-                    if(insteredPrimary!=null)
+            for (Contact contact : exportContacts) {
+                String name = contact.getFirstName() + " " + contact.getLastName();
+                if (!contact.getPrimaryPhoneNumber().equals("")) {
+                    String phonenumber = contact.getPrimaryPhoneNumber();
+                    contentValues.put("tag", name);
+                    contentValues.put("number", phonenumber);
+                    Uri insteredPrimary = contentResolver.insert(simUri, contentValues);
+                    if (insteredPrimary != null)
                         //Toast.makeText(MainActivity.this,name+" exported to sim",Toast.LENGTH_SHORT).show();
                         Log.d("sim", String.valueOf(insteredPrimary));
                 }
-                if(!contact.getSecondaryPhoneNumber().equals("")){
-                    String phonenumber=contact.getSecondaryPhoneNumber();
-                    contentValues.put("name",name);
-                    contentValues.put("number",phonenumber);
-                    Uri insteredSecondary=contentResolver.insert(simUri,contentValues);
-                    if(insteredSecondary!=null)
+                if (!contact.getSecondaryPhoneNumber().equals("")) {
+                    String phonenumber = contact.getSecondaryPhoneNumber();
+                    contentValues.put("name", name);
+                    contentValues.put("number", phonenumber);
+                    Uri insteredSecondary = contentResolver.insert(simUri, contentValues);
+                    if (insteredSecondary != null)
                         Log.d("sim", String.valueOf(insteredSecondary));
                 }
 
@@ -747,11 +754,11 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            Toast.makeText(MainActivity.this,s,Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this, s, Toast.LENGTH_SHORT).show();
         }
     }
 
-    private class ImportDeviceContactsAsyncTask extends AsyncTask<Uri,Void,String>{
+    private class ImportDeviceContactsAsyncTask extends AsyncTask<Uri, Void, String> {
         private ContactAdapter adapter;
         private int which;
 
@@ -763,7 +770,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            Toast.makeText(MainActivity.this,"Import started in Background... ", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this, "Import started in Background... ", Toast.LENGTH_SHORT).show();
         }
 
         @Override
@@ -774,10 +781,10 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected String doInBackground(Uri... uris) {
-            Uri path=uris[0];
-            try(InputStream importStream=getContentResolver().openInputStream(path)){
-                switch (which){
-                    case 0:{
+            Uri path = uris[0];
+            try (InputStream importStream = getContentResolver().openInputStream(path)) {
+                switch (which) {
+                    case 0: {
                         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(importStream));
                         StringBuilder stringBuilder = new StringBuilder();
                         String line = bufferedReader.readLine();
@@ -802,7 +809,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                         return "Contacts Imported";
                     }
-                    case 1:{
+                    case 1: {
                         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(importStream));
                         String line = bufferedReader.readLine();
                         boolean hasNext = false;
@@ -859,14 +866,14 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
 
-            }catch (IOException | JSONException e){
+            } catch (IOException | JSONException e) {
                 e.printStackTrace();
             }
             return "Contacts Imported";
         }
     }
 
-    private class ExportDeviceContactsAsyncTask extends AsyncTask<Uri,Void,String>{
+    private class ExportDeviceContactsAsyncTask extends AsyncTask<Uri, Void, String> {
 
         private ContactAdapter adapter;
         private int which;
@@ -890,9 +897,9 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected String doInBackground(Uri... uris) {
-            Uri path=uris[0];
-            try(OutputStream exportStream=getContentResolver().openOutputStream(path)){
-                if(which==0){
+            Uri path = uris[0];
+            try (OutputStream exportStream = getContentResolver().openOutputStream(path)) {
+                if (which == 0) {
                     JSONObject jsonObject = new JSONObject();
                     JSONArray jsonArray = new JSONArray();
                     for (int i = 0; i < adapter.getItemCount(); i++) {
@@ -908,7 +915,7 @@ public class MainActivity extends AppCompatActivity {
                         exportStream.write(jsonObject.toString().getBytes());
                     }
                 }
-                if(which==1) {
+                if (which == 1) {
                     byte[] begin = "BEGIN:VCARD\n".getBytes();
                     byte[] version = "VERSION:2.1\n".getBytes();
                     byte[] end = "END:VCARD\n".getBytes();
@@ -929,7 +936,7 @@ public class MainActivity extends AppCompatActivity {
                         exportStream.write(end);
                     }
                 }
-            } catch (IOException | JSONException e){
+            } catch (IOException | JSONException e) {
                 e.printStackTrace();
             }
             return "Contacts Exported to: " + path;

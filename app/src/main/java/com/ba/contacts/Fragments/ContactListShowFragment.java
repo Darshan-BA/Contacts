@@ -132,4 +132,10 @@ public class ContactListShowFragment extends Fragment {
 
         }
     };
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        Log.d("fragmentContact", "onDestroyView group_frag");
+        getFragmentManager().popBackStack();
+    }
 }

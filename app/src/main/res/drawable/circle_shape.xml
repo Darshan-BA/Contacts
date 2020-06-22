@@ -8,6 +8,6 @@
         android:color="@android:color/transparent"/>
     <stroke
         android:width="2dp"
-        android:color="@color/primaryColor"/>
+        android:color="?attr/colorPrimary"/>
 
 </shape>

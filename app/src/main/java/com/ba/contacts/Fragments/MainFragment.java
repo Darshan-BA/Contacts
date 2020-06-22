@@ -13,11 +13,9 @@ import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.SearchView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
@@ -35,6 +33,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.ba.contacts.Entities.Contact;
 import com.ba.contacts.Adapters.ContactAdapter;
+import com.ba.contacts.SettingsSharedPref;
 import com.ba.contacts.ViewModels.ContactViewModel;
 import com.ba.contacts.Activities.EditContact;
 import com.ba.contacts.Activities.MainActivity;
@@ -49,9 +48,9 @@ public class MainFragment extends Fragment {
     private ContactAdapter adapter;
     private FloatingActionButton floatingActionButton;
     private ArrayList<Contact> deleteContactList = new ArrayList<>();
-    private String phoneNumberHolder;
     private SearchView searchView;
     private Toolbar toolbar;
+    private String phoneNumberHolder;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -63,7 +62,6 @@ public class MainFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d("frag", "onCreate main_frag");
-        Log.d("fragment","No of back stacks main: "+ getParentFragmentManager().getBackStackEntryCount());
     }
 
 
@@ -116,7 +114,6 @@ public class MainFragment extends Fragment {
                         @Override
                         public boolean onClose() {
                             searchView.setIconified(true);
-                            View view =getActivity().getCurrentFocus();
                             //InputMethodManager inputMethodManager=(InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
                             //inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(),0);
                             return false;
@@ -128,6 +125,7 @@ public class MainFragment extends Fragment {
         });
         SharedPreferences sortPrep = getActivity().getSharedPreferences("SORT", MODE_PRIVATE);
         int sortId = sortPrep.getInt("name", 0);
+        //int sortId=sharedPrefUtil.getSort();
         //adapter = new ContactAdapter();
         adapter=((MainActivity)getActivity()).adapter;
         floatingActionButton = view.findViewById(R.id.add_float);
@@ -136,7 +134,7 @@ public class MainFragment extends Fragment {
         recyclerView.setHasFixedSize(true);
         recyclerView.setAdapter(adapter);
         contactViewModel = new ViewModelProvider(this).get(ContactViewModel.class);
-        if (sortId == 1) {
+        if (SettingsSharedPref.getInstance().getSort().equals("1")) {
             contactViewModel.getAllContactsByLastName().observe(getActivity(), new Observer<List<Contact>>() {
                 @Override
                 public void onChanged(List<Contact> contacts) {
@@ -144,7 +142,7 @@ public class MainFragment extends Fragment {
                 }
             });
         }
-        if (sortId == 0) {
+        if (SettingsSharedPref.getInstance().getSort().equals("0")) {
             contactViewModel.getAllContacts().observe(getActivity(), new Observer<List<Contact>>() {
                 @Override
                 public void onChanged(List<Contact> contacts) {
@@ -417,7 +415,4 @@ public class MainFragment extends Fragment {
         Log.d("frag", "onDetach main_frag");
     }
 
-    private void hideToolbar(){
-
-    }
 }

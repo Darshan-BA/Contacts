@@ -105,7 +105,7 @@ public class GroupFragment extends Fragment {
                 Bundle bundle=new Bundle();
                 bundle.putString("group_name",groupName);
                 contactListShowFramgment.setArguments(bundle);
-                transaction.replace(R.id.framelayout,contactListShowFramgment);
+                transaction.add(R.id.framelayout,contactListShowFramgment);
                 transaction.addToBackStack(null);
                 transaction.commit();
         }
