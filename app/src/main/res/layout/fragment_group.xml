@@ -30,6 +30,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:textSize="12sp"
+        android:textStyle="bold"
+        android:padding="8dp"
         android:textColor="?attr/colorOnSecondary"
         android:visibility="gone"/>
 

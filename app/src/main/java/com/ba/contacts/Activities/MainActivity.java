@@ -94,9 +94,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         SettingsSharedPref.initSettingsSharedPref(getApplicationContext());
         if (SettingsSharedPref.getInstance().getTheme().equals("1"))
-            setTheme(R.style.lightTheme);
+            setTheme(R.style.navigation_light);
         else
-            setTheme(R.style.darkTheme);
+            setTheme(R.style.navigation_dark);
         setContentView(R.layout.activity_main);
         //drawerLayout and navigationView
         drawerLayout = findViewById(R.id.drawerayout);

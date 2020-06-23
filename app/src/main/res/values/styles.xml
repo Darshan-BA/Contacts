@@ -17,7 +17,6 @@
         <item name="colorOnError">@color/lightColorOnError</item>
         <item name="textColorOnCard">@color/lightColorPrimaryVariant</item>
         <item name="windowActionModeOverlay">true</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 
 
@@ -37,7 +36,6 @@
         <item name="colorOnError">@color/darkColorOnError</item>
         <item name="textColorOnCard">@color/darkColorOnPrimary</item>
         <item name="windowActionModeOverlay">true</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 
     <style name="TextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
@@ -47,7 +45,10 @@
         <item name="hintTextColor">?attr/colorOnSecondary</item>
     </style>
 
-   <!-- <style name="navigation" parent="AppTheme">
+    <style name="navigation_dark" parent="darkTheme">
         <item name="android:statusBarColor">@android:color/transparent</item>
-    </style>-->
+    </style>
+    <style name="navigation_light" parent="lightTheme">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
 </resources>

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.ba.contacts">
-
     <uses-sdk android:maxSdkVersion="29" />
 
     <uses-permission android:name="android.permission.CALL_PHONE" />
@@ -17,7 +16,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/contact_icon_round"
         android:supportsRtl="true"
-        android:theme="@style/darkTheme">
+        android:theme="@style/lightTheme">
         <activity android:name=".Activities.MainActivity">
             <meta-data
                 android:name="android.app.searchable"
