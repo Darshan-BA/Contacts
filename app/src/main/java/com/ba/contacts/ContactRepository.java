@@ -109,6 +109,13 @@ public class ContactRepository {
         return simUtil.addSimContact(simContact);
     }
 
+    public Contact getDuplicateContact(String first,String last){
+       return contactDao.getDuplicateContact(first,last);
+    }
+    public Contact getContactAt(int id){
+       return contactDao.getContactAt(id);
+    }
+
     private static class InsertContactAsyncTask extends AsyncTask<Contact, Void, Void> {
         private ContactDao contactDao;
         private FamilyDao familyDao;

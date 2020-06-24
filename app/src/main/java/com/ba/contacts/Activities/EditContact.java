@@ -1,4 +1,5 @@
 package com.ba.contacts.Activities;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
@@ -6,6 +7,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProvider;
+
 import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -27,6 +29,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.ba.contacts.ContactRepository;
 import com.ba.contacts.Entities.Contact;
 import com.ba.contacts.SettingsSharedPref;
 import com.ba.contacts.ViewModels.ContactViewModel;
@@ -45,15 +48,14 @@ public class EditContact extends AppCompatActivity {
     private Contact contact;
     private ContactViewModel contactViewModel;
     private Toolbar toolbar;
-    private TextInputLayout firstNameLay,lastNameLay,emailAddressLay,primaryPhoneNumberLay,secondaryPhoneNumberLay,spinnerLay;
-    private TextInputEditText firstName,lastName,emailAddress,primaryPhoneNumber,secondaryPhoneNumber;
+    private TextInputLayout firstNameLay, lastNameLay, emailAddressLay, primaryPhoneNumberLay, secondaryPhoneNumberLay, spinnerLay;
+    private TextInputEditText firstName, lastName, emailAddress, primaryPhoneNumber, secondaryPhoneNumber;
     private ImageView photo;
     private Uri pUri;
     private String photoPath;
     private Bitmap photoBitmap;
-    private AutoCompleteTextView groupAutoCompleteTextView,saveOptionAutoCompleteText;
+    private AutoCompleteTextView groupAutoCompleteTextView, saveOptionAutoCompleteText;
     private int saveUpdate;
-
 
 
     @Override
@@ -65,45 +67,45 @@ public class EditContact extends AppCompatActivity {
             setTheme(R.style.darkTheme);
         setContentView(R.layout.activity_edit_contact);
         //View widgets initialization
-        firstNameLay=findViewById(R.id.firstname_edit_layout);
-        lastNameLay=findViewById(R.id.lastname_edit_layout);
-        emailAddressLay=findViewById(R.id.email_edit_layout);
-        primaryPhoneNumberLay=findViewById(R.id.primary_edit_layout);
-        secondaryPhoneNumberLay=findViewById(R.id.secondary_edit_layout);
-        spinnerLay=findViewById(R.id.spinner_edit_layout);
-        firstName=findViewById(R.id.firstname_edit);
-        lastName=findViewById(R.id.lastname_edit);
-        emailAddress=findViewById(R.id.email_edit);
-        primaryPhoneNumber=findViewById(R.id.primary_edit);
-        secondaryPhoneNumber=findViewById(R.id.secondary_edit);
-        photo=findViewById(R.id.circlr_image);
+        firstNameLay = findViewById(R.id.firstname_edit_layout);
+        lastNameLay = findViewById(R.id.lastname_edit_layout);
+        emailAddressLay = findViewById(R.id.email_edit_layout);
+        primaryPhoneNumberLay = findViewById(R.id.primary_edit_layout);
+        secondaryPhoneNumberLay = findViewById(R.id.secondary_edit_layout);
+        spinnerLay = findViewById(R.id.spinner_edit_layout);
+        firstName = findViewById(R.id.firstname_edit);
+        lastName = findViewById(R.id.lastname_edit);
+        emailAddress = findViewById(R.id.email_edit);
+        primaryPhoneNumber = findViewById(R.id.primary_edit);
+        secondaryPhoneNumber = findViewById(R.id.secondary_edit);
+        photo = findViewById(R.id.circlr_image);
         photo.setImageResource(R.drawable.add_photo);
         photo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent photoIntent=new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(photoIntent,1);
+                Intent photoIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(photoIntent, 1);
             }
         });
 
         //spinner
-        String[] groupNames={"Family","Friends"};
-        ArrayAdapter<String> groupDropDownArrayAdapter=new ArrayAdapter<String>(this,R.layout.spinner_list_item,groupNames);
-        groupAutoCompleteTextView =findViewById(R.id.dropdown_edit);
+        String[] groupNames = {"Family", "Friends"};
+        ArrayAdapter<String> groupDropDownArrayAdapter = new ArrayAdapter<String>(this, R.layout.spinner_list_item, groupNames);
+        groupAutoCompleteTextView = findViewById(R.id.dropdown_edit);
         groupAutoCompleteTextView.setAdapter(groupDropDownArrayAdapter);
         groupAutoCompleteTextView.setInputType(InputType.TYPE_NULL);
 
 
         //Toolbar initialization
-        toolbar=findViewById(R.id.toolbar_edit_activity);
+        toolbar = findViewById(R.id.toolbar_edit_activity);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.icon_baseline_arrow);
 
 
         //fetched Intent extras
-        Intent intent=getIntent();
-        if(intent.hasExtra("id")) {
+        Intent intent = getIntent();
+        if (intent.hasExtra("id")) {
             toolbar.setTitle("Edit Contact");
             firstName.setText(intent.getStringExtra("first"));
             lastName.setText(intent.getStringExtra("last"));
@@ -112,29 +114,30 @@ public class EditContact extends AppCompatActivity {
             emailAddress.setText(intent.getStringExtra("email"));
             //Uri pathuri=Uri.parse(intent.getStringExtra("photoPath"));
             //new PhotoLoaderAsyncTask(this.getContentResolver()).execute(pathuri);
-            if(Objects.equals(intent.getStringExtra("photoPath"), "")){
+            if (Objects.equals(intent.getStringExtra("photoPath"), "")) {
                 photo.setImageResource(R.drawable.add_photo);
-            }else{
+            } else {
                 photo.setImageBitmap(BitmapFactory.decodeFile(intent.getStringExtra("photoPath")));
             }
             //saveButton.setVisibility(View.GONE);
             //editButton.getVisibility();
             //editButton.setVisibility(View.VISIBLE);
             spinnerLay.setVisibility(View.GONE);
-            saveUpdate=1;
+            saveUpdate = 1;
 
-        }else {
+        } else {
             toolbar.setTitle("Add Contact");
-            saveUpdate=0;
+            saveUpdate = 0;
         }
-        contactViewModel=new ViewModelProvider(this).get(ContactViewModel.class);
+        contactViewModel = new ViewModelProvider(this).get(ContactViewModel.class);
 
     }//end of on create
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode==1 && resultCode == RESULT_OK && data != null){
-            Uri uri=data.getData();
+        if (requestCode == 1 && resultCode == RESULT_OK && data != null) {
+            Uri uri = data.getData();
             new PhotoLoaderAsyncTask(this.getContentResolver()).execute(uri);
         }
     }
@@ -147,11 +150,11 @@ public class EditContact extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case (R.id.save_editcontact_toolbar):
-                if(saveUpdate==0)
+                if (saveUpdate == 0)
                     saveDialog();
-                if(saveUpdate==1)
+                if (saveUpdate == 1)
                     updateDialog();
                 return true;
             case (android.R.id.home):
@@ -160,7 +163,8 @@ public class EditContact extends AppCompatActivity {
         }
         return false;
     }
-    private class PhotoSaveAsyncTask extends AsyncTask<String,Void,String>{
+
+    private class PhotoSaveAsyncTask extends AsyncTask<String, Void, String> {
         int which;
         int id;
 
@@ -176,43 +180,43 @@ public class EditContact extends AppCompatActivity {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            Toast.makeText(EditContact.this,s,Toast.LENGTH_SHORT).show();
+            Toast.makeText(EditContact.this, s, Toast.LENGTH_SHORT).show();
         }
 
         @Override
         protected String doInBackground(String... strings) {
-            SimpleDateFormat simpleDateFormat=new SimpleDateFormat("ddMMyy-HHmmss");
-            String dateTime=simpleDateFormat.format(new Date());
-            String first=strings[0];
-            String last=strings[1];
-            String primary=strings[2];
-            String secondary=strings[3];
-            String email=strings[4];
-            String group=strings[5];
-            String photoPath="";
-            File file=new File(getApplicationContext().getFilesDir(),"Photos");
-            Log.d("edit","filepath1="+file.getAbsolutePath());
-            File photoFile=new File(file,"Photo-"+dateTime+".png");
-            if(!file.exists()){
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("ddMMyy-HHmmss");
+            String dateTime = simpleDateFormat.format(new Date());
+            String first = strings[0];
+            String last = strings[1];
+            String primary = strings[2];
+            String secondary = strings[3];
+            String email = strings[4];
+            String group = strings[5];
+            String photoPath = "";
+            File file = new File(getApplicationContext().getFilesDir(), "Photos");
+            Log.d("edit", "filepath1=" + file.getAbsolutePath());
+            File photoFile = new File(file, "Photo-" + dateTime + ".png");
+            if (!file.exists()) {
                 file.mkdir();
-                Log.d("edit","filepath2="+file.getAbsolutePath());
+                Log.d("edit", "filepath2=" + file.getAbsolutePath());
             }
-            if(photoBitmap!=null) {
+            if (photoBitmap != null) {
                 try (FileOutputStream fileOutputStream = new FileOutputStream(photoFile)) {
                     photoBitmap.compress(Bitmap.CompressFormat.PNG, 50, fileOutputStream);
-                    photoPath=photoFile.getAbsolutePath();
+                    photoPath = photoFile.getAbsolutePath();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
-            Log.d("photoPath","photoPath:"+photoPath);
-            if(which==0){
-                contact=new Contact(first,last,primary,secondary,email,photoPath);
-                contactViewModel.insetWithGroup(contact,group);
+            Log.d("photoPath", "photoPath:" + photoPath);
+            if (which == 0) {
+                contact = new Contact(first, last, primary, secondary, email, photoPath);
+                contactViewModel.insetWithGroup(contact, group);
                 return "Contact Saved";
             }
-            if(which==1){
-                contact=new Contact(first,last,primary,secondary,email,photoPath);
+            if (which == 1) {
+                contact = new Contact(first, last, primary, secondary, email, photoPath);
                 contact.setId(id);
                 contactViewModel.update(contact);
                 return "Contact Updated";
@@ -220,7 +224,8 @@ public class EditContact extends AppCompatActivity {
             return "Contact not Saved";
         }
     }
-    private class PhotoLoaderAsyncTask extends AsyncTask<Uri,Void,Bitmap> {
+
+    private class PhotoLoaderAsyncTask extends AsyncTask<Uri, Void, Bitmap> {
 
         ContentResolver contentResolver;
 
@@ -232,24 +237,25 @@ public class EditContact extends AppCompatActivity {
         protected void onPostExecute(Bitmap bitmap) {
             super.onPostExecute(bitmap);
             photo.setImageBitmap(bitmap);
-            photoBitmap=bitmap;
+            photoBitmap = bitmap;
         }
 
         @RequiresApi(api = Build.VERSION_CODES.P)
         @Override
         protected Bitmap doInBackground(Uri... uris) {
-            Bitmap bitmap= null;
+            Bitmap bitmap = null;
             try {
-                bitmap = ImageDecoder.decodeBitmap(ImageDecoder.createSource(contentResolver,uris[0]));
+                bitmap = ImageDecoder.decodeBitmap(ImageDecoder.createSource(contentResolver, uris[0]));
             } catch (IOException e) {
                 e.printStackTrace();
             }
             return bitmap;
         }
     }
+
     //Dialog when clicked on cancel button
     public void cancelDialog(View view) {
-        AlertDialog.Builder builder=new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setCancelable(false);
         builder.setTitle("Cancel");
         builder.setMessage("Do you want to Cancel?");
@@ -268,50 +274,175 @@ public class EditContact extends AppCompatActivity {
         builder.create().show();
     }
 
+    public void checkDuplicate() {
+    }
+
     //save button dialog
     public void saveDialog() {
-        AlertDialog.Builder builder=new AlertDialog.Builder(this);
-        builder.setCancelable(false);
-        builder.setTitle("Save");
-        builder.setMessage("Press Confirm to Save");
-        builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String first=firstName.getText().toString().trim();
-                String second=lastName.getText().toString().trim();
-                String primary=primaryPhoneNumber.getText().toString().trim();
-                String secondary=secondaryPhoneNumber.getText().toString().trim();
-                String email=emailAddress.getText().toString().trim();
-                String selectedGroup= groupAutoCompleteTextView.getText().toString().trim();
-                if(first.isEmpty() && !second.isEmpty()){
-                    firstNameLay.setError("Is Empty");
-                }
-                else if(first.isEmpty() && second.isEmpty() && primary.isEmpty()
-                        && secondary.isEmpty() && email.isEmpty()){
+        String first = firstName.getText().toString().trim();
+        String second = lastName.getText().toString().trim();
+        String primary = primaryPhoneNumber.getText().toString().trim();
+        String secondary = secondaryPhoneNumber.getText().toString().trim();
+        String email = emailAddress.getText().toString().trim();
+        String selectedGroup = groupAutoCompleteTextView.getText().toString().trim();
+        if (first.isEmpty() && !second.isEmpty()) {
+            firstNameLay.setError("Is Empty");
+        } else if (first.isEmpty() && second.isEmpty() && primary.isEmpty()
+                && secondary.isEmpty() && email.isEmpty()) {
 
-                    Toast.makeText(EditContact.this,"All Fields Are Empty",Toast.LENGTH_SHORT).show();
-                }else{
-                    if(first.isEmpty() && !primary.isEmpty())
-                        first=primary;
-                    if(first.isEmpty() && !secondary.isEmpty() && primary.isEmpty())
-                        first=secondary;
-                    new PhotoSaveAsyncTask(0).execute(first,second,primary,secondary,email,selectedGroup);
-                    finish();
+            Toast.makeText(EditContact.this, "All Fields Are Empty", Toast.LENGTH_SHORT).show();
+        } else {
+            if (first.isEmpty() && !primary.isEmpty())
+                first = primary;
+            if (first.isEmpty() && !secondary.isEmpty() && primary.isEmpty())
+                first = secondary;
+            String finalFirst = first;
+            new Thread() {
+                @Override
+                public void run() {
+                    super.run();
+                    ContactRepository contactRepository = new ContactRepository(getApplication());
+                    Contact duplicateContact = contactRepository.getDuplicateContact(finalFirst, second);
+                    if (duplicateContact != null) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                AlertDialog.Builder builder = new AlertDialog.Builder(EditContact.this);
+                                builder.setCancelable(false);
+                                builder.setTitle("Duplicate");
+                                builder.setMessage("Contact already exits, Are You want merge?");
+                                builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        Toast.makeText(EditContact.this, "Yes clicked", Toast.LENGTH_SHORT).show();
+                                        new PhotoSaveAsyncTask(1, duplicateContact.getId()).execute(finalFirst, second, primary, secondary, email, "");
+                                        finish();
+                                    }
+                                });
+                                builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        Toast.makeText(EditContact.this, "No clicked", Toast.LENGTH_SHORT).show();
+                                        new PhotoSaveAsyncTask(0).execute(finalFirst, second, primary, secondary, email, selectedGroup);
+                                        finish();
+                                    }
+                                });
+                                builder.create();
+                                builder.show();
+                            }
+                        });
+                    } else {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                AlertDialog.Builder builder = new AlertDialog.Builder(EditContact.this);
+                                builder.setCancelable(false);
+                                builder.setTitle("Save");
+                                builder.setMessage("Press Confirm to Save");
+                                builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        new PhotoSaveAsyncTask(0).execute(finalFirst, second, primary, secondary, email, selectedGroup);
+                                        finish();
+                                    }
+                                });
+                                builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                });
+                                builder.create().show();
+                            }
+                        });
+                    }
                 }
-            }
-        });
-        builder.setNegativeButton("NO",new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-        builder.create().show();
+            }.start();
+        }
     }
 
     //update button dialog
     public void updateDialog() {
-        AlertDialog.Builder builder=new AlertDialog.Builder(this);
+        String first = firstName.getText().toString().trim();
+        String second = lastName.getText().toString().trim();
+        String primary = primaryPhoneNumber.getText().toString().trim();
+        String secondary = secondaryPhoneNumber.getText().toString().trim();
+        String email = emailAddress.getText().toString().trim();
+        int id = getIntent().getIntExtra("id", -1);
+        if (first.isEmpty() && !second.isEmpty())
+            if (id == -1) {
+                Toast.makeText(EditContact.this, "Contact can not be update", Toast.LENGTH_SHORT).show();
+            }
+        if (first.isEmpty() && second.isEmpty() && primary.isEmpty()
+                && secondary.isEmpty() && email.isEmpty()) {
+            Toast.makeText(EditContact.this, "All Fields Are Empty", Toast.LENGTH_SHORT).show();
+        } else {
+            new Thread() {
+                @Override
+                public void run() {
+                    super.run();
+                    ContactRepository contactRepository = new ContactRepository(getApplication());
+                    Contact duplicateContact = contactRepository.getDuplicateContact(first, second);
+                    Contact originalContact=contactRepository.getContactAt(id);
+                    if (duplicateContact.getId() == id) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                AlertDialog.Builder builder = new AlertDialog.Builder(EditContact.this);
+                                builder.setCancelable(false);
+                                builder.setTitle("Update");
+                                builder.setMessage("Press Confirm to Update");
+                                builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        new PhotoSaveAsyncTask(1, id).execute(first, second, primary, secondary, email, "");
+                                        finish();
+                                    }
+                                });
+                                builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                });
+                                builder.create().show();
+                            }
+                        });
+                    } else {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                AlertDialog.Builder builder = new AlertDialog.Builder(EditContact.this);
+                                builder.setCancelable(false);
+                                builder.setTitle("Duplicate");
+                                builder.setMessage("Contact already exits, Are You want merge?");
+                                builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        new PhotoSaveAsyncTask(1, duplicateContact.getId()).execute(first, second, primary, secondary, email, "");
+                                        contactRepository.delete(originalContact);
+                                        finish();
+                                    }
+                                });
+                                builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        new PhotoSaveAsyncTask(1, id).execute(first, second, primary, secondary, email, "");
+                                        finish();
+                                    }
+                                });
+                                builder.create();
+                                builder.show();
+
+                            }
+                        });
+                    }
+
+                }
+            }.start();
+
+        }
+        /*AlertDialog.Builder builder=new AlertDialog.Builder(this);
         builder.setCancelable(false);
         builder.setTitle("Update");
         builder.setMessage("Press Confirm to Update");
@@ -338,8 +469,6 @@ public class EditContact extends AppCompatActivity {
                     new PhotoSaveAsyncTask(1,id).execute(first,second,primary,secondary,email,"");
                     finish();
                 }
-
-
             }
         });
         builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
@@ -348,11 +477,11 @@ public class EditContact extends AppCompatActivity {
                 dialog.dismiss();
             }
         });
-        builder.create().show();
+        builder.create().show();*/
 
     }
 
-        @Override
+    @Override
     public void onBackPressed() {
         cancelDialog(null);
     }

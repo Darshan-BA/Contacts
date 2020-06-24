@@ -42,4 +42,10 @@ public interface ContactDao {
     @Query("SELECT * FROM  contacts LEFT JOIN friends_list ON contacts.id=friends_list.friends_key WHERE id=friends_key")
     LiveData<List<Contact>>getAllFriendsContacts();
 
+    @Query("SELECT * FROM contacts WHERE first_name=:first AND last_name=:last")
+    Contact getDuplicateContact(String first,String last);
+
+    @Query("SELECT * FROM contacts WHERE id=:id")
+    Contact getContactAt(int id);
+
 }
