@@ -1,6 +1,7 @@
 package com.ba.contacts.Fragments;
 
 import android.content.ContentResolver;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -11,11 +12,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NavigationRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
@@ -38,6 +41,7 @@ public class SimListFragment extends Fragment {
     private ContactAdapter simContactAdapter;
     private Uri simUri=Uri.parse("content://icc/adn");
     private Toolbar toolbar;
+    private TextView emptyText;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -48,6 +52,7 @@ public class SimListFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view=inflater.inflate(R.layout.fragment_sim,container,false);
+        emptyText=view.findViewById(R.id.sim_empty_text);
         toolbar=view.findViewById(R.id.toolbar_sim_fragment);
         toolbar.setTitle("SIM Contacts");
         toolbar.setNavigationIcon(R.drawable.icon_hamburger);
@@ -77,6 +82,17 @@ public class SimListFragment extends Fragment {
         recyclerView.setAdapter(simContactAdapter);
         simContactViewModel = new ViewModelProvider(this).get(ContactViewModel.class);
         simContactAdapter.setContacts(simContactViewModel.getAllSimContacts(getActivity()));
+        simContactAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onChanged() {
+                super.onChanged();
+                if(simContactAdapter.getItemCount()==0){
+                    emptyText.setVisibility(View.VISIBLE);
+                }else
+                    emptyText.setVisibility(View.INVISIBLE);
+            }
+        });
+
         simContactAdapter.setOnItemClickListener(new ContactAdapter.OnItemClickListner() {
             @Override
             public void onCardClick(int position) {
@@ -92,15 +108,7 @@ public class SimListFragment extends Fragment {
                     public boolean onMenuItemClick(MenuItem item) {
                         switch (item.getItemId()){
                             case R.id.sim_delete_menu_item:{
-                                int id=contact.getId();
-                                int deleteStatus=simContactViewModel.deleteSimContact(getActivity(),contact);
-                                if(deleteStatus==0){
-                                    Toast.makeText(getContext(),"Couldn't deleted",Toast.LENGTH_SHORT).show();
-                                }if(deleteStatus>0) {
-                                    simContactAdapter.notifyDataSetChanged();
-                                    simContactAdapter.setContacts(simContactViewModel.getAllSimContacts(getActivity()));
-                                    Toast.makeText(getContext(),"Contact in SIM deleted",Toast.LENGTH_SHORT).show();
-                                }
+                                deleteDialog(contact);
                                 return true;
                             }
                         }
@@ -126,6 +134,34 @@ public class SimListFragment extends Fragment {
             }
         });
         return view;
+    }
+
+    private void deleteDialog(Contact contact) {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getContext());
+        alertDialog.setTitle("Delete");
+        alertDialog.setMessage("Are you sure want to delete");
+        alertDialog.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                int id=contact.getId();
+                int deleteStatus=simContactViewModel.deleteSimContact(getActivity(),contact);
+                if(deleteStatus==0){
+                    Toast.makeText(getContext(),"Couldn't deleted",Toast.LENGTH_SHORT).show();
+                }if(deleteStatus>0) {
+                    simContactAdapter.notifyDataSetChanged();
+                    simContactAdapter.setContacts(simContactViewModel.getAllSimContacts(getActivity()));
+                    Toast.makeText(getContext(),"Contact in SIM deleted",Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        alertDialog.create();
+        alertDialog.show();
     }
 
     @Override

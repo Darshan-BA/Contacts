@@ -23,6 +23,13 @@
         android:layout_height="match_parent"
         app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
         tools:listitem="@layout/cardview_contacts" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="No Contacts In Sim"
+        android:id="@+id/sim_empty_text"
+        android:visibility="gone"/>
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
