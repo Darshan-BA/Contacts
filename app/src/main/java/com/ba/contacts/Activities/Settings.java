@@ -18,29 +18,33 @@ public class Settings extends AppCompatActivity {
     private Toolbar toolbar;
     private SharedPreferences settingPreference;
     private SharedPreferences.OnSharedPreferenceChangeListener settingPreferenceListener;
-    private boolean restartNeed = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //theme
         if (SettingsSharedPref.getInstance().getTheme().equals("0"))
             setTheme(R.style.darkTheme);
         else
             setTheme(R.style.lightTheme);
         setContentView(R.layout.activity_settings);
+
+        // shared preference listener to detect changes
         settingPreference = PreferenceManager.getDefaultSharedPreferences(this);
         settingPreferenceListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
                 if (key.equals("theme")) {
-                    //TaskStackBuilder.create().addNextIntent(new Intent(,MainActivity.class)).startActivities();
                     restart();
                 }
-                if (key.equals("sort"))
-                    restartNeed = true;
+
             }
         };
+
+        //calling setting preference listener
         getSupportFragmentManager().beginTransaction().replace(R.id.settings_container, new SettingFragment()).commit();
+
+        //toolbar
         toolbar = findViewById(R.id.toolbar_settings_activity);
         toolbar.setTitle("Settings");
         toolbar.setNavigationIcon(R.drawable.icon_baseline_arrow);
@@ -50,20 +54,23 @@ public class Settings extends AppCompatActivity {
                 finish();
             }
         });
-    }
+    }//end of onCreate
 
     @Override
     protected void onResume() {
         super.onResume();
+        //registering for sharedPreference for settings changes
         settingPreference.registerOnSharedPreferenceChangeListener(settingPreferenceListener);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        //unregistering for sharedPreference for settings changes
         settingPreference.unregisterOnSharedPreferenceChangeListener(settingPreferenceListener);
     }
 
+    // recreating activities when there is change in theme preference
     public void restart() {
         Intent settingIntent = new Intent(this, Settings.class);
         settingIntent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
@@ -72,13 +79,12 @@ public class Settings extends AppCompatActivity {
         TaskStackBuilder.create(this).addNextIntent(mainIntent).addNextIntent(settingIntent).startActivities();
     }
 
+    //on back press
     @Override
     public void onBackPressed() {
-        if (restartNeed) {
-            setResult(5);
+
             super.onBackPressed();
-        } else {
-            super.onBackPressed();
-        }
-    }
-}
+
+    }//end of back press
+
+}//end of activity

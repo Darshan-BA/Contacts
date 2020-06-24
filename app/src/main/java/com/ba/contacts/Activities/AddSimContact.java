@@ -30,16 +30,20 @@ public class AddSimContact extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //theme
         if (SettingsSharedPref.getInstance().getTheme().equals("0"))
             setTheme(R.style.darkTheme);
         else
             setTheme(R.style.lightTheme);
         setContentView(R.layout.activity_add_sim_contact);
+
+        //toolbar
         toolbar=findViewById(R.id.toolbar_add_sim_activity);
         toolbar.setTitle("Add SIM Contact");
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.icon_baseline_arrow);
+
         save = findViewById(R.id.save_addSimContact);
         cancel = findViewById(R.id.cancel_addSimContact);
         phone = findViewById(R.id.primary_addSimContact_txtlay);
@@ -47,12 +51,15 @@ public class AddSimContact extends AppCompatActivity {
         phone_edit = findViewById(R.id.primary_addSimContact);
         name_edit = findViewById(R.id.name_addSimContact);
         contactViewModel=new ContactViewModel(getApplication());
-    }
+    }//end of on create
 
+    //on back pressed
     @Override
     public void onBackPressed() {
         cancelDialog(null);
     }
+
+    //cancel dialog
     public void cancelDialog(View view){
         AlertDialog.Builder builder = new AlertDialog.Builder(AddSimContact.this);
         builder.setCancelable(false);
@@ -75,7 +82,9 @@ public class AddSimContact extends AppCompatActivity {
         });
         builder.create();
         builder.show();
-    }
+    }//end of cancel dialog
+
+    //save dialog
     public void saveDialog(View view){
         AlertDialog.Builder builder = new AlertDialog.Builder(AddSimContact.this);
         builder.setCancelable(false);
@@ -112,5 +121,5 @@ public class AddSimContact extends AppCompatActivity {
         });
         builder.create();
         builder.show();
-    }
+    }//end of save dialog
 }

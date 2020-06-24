@@ -31,14 +31,17 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactH
     private boolean setMultiDelete=false;
     private OnItemClickListner mListener;
 
+    //multiple se
     public void setSetMultiDelete(boolean setMultiDelete) {
         this.setMultiDelete = setMultiDelete;
     }
 
+    //to get contact at particular adapter position
     public Contact getContactAt(int position) {
         return contacts.get(position);
     }
 
+    //filter for searching the contacts
     @Override
     public Filter getFilter() {
         return new Filter() {
@@ -68,8 +71,9 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactH
                 notifyDataSetChanged();
             }
         };
-    }
+    }//end of filter
 
+    // interface for click operation on recyclerview
     public interface OnItemClickListner {
         void onCardClick(int position);
         void onPopUpClick(Contact contact, View view);
@@ -78,6 +82,8 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactH
         void multiSelect(int adapterPosition,boolean check);
     }
 
+
+    //reference to onclick listener
     public void setOnItemClickListener(OnItemClickListner listener) {
         mListener = listener;
     }
@@ -122,13 +128,10 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactH
         return contacts.size();
     }
 
+
     public void setContacts(List<Contact> contacts) {
         this.contacts = contacts;
         duplicateContacts=contacts;
-        notifyDataSetChanged();
-    }
-    public void setSimContacts(List<Contact> contacts){
-        this.simContacts=contacts;
         notifyDataSetChanged();
     }
 

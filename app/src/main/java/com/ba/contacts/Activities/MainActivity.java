@@ -101,9 +101,6 @@ public class MainActivity extends AppCompatActivity {
         //drawerLayout and navigationView
         drawerLayout = findViewById(R.id.drawerayout);
         navigationView = findViewById(R.id.navigation_view);
-        //ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.openNavigation, R.string.closeNavigation);
-        //drawerLayout.addDrawerListener(actionBarDrawerToggle);
-        //actionBarDrawerToggle.syncState();
         navigationView.setNavigationItemSelectedListener(item -> {
             switch (item.getItemId()) {
                 case R.id.contact_menu_item:
@@ -133,9 +130,6 @@ public class MainActivity extends AppCompatActivity {
                         ec();
                     }
                     break;
-                /*case R.id.sort_menu_item:
-                    sc();
-                    break;*/
                 case R.id.family_menu_item:
                     gc(0);
                     break;
@@ -164,18 +158,6 @@ public class MainActivity extends AppCompatActivity {
         //SharedPrefrence for Contacts Sort
         SharedPreferences sortPrep = getSharedPreferences("SORT", MODE_PRIVATE);
         int sortId = sortPrep.getInt("name", 0);
-
-       /* SharedPreferences sharedPreferences =
-                PreferenceManager.getDefaultSharedPreferences(this);
-        String name = sharedPreferences.getString("sort", "");
-        Log.d("preference",name);
-        sharedPreferences.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener() {
-            @Override
-            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-                Log.d("preference","Preference value was updated to:" + sharedPreferences.getString(key,""));
-            }
-        });*/
-
 
         //ViewModel instance
         contactViewModel = new ViewModelProvider(this).get(ContactViewModel.class);
@@ -585,58 +567,6 @@ public class MainActivity extends AppCompatActivity {
             fragmentTransaction.commit();
         }
     }
-
-    // Option Menu Create
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.toolbar_menu, menu);
-        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        searchView = (SearchView) menu.findItem(R.id.search_toolbar).getActionView();
-        searchView.setIconifiedByDefault(false);
-        searchView.setFocusable(true);
-        searchView.setIconified(false);
-        searchView.requestFocusFromTouch();
-        searchView.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
-            @Override
-            public boolean onClose() {
-                Log.d("searchview", "search view on close listner");
-                return false;
-            }
-        });
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                adapter.getFilter().filter(query);
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                adapter.getFilter().filter(newText);
-                return false;
-            }
-        });
-        return true;
-    }//end of Option Menu Create
-
-
-    public void setFragIndex(int fragIndex) {
-        this.fragIndex = fragIndex;
-        invalidateOptionsMenu();
-    }
-
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        switch (fragIndex) {
-            case 2:
-                menu.findItem(R.id.search_toolbar).setVisible(false);
-
-        }
-        return super.onPrepareOptionsMenu(menu);
-    }
-
 
     // Action CallBack for Multiple Delete
     private ActionMode.Callback actionModeCallback = new ActionMode.Callback() {

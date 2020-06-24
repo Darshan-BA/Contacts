@@ -51,21 +51,20 @@ public class EditContact extends AppCompatActivity {
     private TextInputLayout firstNameLay, lastNameLay, emailAddressLay, primaryPhoneNumberLay, secondaryPhoneNumberLay, spinnerLay;
     private TextInputEditText firstName, lastName, emailAddress, primaryPhoneNumber, secondaryPhoneNumber;
     private ImageView photo;
-    private Uri pUri;
-    private String photoPath;
     private Bitmap photoBitmap;
     private AutoCompleteTextView groupAutoCompleteTextView, saveOptionAutoCompleteText;
     private int saveUpdate;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //theme
         if (SettingsSharedPref.getInstance().getTheme().equals("1"))
             setTheme(R.style.lightTheme);
         else
             setTheme(R.style.darkTheme);
         setContentView(R.layout.activity_edit_contact);
+
         //View widgets initialization
         firstNameLay = findViewById(R.id.firstname_edit_layout);
         lastNameLay = findViewById(R.id.lastname_edit_layout);
@@ -88,7 +87,7 @@ public class EditContact extends AppCompatActivity {
             }
         });
 
-        //spinner
+        //autocomplete text view for group
         String[] groupNames = {"Family", "Friends"};
         ArrayAdapter<String> groupDropDownArrayAdapter = new ArrayAdapter<String>(this, R.layout.spinner_list_item, groupNames);
         groupAutoCompleteTextView = findViewById(R.id.dropdown_edit);
@@ -112,16 +111,11 @@ public class EditContact extends AppCompatActivity {
             primaryPhoneNumber.setText(intent.getStringExtra("primary"));
             secondaryPhoneNumber.setText(intent.getStringExtra("secondary"));
             emailAddress.setText(intent.getStringExtra("email"));
-            //Uri pathuri=Uri.parse(intent.getStringExtra("photoPath"));
-            //new PhotoLoaderAsyncTask(this.getContentResolver()).execute(pathuri);
             if (Objects.equals(intent.getStringExtra("photoPath"), "")) {
                 photo.setImageResource(R.drawable.add_photo);
             } else {
                 photo.setImageBitmap(BitmapFactory.decodeFile(intent.getStringExtra("photoPath")));
             }
-            //saveButton.setVisibility(View.GONE);
-            //editButton.getVisibility();
-            //editButton.setVisibility(View.VISIBLE);
             spinnerLay.setVisibility(View.GONE);
             saveUpdate = 1;
 
@@ -133,6 +127,7 @@ public class EditContact extends AppCompatActivity {
 
     }//end of on create
 
+    //onActivity result
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -140,14 +135,16 @@ public class EditContact extends AppCompatActivity {
             Uri uri = data.getData();
             new PhotoLoaderAsyncTask(this.getContentResolver()).execute(uri);
         }
-    }
+    }//end of on activity result
 
+    // option menu
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.editcontact_toolbar_ment, menu);
         return true;
-    }
+    }//end of option menu creation
 
+    // option menu item selected
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
@@ -162,8 +159,10 @@ public class EditContact extends AppCompatActivity {
                 return true;
         }
         return false;
-    }
+    }//end of option menu item selected
 
+
+    // Async task for adding and updating contacts with photo
     private class PhotoSaveAsyncTask extends AsyncTask<String, Void, String> {
         int which;
         int id;
@@ -223,8 +222,10 @@ public class EditContact extends AppCompatActivity {
             }
             return "Contact not Saved";
         }
-    }
+    }//end of async task for adding and updating contacts with photo
 
+
+    // Async task for loading photo to image view
     private class PhotoLoaderAsyncTask extends AsyncTask<Uri, Void, Bitmap> {
 
         ContentResolver contentResolver;
@@ -251,7 +252,7 @@ public class EditContact extends AppCompatActivity {
             }
             return bitmap;
         }
-    }
+    }//end of async task for loading photo to image view
 
     //Dialog when clicked on cancel button
     public void cancelDialog(View view) {
@@ -272,12 +273,10 @@ public class EditContact extends AppCompatActivity {
             }
         });
         builder.create().show();
-    }
+    }//end of cancel dialog
 
-    public void checkDuplicate() {
-    }
 
-    //save button dialog
+    //Dialog when clicled on save
     public void saveDialog() {
         String first = firstName.getText().toString().trim();
         String second = lastName.getText().toString().trim();
@@ -359,7 +358,7 @@ public class EditContact extends AppCompatActivity {
                 }
             }.start();
         }
-    }
+    }//end of save dialog
 
     //update button dialog
     public void updateDialog() {
@@ -433,57 +432,19 @@ public class EditContact extends AppCompatActivity {
                                 });
                                 builder.create();
                                 builder.show();
-
                             }
                         });
                     }
-
                 }
             }.start();
-
-        }
-        /*AlertDialog.Builder builder=new AlertDialog.Builder(this);
-        builder.setCancelable(false);
-        builder.setTitle("Update");
-        builder.setMessage("Press Confirm to Update");
-        builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String first=firstName.getText().toString().trim();
-                String second=lastName.getText().toString().trim();
-                String primary=primaryPhoneNumber.getText().toString().trim();
-                String secondary=secondaryPhoneNumber.getText().toString().trim();
-                String email=emailAddress.getText().toString().trim();
-                int id=getIntent().getIntExtra("id",-1);
-                if(first.isEmpty() && !second.isEmpty())
-                if(id == -1){
-                    Toast.makeText(EditContact.this,"Contact can not be update",Toast.LENGTH_SHORT).show();
-                }
-                if(first.isEmpty() && second.isEmpty() && primary.isEmpty()
-                        && secondary.isEmpty() && email.isEmpty()){
-                    Toast.makeText(EditContact.this,"All Fields Are Empty",Toast.LENGTH_SHORT).show();
-                }else{
-                    //contact=new Contact(first,second,primary,secondary,email,"");
-                    //contact.setId(id);
-                    //contactViewModel.update(contact);
-                    new PhotoSaveAsyncTask(1,id).execute(first,second,primary,secondary,email,"");
-                    finish();
-                }
-            }
-        });
-        builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-        builder.create().show();*/
-
+        }//end of update dialog
     }
 
+    // Back button press
     @Override
     public void onBackPressed() {
         cancelDialog(null);
-    }
-}
+    }//end of back button press
+
+}//end of activity
 

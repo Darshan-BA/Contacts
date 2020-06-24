@@ -30,17 +30,24 @@ public class ContactSelectActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // theme
         if (SettingsSharedPref.getInstance().getTheme().equals("1"))
             setTheme(R.style.lightTheme);
         else
             setTheme(R.style.darkTheme);
         setContentView(R.layout.activity_contact_select);
+        // getting intent data
         groupName = getIntent().getStringExtra("group_name");
+
+        //toolbar
         toolbar=findViewById(R.id.toolbar_contact_activity);
         toolbar.setTitle("Choose Contact");
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.icon_close);
+
+        // group adapter
         groupAdapter=new GroupAdapter();
         final RecyclerView recyclerView =findViewById(R.id.recyclerview_contactselect);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -52,6 +59,8 @@ public class ContactSelectActivity extends AppCompatActivity {
                 groupAdapter.setContacts(contacts);
             }
         });
+
+        // recycler view touch listener
         recyclerView.addOnItemTouchListener(new GroupAdapterTouchListner(this, recyclerView, new GroupAdapterTouchListner.ClickListner() {
             @Override
             public void onClick(View view, int position) {
@@ -63,11 +72,8 @@ public class ContactSelectActivity extends AppCompatActivity {
 
             @Override
             public void onLongClick(View view, int position) {
-                //groupAdapter.setSetMultiselect(true);
-                //groupAdapter.notifyDataSetChanged();
-                //toolbar.startActionMode(callback);
+
             }
         }));
-
-    }
-}
+    }//end of on create
+}//end of activity
