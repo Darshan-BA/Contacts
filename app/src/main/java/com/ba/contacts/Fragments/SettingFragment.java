@@ -11,7 +11,7 @@ public class SettingFragment extends PreferenceFragmentCompat {
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         Context context = getPreferenceManager().getContext();
         PreferenceScreen screen = getPreferenceManager().createPreferenceScreen(context);
-        // theme
+        // theme preference
         ListPreference themePreference=new ListPreference(context);
         themePreference.setKey(themeKey);
         CharSequence[] themeEntries=new CharSequence[]{"Dark Mode","Light Mode"};
@@ -26,6 +26,7 @@ public class SettingFragment extends PreferenceFragmentCompat {
         themePreference.setNegativeButtonText("Cancel");
         screen.addPreference(themePreference);
 
+        //sort preference
         ListPreference sortPreference =new ListPreference(context);
         sortPreference.setKey("sort");
         CharSequence[] entries=new CharSequence[]{"First Name","Last Name"};

@@ -1,14 +1,14 @@
 package com.ba.contacts;
 
-import android.app.Application;
+
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import androidx.preference.PreferenceManager;
 
 import com.ba.contacts.Fragments.SettingFragment;
 
+//singleton class for getting reference to setting shared preference
 public class SettingsSharedPref {
 
     private static SettingsSharedPref settingsSingleton;

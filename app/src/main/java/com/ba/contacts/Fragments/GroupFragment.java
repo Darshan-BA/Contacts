@@ -50,9 +50,8 @@ public class GroupFragment extends Fragment {
         Log.d("frag","onCreateView created ");
         String groupName=getArguments().getString("group_name");
         textView=view.findViewById(R.id.empty_text);
-        //Toolbar toolbar=(Toolbar)getActivity().findViewById(R.id.toolbar);
+        //toolbar
         Toolbar toolbar=view.findViewById(R.id.toolbar_group_fragment);
-        //toolbar.inflateMenu(R.menu.menu_actionmodecallback);
         toolbar.setNavigationIcon(R.drawable.icon_hamburger);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -61,11 +60,15 @@ public class GroupFragment extends Fragment {
                 drawerLayout.openDrawer(GravityCompat.START);
             }
         });
+
+        //adapter
         groupContactAdapter=new ContactAdapter();
         toolbar.setTitle(groupName);
         final RecyclerView recyclerView = view.findViewById(R.id.group_recyclerview);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(groupContactAdapter);
+
+        //contact view model
         contactViewModel1 = new ViewModelProvider(this).get(ContactViewModel.class);
         if(groupName.equals("Friends")){
             contactViewModel1.getAllFriendsContacts().observe(getActivity(), new Observer<List<Contact>>() {
@@ -96,24 +99,18 @@ public class GroupFragment extends Fragment {
             });
         }
 
+        //floating button
         FloatingActionButton floatingActionButton = view.findViewById(R.id.group_add_float);
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               /* FragmentManager fm=getFragmentManager();
-                FragmentTransaction transaction=fm.beginTransaction();
-                ContactListShowFragment contactListShowFramgment=new ContactListShowFragment();
-                Bundle bundle=new Bundle();
-                bundle.putString("group_name",groupName);
-                contactListShowFramgment.setArguments(bundle);
-                transaction.add(R.id.framelayout,contactListShowFramgment);
-                transaction.addToBackStack(null);
-                transaction.commit();*/
                Intent intent=new Intent(getActivity(),ContactSelectActivity.class);
                intent.putExtra("group_name",groupName);
                startActivity(intent);
         }
         });
+
+        //onclick listener for group adapter
         groupContactAdapter.setOnItemClickListener(new ContactAdapter.OnItemClickListner() {
             @Override
             public void onCardClick(int position) {

@@ -50,7 +50,6 @@ public class MainFragment extends Fragment {
     private ArrayList<Contact> deleteContactList = new ArrayList<>();
     private SearchView searchView;
     private Toolbar toolbar;
-    private String phoneNumberHolder;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -83,11 +82,11 @@ public class MainFragment extends Fragment {
                 drawerLayout.openDrawer(GravityCompat.START);
             }
         });
+        //toolbar menu item click listener
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 if(item.getItemId()==R.id.search_toolbar){
-                    //getActivity().onSearchRequested();
                     MenuItem menuItem=item;
                     SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
                     searchView = (SearchView) menuItem.getActionView();
@@ -114,8 +113,6 @@ public class MainFragment extends Fragment {
                         @Override
                         public boolean onClose() {
                             searchView.setIconified(true);
-                            //InputMethodManager inputMethodManager=(InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-                            //inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(),0);
                             return false;
                         }
                     });
@@ -123,16 +120,14 @@ public class MainFragment extends Fragment {
                 return false;
             }
         });
-        SharedPreferences sortPrep = getActivity().getSharedPreferences("SORT", MODE_PRIVATE);
-        int sortId = sortPrep.getInt("name", 0);
-        //int sortId=sharedPrefUtil.getSort();
-        //adapter = new ContactAdapter();
+        //getting contacts from adapter in main activity
         adapter=((MainActivity)getActivity()).adapter;
         floatingActionButton = view.findViewById(R.id.add_float);
         final RecyclerView recyclerView = view.findViewById(R.id.recyclerview);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setHasFixedSize(true);
         recyclerView.setAdapter(adapter);
+        //contact view model
         contactViewModel = new ViewModelProvider(this).get(ContactViewModel.class);
         if (SettingsSharedPref.getInstance().getSort().equals("1")) {
             contactViewModel.getAllContactsByLastName().observe(getActivity(), new Observer<List<Contact>>() {
@@ -157,7 +152,8 @@ public class MainFragment extends Fragment {
                 startActivity(intent);
             }
         });
-        // OnClick listner for deleting and editing
+
+        // OnClick listener for deleting and editing
         adapter.setOnItemClickListener(new ContactAdapter.OnItemClickListner() {
             @Override
             public void onPopUpClick(final Contact contact, View view) {
@@ -297,7 +293,6 @@ public class MainFragment extends Fragment {
                             startActivity(emailIntent);
 
                         } else {
-                            phoneNumberHolder = dialogList[which];
                             if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
                                 ((MainActivity) getActivity()).permissionNotGrandted(Manifest.permission.CALL_PHONE);
                             } else {
@@ -315,6 +310,7 @@ public class MainFragment extends Fragment {
         return view;
     }
 
+    //contextual action mode
     private ActionMode.Callback actionModeCallback = new ActionMode.Callback() {
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {

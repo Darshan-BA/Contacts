@@ -18,7 +18,6 @@ public class ContactViewModel extends AndroidViewModel {
     private ContactRepository repository;
     private LiveData<List<Contact>>allContacts;
     private LiveData<List<Contact>>allContactsByLastName;
-
     private LiveData<List<Contact>> allFamilyContacts;
     private LiveData<List<Contact>> allFriendsContacts;
 

@@ -53,13 +53,14 @@ public class SimListFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view=inflater.inflate(R.layout.fragment_sim,container,false);
         emptyText=view.findViewById(R.id.sim_empty_text);
+
+        //toolbar
         toolbar=view.findViewById(R.id.toolbar_sim_fragment);
         toolbar.setTitle("SIM Contacts");
         toolbar.setNavigationIcon(R.drawable.icon_hamburger);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d("toolba","toolbar clicked");
                 DrawerLayout drawerLayout = ((MainActivity)getActivity()).findViewById(R.id.drawerayout);
                 drawerLayout.openDrawer(GravityCompat.START);
             }
@@ -75,6 +76,7 @@ public class SimListFragment extends Fragment {
                 return true;
             }
         });
+
         ContentResolver contentResolver = getActivity().getContentResolver();
         RecyclerView recyclerView=view.findViewById(R.id.sim_recyclerview);
         simContactAdapter=new ContactAdapter();
@@ -93,6 +95,7 @@ public class SimListFragment extends Fragment {
             }
         });
 
+        // adapter on onclick listener
         simContactAdapter.setOnItemClickListener(new ContactAdapter.OnItemClickListner() {
             @Override
             public void onCardClick(int position) {
@@ -136,6 +139,7 @@ public class SimListFragment extends Fragment {
         return view;
     }
 
+    //dialog confirmation for deleting contact in sim card
     private void deleteDialog(Contact contact) {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(getContext());
         alertDialog.setTitle("Delete");
