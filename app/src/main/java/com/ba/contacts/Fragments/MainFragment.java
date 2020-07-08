@@ -59,6 +59,9 @@ public class MainFragment extends Fragment {
     private BottomSheetBehavior bottomSheetBehavior;
     private TextView primaryPhoneNumber,secondaryPhoneNumber,emailAddress;
     private ImageView photoView;
+    private Toolbar toolbarCollapsingLayout;
+
+    private Contact contact;
 
 
     @Override
@@ -86,6 +89,9 @@ public class MainFragment extends Fragment {
         emailAddress=view.findViewById(R.id.email_address);
         photoView=view.findViewById(R.id.expandedImage);
 
+        toolbarCollapsingLayout=view.findViewById(R.id.toolbar_collapsing_layout);
+        toolbarCollapsingLayout.inflateMenu(R.menu.contact_card_menu);
+        toolbarCollapsingLayout.setOnMenuItemClickListener(toolbarCollapsingLayoutMenuClickListener);
         //toolbar
         toolbar=view.findViewById(R.id.toolbar_main_fragment);
         toolbar.setTitle(R.string.app_name);
@@ -174,7 +180,7 @@ public class MainFragment extends Fragment {
         adapter.setOnItemClickListener(new ContactAdapter.OnItemClickListner() {
             @Override
             public void onPopUpClick(final Contact contact, View view) {
-                PopupMenu popupMenu = new PopupMenu(getContext(), view);
+                /*PopupMenu popupMenu = new PopupMenu(getContext(), view);
                 popupMenu.getMenuInflater().inflate(R.menu.contact_card_menu, popupMenu.getMenu());
                 popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
@@ -222,14 +228,12 @@ public class MainFragment extends Fragment {
                         }
                     }
                 });
-                popupMenu.show();
+                popupMenu.show();*/
             }
 
             @Override
             public void onIconClick(int position, View view) {
                 //need to implement adding profile photo
-                //getFragmentManager().beginTransaction().replace(R.id.framelayout, new CollapsingFragment()).commit();
-
             }
 
             @Override
@@ -252,79 +256,14 @@ public class MainFragment extends Fragment {
 
             @Override
             public void onCardClick(int position) {
-                //final String[] dialogList;
                 bottomSheetBehavior=BottomSheetBehavior.from(bottomsheet);
                 bottomSheetBehavior.setBottomSheetCallback(bottomSheetCallback);
                 CollapsingToolbarLayout collapsingToolbarLayout=view.findViewById(R.id.collapsing_layout);
                 Contact cardContact = adapter.getContactAt(position);
+                contact=adapter.getContactAt(position);
                 String first = cardContact.getPrimaryPhoneNumber();
                 String second = cardContact.getSecondaryPhoneNumber();
                 String email = cardContact.getEmailId();
-                Log.d("number", first);
-                Log.d("number", second);
-                Log.d("number", email);
-                /*if (first.isEmpty() && second.isEmpty() && email.isEmpty()) {
-                    dialogList = new String[0];
-                    Toast.makeText(getContext(), "No Phone Numbers to Call", Toast.LENGTH_SHORT).show();
-                } else if (second.isEmpty() && email.isEmpty()) {
-                    dialogList = new String[1];
-                    dialogList[0] = cardContact.getPrimaryPhoneNumber();
-                } else if (first.isEmpty() && email.isEmpty()) {
-                    dialogList = new String[1];
-                    dialogList[0] = cardContact.getSecondaryPhoneNumber();
-                } else if (first.isEmpty() && second.isEmpty()) {
-                    dialogList = new String[1];
-                    dialogList[0] = cardContact.getEmailId();
-                } else if (email.isEmpty()) {
-                    dialogList = new String[2];
-                    dialogList[0] = cardContact.getPrimaryPhoneNumber();
-                    dialogList[1] = cardContact.getSecondaryPhoneNumber();
-                } else if (second.isEmpty()) {
-                    dialogList = new String[2];
-                    dialogList[0] = cardContact.getPrimaryPhoneNumber();
-                    dialogList[1] = cardContact.getEmailId();
-                } else if (first.isEmpty()) {
-                    dialogList = new String[2];
-                    dialogList[0] = cardContact.getSecondaryPhoneNumber();
-                    dialogList[1] = cardContact.getEmailId();
-                }else {
-                    dialogList = new String[3];
-                    dialogList[0] = cardContact.getPrimaryPhoneNumber();
-                    dialogList[1] = cardContact.getSecondaryPhoneNumber();
-                    dialogList[2] = cardContact.getEmailId();
-                }
-
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setItems(dialogList, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        String var = dialogList[which];
-                        boolean isVarEmail = false;
-                        for (int i = 0; i < var.length(); i++) {
-                            char temp = var.charAt(i);
-                            Log.d("ba", String.valueOf(temp));
-                            if (temp == '@') {
-                                isVarEmail = true;
-                                break;
-                            }
-                        }
-                        if (isVarEmail) {
-                            emailIntent.setData(Uri.parse("mailto:" + dialogList[which]));
-                            startActivity(emailIntent);
-
-                        } else {
-                            if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-                                ((MainActivity) getActivity()).permissionNotGrandted(Manifest.permission.CALL_PHONE);
-                            } else {
-                                phoneIntent.setData(Uri.parse("tel:" + dialogList[which]));
-                                startActivity(phoneIntent);
-                            }
-                        }
-                    }
-                });
-                //builder.create();
-                //builder.show(); */
                 final Intent phoneIntent = new Intent((Intent.ACTION_CALL));
                 final Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
                 collapsingToolbarLayout.setTitle(cardContact.getFirstName()+" "+cardContact.getLastName());
@@ -382,7 +321,6 @@ public class MainFragment extends Fragment {
                 }
                 break;
                 case BottomSheetBehavior.STATE_COLLAPSED: {
-                    bottomSheetBehavior.setExpandedOffset(400);
                     Log.d("bottomsheet","collapsed");
                 }
                 break;
@@ -400,6 +338,54 @@ public class MainFragment extends Fragment {
 
         }
 
+    };
+
+    private Toolbar.OnMenuItemClickListener toolbarCollapsingLayoutMenuClickListener=new Toolbar.OnMenuItemClickListener() {
+        @Override
+        public boolean onMenuItemClick(MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.edit:
+                    Intent intent = new Intent(getActivity(), EditContact.class);
+                    intent.putExtra("id", contact.getId());
+                    intent.putExtra("first", contact.getFirstName());
+                    intent.putExtra("last", contact.getLastName());
+                    intent.putExtra("primary", contact.getPrimaryPhoneNumber());
+                    intent.putExtra("secondary", contact.getSecondaryPhoneNumber());
+                    intent.putExtra("email", contact.getEmailId());
+                    intent.putExtra("photoPath", contact.getPhotoPath());
+                    startActivity(intent);
+                    return true;
+                case R.id.delete:
+                    final AlertDialog.Builder alertDialog = new AlertDialog.Builder(getContext());
+                    alertDialog.setTitle("Delete");
+                    alertDialog.setMessage("Are you sure want to delete");
+                    alertDialog.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            contactViewModel.delete(contact);
+                            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                        }
+                    });
+                    alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                    alertDialog.create();
+                    alertDialog.show();
+                    return true;
+                case R.id.share:
+                    Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                    shareIntent.putExtra(Intent.EXTRA_TEXT, "Name: " + contact.getFirstName() + "\b" + contact.getLastName() + "\n" + "Primary Number: "
+                            + contact.getPrimaryPhoneNumber() + "\n" + "Secondary Number: " + contact.getSecondaryPhoneNumber() + "\n" + "EmailId :" + contact.getEmailId());
+                    shareIntent.setType("text/plain");
+                    startActivity(Intent.createChooser(shareIntent, "Sharing Contact"));
+                    return true;
+                default:
+                    return false;
+            }
+        }
     };
 
 
