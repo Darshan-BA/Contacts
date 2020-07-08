@@ -545,12 +545,14 @@ public class MainActivity extends AppCompatActivity {
         fragment = new GroupFragment();
         Bundle bundle = new Bundle();
         if (which == 0) {
+            fragmentTransaction.setCustomAnimations(R.anim.enter_from_left,R.anim.exit_to_right,R.anim.enter_from_right,R.anim.exit_to_right);
             fragmentTransaction.replace(R.id.framelayout, fragment);
             bundle.putString("group_name", "Family");
             fragment.setArguments(bundle);
             fragmentTransaction.commit();
         }
         if (which == 1) {
+            fragmentTransaction.setCustomAnimations(R.anim.enter_from_right,R.anim.exit_to_left,R.anim.enter_from_left,R.anim.exit_to_left);
             fragmentTransaction.replace(R.id.framelayout, fragment);
             bundle.putString("group_name", "Friends");
             fragment.setArguments(bundle);
