@@ -39,6 +39,14 @@
         app:borderWidth="2dp"
         app:fabSize="normal"
         app:rippleColor="?attr/colorSecondaryVariant" />
-
-    <include layout="@layout/collapsing_layout" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:behavior_peekHeight="0dp"
+        app:behavior_hideable="true"
+        android:id="@+id/bootomsheet"
+        app:layout_behavior="@string/bottom_sheet_behavior"
+        android:background="?attr/background">
+        <include layout="@layout/collapsing_layout" />
+    </RelativeLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

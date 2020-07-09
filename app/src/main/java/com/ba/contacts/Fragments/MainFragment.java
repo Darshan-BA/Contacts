@@ -25,6 +25,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
+import androidx.collection.ArrayMap;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
@@ -46,6 +47,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 
 public class MainFragment extends Fragment {
@@ -256,6 +258,7 @@ public class MainFragment extends Fragment {
 
             @Override
             public void onCardClick(int position) {
+                floatingActionButton.hide();
                 bottomSheetBehavior=BottomSheetBehavior.from(bottomsheet);
                 bottomSheetBehavior.setBottomSheetCallback(bottomSheetCallback);
                 CollapsingToolbarLayout collapsingToolbarLayout=view.findViewById(R.id.collapsing_layout);
@@ -272,7 +275,11 @@ public class MainFragment extends Fragment {
                 primaryPhoneNumber.setText(first);
                 secondaryPhoneNumber.setText(second);
                 emailAddress.setText(email);
-                photoView.setImageBitmap(BitmapFactory.decodeFile(cardContact.getPhotoPath()));
+                if (!cardContact.getPhotoPath().equals("")) {
+                    photoView.setImageBitmap(BitmapFactory.decodeFile(cardContact.getPhotoPath()));
+                } else {
+                    photoView.setImageResource(R.drawable.blueheaddp);
+                }
                 primaryPhoneNumber.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -321,6 +328,7 @@ public class MainFragment extends Fragment {
                 }
                 break;
                 case BottomSheetBehavior.STATE_COLLAPSED: {
+                    floatingActionButton.show();
                     Log.d("bottomsheet","collapsed");
                 }
                 break;
