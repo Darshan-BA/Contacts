@@ -24,9 +24,9 @@ public class Settings extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         //theme
         if (SettingsSharedPref.getInstance().getTheme().equals("0"))
-            setTheme(R.style.darkTheme);
-        else
             setTheme(R.style.lightTheme);
+        else
+            setTheme(R.style.darkTheme);
         setContentView(R.layout.activity_settings);
 
         // shared preference listener to detect changes

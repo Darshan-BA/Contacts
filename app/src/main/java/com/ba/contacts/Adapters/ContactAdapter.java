@@ -104,6 +104,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactH
         holder.email.setText(currentContact.getEmailId());
         holder.primary.setText(currentContact.getPrimaryPhoneNumber());
         holder.secondary.setText(currentContact.getSecondaryPhoneNumber());
+        //holder.popUpOption.setVisibility(View.GONE);
         if(currentContact.getPhotoPath()!=null) {
             //Glide.with(mainActivity).load(new File(currentContact.getPhotoPath())).into(holder.icon);
             if (currentContact.getPhotoPath().equals("")) {

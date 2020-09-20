@@ -182,7 +182,7 @@ public class MainFragment extends Fragment {
         adapter.setOnItemClickListener(new ContactAdapter.OnItemClickListner() {
             @Override
             public void onPopUpClick(final Contact contact, View view) {
-                /*PopupMenu popupMenu = new PopupMenu(getContext(), view);
+                PopupMenu popupMenu = new PopupMenu(getContext(), view);
                 popupMenu.getMenuInflater().inflate(R.menu.contact_card_menu, popupMenu.getMenu());
                 popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
@@ -230,7 +230,7 @@ public class MainFragment extends Fragment {
                         }
                     }
                 });
-                popupMenu.show();*/
+                popupMenu.show();
             }
 
             @Override
@@ -362,6 +362,7 @@ public class MainFragment extends Fragment {
                     intent.putExtra("email", contact.getEmailId());
                     intent.putExtra("photoPath", contact.getPhotoPath());
                     startActivity(intent);
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                     return true;
                 case R.id.delete:
                     final AlertDialog.Builder alertDialog = new AlertDialog.Builder(getContext());
@@ -389,6 +390,7 @@ public class MainFragment extends Fragment {
                             + contact.getPrimaryPhoneNumber() + "\n" + "Secondary Number: " + contact.getSecondaryPhoneNumber() + "\n" + "EmailId :" + contact.getEmailId());
                     shareIntent.setType("text/plain");
                     startActivity(Intent.createChooser(shareIntent, "Sharing Contact"));
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                     return true;
                 default:
                     return false;

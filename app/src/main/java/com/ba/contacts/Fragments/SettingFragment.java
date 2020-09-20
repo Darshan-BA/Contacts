@@ -14,7 +14,7 @@ public class SettingFragment extends PreferenceFragmentCompat {
         // theme preference
         ListPreference themePreference=new ListPreference(context);
         themePreference.setKey(themeKey);
-        CharSequence[] themeEntries=new CharSequence[]{"Dark Mode","Light Mode"};
+        CharSequence[] themeEntries=new CharSequence[]{"Light Mode","Dark Mode"};
         CharSequence[] themeEntryValues=new CharSequence[]{"0","1"};
         themePreference.setEntries(themeEntries);
         themePreference.setEntryValues(themeEntryValues);

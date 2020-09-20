@@ -59,7 +59,7 @@ public class EditContact extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //theme
-        if (SettingsSharedPref.getInstance().getTheme().equals("1"))
+        if (SettingsSharedPref.getInstance().getTheme().equals("0"))
             setTheme(R.style.lightTheme);
         else
             setTheme(R.style.darkTheme);

@@ -102,6 +102,7 @@ public class SimListFragment extends Fragment {
 
             }
 
+
             @Override
             public void onPopUpClick(Contact contact, View view) {
                 PopupMenu popupMenu=new PopupMenu(getContext(),view);
